@@ -1,4 +1,5 @@
 using System;
+using Boo.Lang;
 using Unibas.DBIS.DynamicModelling.Models;
 using UnityEngine;
 
@@ -276,6 +277,61 @@ namespace Unibas.DBIS.DynamicModelling
             return root;
         }
         
+     
+        public static GameObject CreatePolygonalRoom(PolygonRoomModel model)
+        {
+            GameObject root = new GameObject("PolygonalRoom");
+            
+            var walls = model.GetWalls();
+            List<GameObject> goWall = new List<GameObject>();
+            for (int i = 1; i < model.GetWalls().Length; i++) {
+                String wallName = "Wall" + i;
+                goWall.Add(CreateWall(walls[i]));
+                goWall[i].name = wallName;
+            }
+            
+            // Floor
+            GameObject floorAnchor = new GameObject("FloorAnchor");
+            floorAnchor.transform.parent = root.transform;
+
+
+            var floorsize = Vector3.Distance(model.GetWallAt(0).Start, model.Position);
+            GameObject floor = CreatePolygonalWall(model.GetWalls().Rank,floorsize, model.FloorMaterial);
+            floor.name = "Floor";
+            floor.transform.parent = floorAnchor.transform;
+            // North Aligned
+            //
+            //Not sure if 0 0 0 is right!!!!!! done with -halfsize for x and z in cuboid
+            // pretty sure its wrong since wall coordinates are still all positive since not my logic
+            //
+            floorAnchor.transform.position = new Vector3(0, 0, 0);
+            floorAnchor.transform.Rotate(Vector3.right, 90);
+            // East Aligned
+            //floorAnchor.transform.position = new Vector3(-halfSize, 0, halfSize);
+            //floorAnchor.transform.Rotate(Vector3f.back,90);
+
+            // Ceiling
+            GameObject ceilingAnchor = new GameObject("CeilingAnchor");
+            ceilingAnchor.transform.parent = root.transform;
+
+            GameObject ceiling = CreatePolygonalWall(model.GetWalls().Length, floorsize, model.CeilingMaterial);
+            ceiling.name = "Ceiling";
+            ceiling.transform.parent = ceilingAnchor.transform;
+
+            
+            // North Aligned
+            ceilingAnchor.transform.position = new Vector3(0, model.GetWallAt(0).Height, 0);
+            ceilingAnchor.transform.Rotate(Vector3.right, -90);
+            // East Aligned
+            //ceilingAnchor.transform.position = new Vector3(halfSize, height, -halfSize);
+            //ceilingAnchor.transform.Rotate( Vector3.back, -90);
+
+            root.transform.position = model.Position;
+            
+            root.AddComponent<ModelContainer>().Model = model;
+            return root;
+        }
+        
         
 
 
@@ -307,6 +363,72 @@ namespace Unibas.DBIS.DynamicModelling
             }
 
             return null;
+        }
+
+        public static GameObject CreatePolygonalWall(int corners, float sizeRadius ,Material mat)
+        {
+            GameObject go =new GameObject("PolygonalWall");
+            MeshFilter meshFilter = go.AddComponent<MeshFilter>();
+            MeshRenderer meshRenderer = go.AddComponent<MeshRenderer>();
+            Mesh mesh = meshFilter.mesh;
+
+            // Math for polygon
+            Vector3[] vertices = new Vector3[corners];
+            for (int i = 1; i <= corners; i++) {
+                vertices[i - 1] = new Vector3((float) (sizeRadius * Math.Sin((2 * Math.PI / corners) * i)),
+                    (float) (sizeRadius * Math.Cos((2 * Math.PI / corners) * i)), 0);
+            }
+            
+            mesh.vertices = vertices;
+
+            // There are n-2 Trinagles in a polygon, every Trinagle defined by 3 vertices
+            int numberOfTrinagles = corners - 2;
+            int numberOfTrinaglePoints = (corners - 2) * 3;
+            int[] tri = new int[numberOfTrinaglePoints];
+            
+            for (int i = 0; i < numberOfTrinagles; i++) {
+                int mult = i * 3;
+                tri[mult] = 0;
+                tri[mult + 1] = i + 1;
+                tri[mult + 2] = i + 2;
+            }
+            
+            
+            mesh.triangles = tri;
+            
+            Vector3[] normals = new Vector3[corners];
+            for (int i = 0; i < corners; i++) {
+                normals[i] = -Vector3.forward;
+
+            }
+
+            mesh.normals = normals;
+            
+            Vector2[] uv=new Vector2[corners];
+            for (int i = 0; i < corners; i++) {
+                uv[i] = new Vector2(vertices[i].x, vertices[i].y);
+            }
+            
+            mesh.uv = uv;
+            
+            
+            mesh.RecalculateBounds();
+            mesh.RecalculateNormals();
+            mesh.RecalculateTangents();
+
+            if (mat != null)
+            {
+                meshRenderer.material.CopyPropertiesFromMaterial(mat);
+                //meshRenderer.material.SetTextureScale("_MainTex", new Vector2(1,1));
+                meshRenderer.material.name = mat.name;
+            }
+            else
+            {
+                meshRenderer.material = new Material(Shader.Find("Standard"));
+                meshRenderer.material.color = Color.white;
+            }
+
+            return go;
         }
 
         public static GameObject CreateWall(float width, float height, Material mat = null)
