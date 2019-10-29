@@ -294,13 +294,25 @@ namespace Unibas.DBIS.DynamicModelling
             }
             // Position walls
 
+            
+            //var n = model.numberOfWalls;
+            //var x = 1f / n;
+            //double alpha = ((x* 360f) *0.5f);
+            
             for (int i = 0; i < model.numberOfWalls; i++) {
                 goWall[i].name = i.ToString();
                 goWall[i].transform.parent = root.transform;
                 goWall[i].transform.position=new Vector3((float) (rad * Math.Sin((2 * Math.PI / model.numberOfWalls) * i)),0,
                     (float) (rad * Math.Cos((2 * Math.PI / model.numberOfWalls) * i)));
-                goWall[i].transform.Rotate(Vector3.up,(((model.numberOfWalls-2)*180/model.numberOfWalls)*i)+((model.numberOfWalls-2)*180/model.numberOfWalls)/2);
+                //+(1/n*360)*i;
+                
+              //  Debug.Log(x);
+               // Debug.Log(n);
+               // Debug.Log("Winkel!!!  "+ alpha);
+                goWall[i].transform.Rotate(Vector3.up,(((1f/model.numberOfWalls)*360f*i) + ((1f/model.numberOfWalls)*360f)/2f));
+                //aussen winkel (((model.numberOfWalls-2)*180/model.numberOfWalls)*i)+((model.numberOfWalls-2)*180/model.numberOfWalls)/2) 
             }
+            
             
             // Floor
             GameObject floorAnchor = new GameObject("FloorAnchor");

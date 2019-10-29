@@ -246,8 +246,9 @@ namespace World
             var sizeHalf = model.size / 2f;
             
             pos=new Vector3((float) (rad * Math.Sin((2 * Math.PI / model.numberOfWalls) * Wallnumber)),0,(float) (rad * Math.Cos((2 * Math.PI / model.numberOfWalls) * Wallnumber)));
-            a = (((model.numberOfWalls - 2) * 180 / model.numberOfWalls)*Wallnumber)+((model.numberOfWalls - 2) * 180 / model.numberOfWalls)/2;
             
+            //a = (((model.numberOfWalls - 2) * 180 / model.numberOfWalls)*Wallnumber)+(((model.numberOfWalls - 2) * 180 / model.numberOfWalls)/2);
+            a = (((1f / model.numberOfWalls) * 360f * Wallnumber) + ((1f / model.numberOfWalls) * 360f) / 2f);
             
             anchor.transform.Rotate(Vector3.up, a);
             anchor.transform.localPosition = pos;
