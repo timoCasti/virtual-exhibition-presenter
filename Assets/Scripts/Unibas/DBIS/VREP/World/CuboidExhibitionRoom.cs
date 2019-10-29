@@ -115,10 +115,13 @@ namespace Unibas.DBIS.VREP.World
         /// </summary>
         /// <param name="orientation">The orientation for which the wall is requested</param>
         /// <returns>The ExhibitionWall component for the specified orientation</returns>
+       
+        /*
         public ExhibitionWall GetWallForOrientation(WallOrientation orientation)
         {
             return Walls.Find(wall => wall.GetOrientation() == orientation);
         }
+        */
 
         /// <summary>
         /// Loads the ambient audio of this room.

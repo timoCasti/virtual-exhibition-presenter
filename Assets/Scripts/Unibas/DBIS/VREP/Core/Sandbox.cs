@@ -7,14 +7,15 @@ namespace DefaultNamespace {
 
     public bool Enabled;
     
-    void Start() {
+    /*void Start() {
       if (Enabled) {
         TestObjectFactory();
       }
       
-    }
+    }*/
 
-    private void TestObjectFactory() {
+    
+   /* private void TestObjectFactory() {
       var nw = new VREM.Model.Wall();
       nw.direction = "NORTH";
       nw.texture = "NBricks";
@@ -39,7 +40,7 @@ namespace DefaultNamespace {
 
       ObjectFactory.BuildRoom(room);
     }
-    
+    */
   }
   
   

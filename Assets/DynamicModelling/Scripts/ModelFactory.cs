@@ -123,8 +123,8 @@ namespace Unibas.DBIS.DynamicModelling
             go.transform.position = start;
             return go;
         }
-
-        public static GameObject CreateWall(WallModel model)
+/*
+        public static GameObject CreateWall(DefaultNamespace.VREM.Model.Wall model)
         {
             float width = Vector3.Distance(model.Start, model.End);
             float a = Vector3.Angle(model.Start - model.End, Vector3.right);
@@ -139,7 +139,7 @@ namespace Unibas.DBIS.DynamicModelling
             return go;
         }
 
-
+*/
         /// <summary>
         /// 
         /// </summary>
@@ -282,21 +282,33 @@ namespace Unibas.DBIS.DynamicModelling
         {
             GameObject root = new GameObject("PolygonalRoom");
             
-            var walls = model.GetWalls();
+            // math: from size to radius
+            float rad = (float) (model.size / (2 * (Math.Sin((Math.PI / model.numberOfWalls)))));
+
+            //var walls = model.GetWalls();
             List<GameObject> goWall = new List<GameObject>();
-            for (int i = 1; i < model.GetWalls().Length; i++) {
+            for (int i = 0; i < model.numberOfWalls; i++) {
                 String wallName = "Wall" + i;
-                goWall.Add(CreateWall(walls[i]));
+                goWall.Add(CreateWall(model.size,model.height,model.materials[i]));
                 goWall[i].name = wallName;
+            }
+            // Position walls
+
+            for (int i = 0; i < model.numberOfWalls; i++) {
+                goWall[i].name = i.ToString();
+                goWall[i].transform.parent = root.transform;
+                goWall[i].transform.position=new Vector3((float) (rad * Math.Sin((2 * Math.PI / model.numberOfWalls) * i)),0,
+                    (float) (rad * Math.Cos((2 * Math.PI / model.numberOfWalls) * i)));
+                goWall[i].transform.Rotate(Vector3.up,(((model.numberOfWalls-2)*180/model.numberOfWalls)*i)+((model.numberOfWalls-2)*180/model.numberOfWalls)/2);
             }
             
             // Floor
             GameObject floorAnchor = new GameObject("FloorAnchor");
             floorAnchor.transform.parent = root.transform;
-
-
-            var floorsize = Vector3.Distance(model.GetWallAt(0).Start, model.Position);
-            GameObject floor = CreatePolygonalWall(model.GetWalls().Rank,floorsize, model.FloorMaterial);
+         
+            
+            //var floorsize = Vector3.Distance(model.GetWallAt(0).Start, model.Position);
+            GameObject floor = CreatePolygonalWall(model.numberOfWalls,rad, model.FloorMaterial);
             floor.name = "Floor";
             floor.transform.parent = floorAnchor.transform;
             // North Aligned
@@ -314,13 +326,13 @@ namespace Unibas.DBIS.DynamicModelling
             GameObject ceilingAnchor = new GameObject("CeilingAnchor");
             ceilingAnchor.transform.parent = root.transform;
 
-            GameObject ceiling = CreatePolygonalWall(model.GetWalls().Length, floorsize, model.CeilingMaterial);
+            GameObject ceiling = CreatePolygonalWall(model.numberOfWalls, rad, model.CeilingMaterial);
             ceiling.name = "Ceiling";
             ceiling.transform.parent = ceilingAnchor.transform;
 
             
             // North Aligned
-            ceilingAnchor.transform.position = new Vector3(0, model.GetWallAt(0).Height, 0);
+            ceilingAnchor.transform.position = new Vector3(0, model.height, 0);
             ceilingAnchor.transform.Rotate(Vector3.right, -90);
             // East Aligned
             //ceilingAnchor.transform.position = new Vector3(halfSize, height, -halfSize);

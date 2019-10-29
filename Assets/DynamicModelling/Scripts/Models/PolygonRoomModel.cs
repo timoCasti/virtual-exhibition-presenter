@@ -7,31 +7,58 @@ namespace Unibas.DBIS.DynamicModelling.Models
     public class PolygonRoomModel : IModel
     {
         public Vector3 Position;
-        private List<WallModel> _walls;
+        
+        //private List<DefaultNamespace.VREM.Model.Wall> _walls;
+
+        public int numberOfWalls;
+        
+        public float size;
+        public float height;
+
+        public Material[] materials;
+        //private List<WallModel> _walls;
         public Material FloorMaterial;
         public Material CeilingMaterial;
 
-        public PolygonRoomModel(Vector3 position, List<WallModel> walls, Material floorMaterial, Material ceilingMaterial)
+        
+        public PolygonRoomModel(Vector3 position, int NumberOfWalls, float Size, float Height)
         {
             Position = position;
-            _walls = walls;
-            FloorMaterial = floorMaterial;
-            CeilingMaterial = ceilingMaterial;
+            numberOfWalls = NumberOfWalls;
+            size = Size;
+            height = Height;
+           // FloorMaterial = floorMaterial;
+           // CeilingMaterial = ceilingMaterial;
         }
+        
+        public PolygonRoomModel(Vector3 position, int NumberOfWalls, float Size, float Height, Material floor, Material ceiling, Material[] wallmats)
+        {
+            Position = position;
+            numberOfWalls = NumberOfWalls;
+            size = Size;
+            height = Height;
+            FloorMaterial = floor;
+            CeilingMaterial = ceiling;
+            materials = wallmats;
+        }
+        
 
-        public WallModel[] GetWalls()
+
+/*
+        public DefaultNamespace.VREM.Model.Wall[] GetWalls()
         {
             return _walls.ToArray();
         }
 
-        public WallModel GetWallAt(int index)
+        public DefaultNamespace.VREM.Model.Wall GetWallAt(int index)
         {
             return _walls[index];
         }
 
-        public void Add(WallModel model)
+        public void Add(DefaultNamespace.VREM.Model.Wall model)
         {
             _walls.Add(model);
         }
+        */
     }
 }

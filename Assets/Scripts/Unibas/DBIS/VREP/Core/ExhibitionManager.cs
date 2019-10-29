@@ -16,9 +16,19 @@ namespace Unibas.DBIS.VREP.Core
             this._exhibition = exhibition;
         }
 
-        private List<CuboidExhibitionRoom> _rooms = new List<CuboidExhibitionRoom>();
+        // is now made for polygonal rooms only
+        
+        //private List<CuboidExhibitionRoom> _rooms = new List<CuboidExhibitionRoom>();
 
-        public CuboidExhibitionRoom GetRoomByIndex(int index)
+        private List<PolygonalExhibitionRoom> _rooms = new List<PolygonalExhibitionRoom>();
+
+        
+        /*public CuboidExhibitionRoom GetRoomByIndex(int index)
+        {
+            return _rooms[index];
+        }
+        */
+        public PolygonalExhibitionRoom GetRoomByIndex(int index)
         {
             return _rooms[index];
         }
@@ -78,10 +88,16 @@ namespace Unibas.DBIS.VREP.Core
         {
             foreach (var room in _exhibition.rooms)
             {
+                Debug.Log("Here we go  " + room.size);
                 var roomGameObject = ObjectFactory.BuildRoom(room);
-                var exhibitionRoom = roomGameObject.GetComponent<CuboidExhibitionRoom>();
+                Debug.Log("Here 2  "+ roomGameObject.name);
+                
+                //var exhibitionRoom = roomGameObject.GetComponent<CuboidExhibitionRoom>();
+                var exhibitionRoom = roomGameObject.GetComponent<PolygonalExhibitionRoom>();
+
                 _rooms.Add(exhibitionRoom);
 
+                /*
                 if (VREPController.Instance.Settings.CeilingLogoEnabled)
                 {
                     GameObject pref = Resources.Load<GameObject>("Objects/unibas");
@@ -94,6 +110,7 @@ namespace Unibas.DBIS.VREP.Core
                     logo.transform.localRotation = Quaternion.Euler(new Vector3(90, 180));
                     logo.transform.localScale = Vector3.one * 10000;
                 }
+                */
             }
 
             // For teleporting, each room needs to be created.
@@ -121,8 +138,7 @@ namespace Unibas.DBIS.VREP.Core
                 TexturingUtility.LoadMaterialByName("none"),
                 TexturingUtility.LoadMaterialByName("NMetal"), TexturingUtility.LoadMaterialByName("NPlastic"));
 
-            if (_exhibition.rooms.Length > 1)
-            {
+            if (_exhibition.rooms.Length > 1) {
                 // back teleporter
                 var backTpBtn = SteamVRTeleportButton.Create(room.gameObject, backPos, pd, model
                     ,
@@ -139,6 +155,44 @@ namespace Unibas.DBIS.VREP.Core
                 nextTpBtn.OnTeleportStart = room.OnRoomLeave;
                 nextTpBtn.OnTeleportEnd = next.OnRoomEnter;
             }
+        }
+
+        // same method for polys
+        private void CreateAndAttachTeleporters(PolygonalExhibitionRoom room)
+            {
+                var index = GetRoomIndex(room.RoomData);
+                var next = _rooms[GetNextRoomIndex(index)];
+                var prev = _rooms[GetPreviousRoomIndex(index)];
+
+                var nd = next.GetEntryPoint();
+                var pd = prev.GetEntryPoint();
+
+                var backPos = new Vector3(-.25f, 0, .2f);
+                var nextPos = new Vector3(.25f, 0, .2f);
+
+                // TODO Configurable TPBtnModel
+                var model = new SteamVRTeleportButton.TeleportButtonModel(0.1f, .02f, 1f,
+                    TexturingUtility.LoadMaterialByName("none"),
+                    TexturingUtility.LoadMaterialByName("NMetal"), TexturingUtility.LoadMaterialByName("NPlastic"));
+
+                if (_exhibition.rooms.Length > 1)
+                {
+                    // back teleporter
+                    var backTpBtn = SteamVRTeleportButton.Create(room.gameObject, backPos, pd, model
+                        ,
+                        Resources.Load<Sprite>("Sprites/UI/chevron-left"));
+
+                    backTpBtn.OnTeleportStart = room.OnRoomLeave;
+                    backTpBtn.OnTeleportEnd = prev.OnRoomEnter;
+
+                    // back teleporter
+                    var nextTpBtn = SteamVRTeleportButton.Create(room.gameObject, nextPos, nd,
+                        model,
+                        Resources.Load<Sprite>("Sprites/UI/chevron-right"));
+
+                    nextTpBtn.OnTeleportStart = room.OnRoomLeave;
+                    nextTpBtn.OnTeleportEnd = next.OnRoomEnter;
+                }
 
 
             if (VREPController.Instance.Settings.StartInLobby)
