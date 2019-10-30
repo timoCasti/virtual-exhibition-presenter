@@ -15,7 +15,8 @@ namespace DefaultNamespace.VREM.Model {
     public string description;
 
     public Room[] rooms;
-    
+
+    public Corridor[] corridors;
 
   }
 }

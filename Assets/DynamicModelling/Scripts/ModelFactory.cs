@@ -276,6 +276,75 @@ namespace Unibas.DBIS.DynamicModelling
             return root;
         }
         
+        /**
+         * Creates corridor model
+         */
+        public static GameObject CreateCorridor(CuboidCorridorModel model)
+        {
+            GameObject root = new GameObject("CuboidRoom");
+
+            float halfSize = model.Size / 2f;
+
+            // North wall
+            GameObject north = CreateWall(model.Size, model.Height, model.NorthMaterial);
+            north.name = "NorthWall";
+            north.transform.parent = root.transform;
+            north.transform.position = new Vector3(-halfSize, 0, halfSize);
+            // East wall
+            GameObject east = CreateWall(model.Size, model.Height, model.EastMaterial);
+            east.name = "EastWall";
+            east.transform.parent = root.transform;
+            east.transform.position = new Vector3(halfSize, 0, halfSize);
+            east.transform.Rotate(Vector3.up, 90);
+            // South wall
+            GameObject south = CreateWall(model.Size, model.Height, model.SouthMaterial);
+            south.name = "SouthWall";
+            south.transform.parent = root.transform;
+            south.transform.position = new Vector3(halfSize, 0, -halfSize);
+            south.transform.Rotate(Vector3.up, 180);
+            // West wall
+            GameObject west = CreateWall(model.Size, model.Height, model.WestMaterial);
+            west.name = "WestWall";
+            west.transform.parent = root.transform;
+            west.transform.position = new Vector3(-halfSize, 0, -halfSize);
+            west.transform.Rotate(Vector3.up, 270);
+
+            // Floor
+            GameObject floorAnchor = new GameObject("FloorAnchor");
+            floorAnchor.transform.parent = root.transform;
+
+            GameObject floor = CreateWall(model.Size, model.Size, model.FloorMaterial);
+            floor.name = "Floor";
+            floor.transform.parent = floorAnchor.transform;
+            // North Aligned
+            floorAnchor.transform.position = new Vector3(-halfSize, 0, -halfSize);
+            floorAnchor.transform.Rotate(Vector3.right, 90);
+            // East Aligned
+            //floorAnchor.transform.position = new Vector3(-halfSize, 0, halfSize);
+            //floorAnchor.transform.Rotate(Vector3f.back,90);
+
+            // Ceiling
+            GameObject ceilingAnchor = new GameObject("CeilingAnchor");
+            ceilingAnchor.transform.parent = root.transform;
+
+            GameObject ceiling = CreateWall(model.Size, model.Size, model.CeilingMaterial);
+            ceiling.name = "Ceiling";
+            ceiling.transform.parent = ceilingAnchor.transform;
+
+            
+            // North Aligned
+            ceilingAnchor.transform.position = new Vector3(-halfSize, model.Height, halfSize);
+            ceilingAnchor.transform.Rotate(Vector3.right, -90);
+            // East Aligned
+            //ceilingAnchor.transform.position = new Vector3(halfSize, height, -halfSize);
+            //ceilingAnchor.transform.Rotate( Vector3.back, -90);
+
+            root.transform.position = model.Position;
+            
+            root.AddComponent<ModelContainer>().Model = model;
+            return root;
+        }
+        
         
 
 

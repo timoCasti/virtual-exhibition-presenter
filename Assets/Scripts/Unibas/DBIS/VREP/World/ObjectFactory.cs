@@ -40,6 +40,18 @@ namespace World
             return new Vector3(x * room.size.x + x * off, y * room.size.y + y * off, z * room.size.z + z * off);
         }
 
+        public static Vector3 CalculateCorridorPosition(DefaultNamespace.VREM.Model.Corridor corridor)
+        {
+            float x = corridor.position.x, y = corridor.position.y, z = corridor.position.z;
+
+            return new Vector3()
+            {
+                x = x * corridor.size.x,
+                y = y * corridor.size.y,
+                z = z * corridor.size.z
+            };
+        }
+
         public static GameObject BuildRoom(DefaultNamespace.VREM.Model.Room roomData)
         {
             Material[] mats =
@@ -95,6 +107,12 @@ namespace World
 
             return room;
         }
+        
+        //TODO
+        public static GameObject BuildCorridor(DefaultNamespace.VREM.Model.Corridor corridorData)
+        {
+            return null;
+        }
 
         private static ExhibitionWall CreateExhibitionWall(WallOrientation orientation, DefaultNamespace.VREM.Model.Room room, GameObject anchor)
         {
@@ -103,6 +121,13 @@ namespace World
             wall.WallModel = null;
             wall.WallData = room.GetWall(orientation);
             return wall;
+        }
+        
+        //TODO
+        private static CorridorWall CreateCorridorWall(WallOrientation orientation,
+            DefaultNamespace.VREM.Model.Corridor corridor, CuboidCorridorModel model)
+        {
+            return null;
         }
 
         private static Material GetMaterialForWallOrientation(WallOrientation orientation,
