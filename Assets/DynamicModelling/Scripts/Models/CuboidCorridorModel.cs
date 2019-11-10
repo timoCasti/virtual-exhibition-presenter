@@ -2,6 +2,7 @@ using UnityEngine;
 
 namespace Unibas.DBIS.DynamicModelling.Models
 {
+    [System.Serializable]
     public class CuboidCorridorModel : IModel
     {
         public Vector3 Position;
@@ -11,9 +12,7 @@ namespace Unibas.DBIS.DynamicModelling.Models
         public Material FloorMaterial;
         public Material CeilingMaterial;
         public Material NorthMaterial;
-        public Material EastMaterial;
         public Material SouthMaterial;
-        public Material WestMaterial;
 
         public CuboidCorridorModel(Vector3 position, float size, float height)
         {
@@ -23,7 +22,7 @@ namespace Unibas.DBIS.DynamicModelling.Models
         }
 
         public CuboidCorridorModel(Vector3 position, float size, float height, Material floorMaterial = null, 
-            Material ceilingMaterial = null, Material northMaterial = null, Material eastMaterial = null, Material southMaterial = null, Material westMaterial = null)
+            Material ceilingMaterial = null, Material northMaterial = null, Material southMaterial = null)
         {
             Position = position;
             Size = size;
@@ -31,9 +30,7 @@ namespace Unibas.DBIS.DynamicModelling.Models
             FloorMaterial = floorMaterial;
             CeilingMaterial = ceilingMaterial;
             NorthMaterial = northMaterial;
-            EastMaterial = eastMaterial;
             SouthMaterial = southMaterial;
-            WestMaterial = westMaterial;
         }
     }
     

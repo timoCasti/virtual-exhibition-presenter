@@ -281,7 +281,7 @@ namespace Unibas.DBIS.DynamicModelling
          */
         public static GameObject CreateCorridor(CuboidCorridorModel model)
         {
-            GameObject root = new GameObject("CuboidRoom");
+            GameObject root = new GameObject("CuboidCorridor");
 
             float halfSize = model.Size / 2f;
 
@@ -290,24 +290,12 @@ namespace Unibas.DBIS.DynamicModelling
             north.name = "NorthWall";
             north.transform.parent = root.transform;
             north.transform.position = new Vector3(-halfSize, 0, halfSize);
-            // East wall
-            GameObject east = CreateWall(model.Size, model.Height, model.EastMaterial);
-            east.name = "EastWall";
-            east.transform.parent = root.transform;
-            east.transform.position = new Vector3(halfSize, 0, halfSize);
-            east.transform.Rotate(Vector3.up, 90);
             // South wall
             GameObject south = CreateWall(model.Size, model.Height, model.SouthMaterial);
             south.name = "SouthWall";
             south.transform.parent = root.transform;
             south.transform.position = new Vector3(halfSize, 0, -halfSize);
             south.transform.Rotate(Vector3.up, 180);
-            // West wall
-            GameObject west = CreateWall(model.Size, model.Height, model.WestMaterial);
-            west.name = "WestWall";
-            west.transform.parent = root.transform;
-            west.transform.position = new Vector3(-halfSize, 0, -halfSize);
-            west.transform.Rotate(Vector3.up, 270);
 
             // Floor
             GameObject floorAnchor = new GameObject("FloorAnchor");
