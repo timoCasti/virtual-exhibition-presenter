@@ -1,5 +1,5 @@
 {
-  "StartInLobby": true,
+  "StartInLobby": false,
   "VREMAddress": "http://127.0.0.1:4567",
   "SpotsEnabled": false,
   "LobbyFloorLogoEnabled": true,
@@ -8,6 +8,6 @@
   "PlaygroundEnabled": true,
   "RequestExhibitions": false,
   "exhibitionIds": [
-    "5d80e13801087e14980615a4"
+    "5dc498f965e8180e5403e6f0"
   ]
 }
