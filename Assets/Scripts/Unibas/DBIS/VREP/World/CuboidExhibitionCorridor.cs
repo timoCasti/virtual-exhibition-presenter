@@ -7,7 +7,7 @@ using World;
 namespace Unibas.DBIS.VREP.World
 {
     [RequireComponent(typeof(AudioLoader))]
-    public class CuboidCorridor : MonoBehaviour
+    public class CuboidExhibitionCorridor : MonoBehaviour
     {
         /**
          * The corridors's 3d appearance as a model.
