@@ -105,7 +105,7 @@ namespace Unibas.DBIS.VREP.Core
         
         private DefaultNamespace.VREM.Model.Corridor GetNext(DefaultNamespace.VREM.Model.Corridor corridor)
         {
-            var pos = GetRoomIndex(corridor);
+            var pos = GetCorridorIndex(corridor);
             if (pos == -1)
             {
                 // TODO This should not happen
@@ -117,7 +117,7 @@ namespace Unibas.DBIS.VREP.Core
 
         private DefaultNamespace.VREM.Model.Corridor GetPrevious(DefaultNamespace.VREM.Model.Corridor corridor)
         {
-            var pos = GetRoomIndex(corridor);
+            var pos = GetCorridorIndex(corridor);
             if (pos == -1)
             {
                 // TODO This should not happen
