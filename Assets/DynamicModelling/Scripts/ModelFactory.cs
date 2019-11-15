@@ -304,21 +304,30 @@ namespace Unibas.DBIS.DynamicModelling
                 goWall[i].transform.parent = root.transform;
                 goWall[i].transform.position=new Vector3((float) (rad * Math.Sin((2 * Math.PI / model.numberOfWalls) * i)),0,
                     (float) (rad * Math.Cos((2 * Math.PI / model.numberOfWalls) * i)));
-                //+(1/n*360)*i;
-                
-              //  Debug.Log(x);
-               // Debug.Log(n);
-               // Debug.Log("Winkel!!!  "+ alpha);
+              
                 goWall[i].transform.Rotate(Vector3.up,(((1f/model.numberOfWalls)*360f*i) + ((1f/model.numberOfWalls)*360f)/2f));
                 //aussen winkel (((model.numberOfWalls-2)*180/model.numberOfWalls)*i)+((model.numberOfWalls-2)*180/model.numberOfWalls)/2) 
             }
+            // Ceiling
+            GameObject ceilingAnchor = new GameObject("CeilingAnchor");
+            ceilingAnchor.transform.parent = root.transform;
+
+            GameObject ceiling = CreatePolygonalWall(model.numberOfWalls, rad, model.CeilingMaterial);
+            ceiling.name = "Ceiling";
+            ceiling.transform.parent = ceilingAnchor.transform;
             
+            // North Aligned
+            ceilingAnchor.transform.position = new Vector3(0, model.height, 0);
+            ceilingAnchor.transform.Rotate(Vector3.right, -90);
             
+            // No idea why ceiling has to be rotated, only needs to be rotated if numberofwalls is odd
+            if (model.numberOfWalls % 2 == 1) {
+                ceilingAnchor.transform.Rotate(Vector3.back, ((1f / model.numberOfWalls) * 360f) / 2f);
+            }
+
             // Floor
             GameObject floorAnchor = new GameObject("FloorAnchor");
             floorAnchor.transform.parent = root.transform;
-         
-            
             //var floorsize = Vector3.Distance(model.GetWallAt(0).Start, model.Position);
             GameObject floor = CreatePolygonalWall(model.numberOfWalls,rad, model.FloorMaterial);
             floor.name = "Floor";
@@ -330,25 +339,9 @@ namespace Unibas.DBIS.DynamicModelling
             //
             floorAnchor.transform.position = new Vector3(0, 0, 0);
             floorAnchor.transform.Rotate(Vector3.right, 90);
-            // East Aligned
-            //floorAnchor.transform.position = new Vector3(-halfSize, 0, halfSize);
-            //floorAnchor.transform.Rotate(Vector3f.back,90);
-
-            // Ceiling
-            GameObject ceilingAnchor = new GameObject("CeilingAnchor");
-            ceilingAnchor.transform.parent = root.transform;
-
-            GameObject ceiling = CreatePolygonalWall(model.numberOfWalls, rad, model.CeilingMaterial);
-            ceiling.name = "Ceiling";
-            ceiling.transform.parent = ceilingAnchor.transform;
-
-            
-            // North Aligned
-            ceilingAnchor.transform.position = new Vector3(0, model.height, 0);
-            ceilingAnchor.transform.Rotate(Vector3.right, -90);
-            // East Aligned
-            //ceilingAnchor.transform.position = new Vector3(halfSize, height, -halfSize);
-            //ceilingAnchor.transform.Rotate( Vector3.back, -90);
+           
+        
+    
 
             root.transform.position = model.Position;
             
