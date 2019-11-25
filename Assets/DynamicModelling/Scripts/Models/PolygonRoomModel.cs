@@ -10,7 +10,7 @@ namespace Unibas.DBIS.DynamicModelling.Models
         private List<WallModel> _walls;
         public Material FloorMaterial;
         public Material CeilingMaterial;
-
+        
         public PolygonRoomModel(Vector3 position, List<WallModel> walls, Material floorMaterial, Material ceilingMaterial)
         {
             Position = position;
