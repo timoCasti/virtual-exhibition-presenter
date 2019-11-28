@@ -31,7 +31,7 @@ namespace World
             return prefab;
             //}
         }
-
+/*
         public static Vector3 CalculateRoomPosition(DefaultNamespace.VREM.Model.Room room)
         {
             // TODO exhibition-dependet calculation
@@ -39,6 +39,7 @@ namespace World
             var off = Settings.RoomOffset;
             return new Vector3(x * room.size.x + x * off, y * room.size.y + y * off, z * room.size.z + z * off);
         }
+*/
 
         public static GameObject BuildRoom(DefaultNamespace.VREM.Model.Room roomData)
         {
@@ -95,6 +96,9 @@ namespace World
 
             return room;
         }
+        
+        
+        
 
         private static ExhibitionWall CreateExhibitionWall(WallOrientation orientation, DefaultNamespace.VREM.Model.Room room, GameObject anchor)
         {

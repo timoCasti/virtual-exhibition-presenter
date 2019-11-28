@@ -8,16 +8,20 @@ namespace DefaultNamespace.VREM.Model {
   public class Wall {
     
     public Vector3 color;
-    public string direction;
+
+    public int wallNumber;
+
+    public Vector3[] wallCoordinates;
 
     public Exhibit[] exhibits;
 
     public string texture; // NONE -> debug: colors
 
+    /*
     public WallOrientation GetOrientation()
     {
       return (WallOrientation) Enum.Parse(typeof(WallOrientation), direction, true);
     }
-    
+    */
   }
 }
