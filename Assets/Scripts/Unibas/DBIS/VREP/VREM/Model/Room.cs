@@ -8,13 +8,12 @@ namespace DefaultNamespace.VREM.Model {
   public class Room {
 
     
-    //needs to be changed later for non prismal polygons
-    public string shape; // shape is new needs to be changed in parser.... probalbly only needed for polyhedrons
     public string text;
-    public Vector3 size;
+    
     public Vector3 position;
     public Vector3 entrypoint;
-    
+
+    public float height; // replaces size, since size is defined in walls now
     //for cuboid rooms we define north=0,east=1,south=2,west=3 , since orientation died
     public Wall[] walls;
 

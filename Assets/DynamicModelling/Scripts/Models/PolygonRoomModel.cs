@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -10,36 +11,38 @@ namespace Unibas.DBIS.DynamicModelling.Models
         
         //private List<DefaultNamespace.VREM.Model.Wall> _walls;
 
+        public DefaultNamespace.VREM.Model.Wall[] walls;
+        
         public int numberOfWalls;
         
         public float size;
         public float height;
 
-        public Material[] materials;
+        //public Material[] materials;
         //private List<WallModel> _walls;
-        public Material FloorMaterial;
-        public Material CeilingMaterial;
+        public string FloorMaterial;
+        public string CeilingMaterial;
 
         
-        public PolygonRoomModel(Vector3 position, int NumberOfWalls, float Size, float Height)
+        public PolygonRoomModel(Vector3 position, int NumberOfWalls, float Height)
         {
             Position = position;
             numberOfWalls = NumberOfWalls;
-            size = Size;
+           // size = Size;
             height = Height;
            // FloorMaterial = floorMaterial;
            // CeilingMaterial = ceilingMaterial;
         }
         
-        public PolygonRoomModel(Vector3 position, int NumberOfWalls, float Size, float Height, Material floor, Material ceiling, Material[] wallmats)
+        public PolygonRoomModel(Vector3 position, int NumberOfWalls, float Height, string floor, string ceiling, DefaultNamespace.VREM.Model.Wall[] walls)
         {
             Position = position;
             numberOfWalls = NumberOfWalls;
-            size = Size;
+           // size = Size;
             height = Height;
             FloorMaterial = floor;
             CeilingMaterial = ceiling;
-            materials = wallmats;
+            this.walls = walls;
         }
         
 

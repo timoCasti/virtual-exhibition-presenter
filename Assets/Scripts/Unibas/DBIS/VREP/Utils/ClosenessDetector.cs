@@ -32,7 +32,7 @@ public class ClosenessDetector : MonoBehaviour {
 		if (!string.IsNullOrEmpty(url) && this.audioSource.clip == null && !downloading)
 		{
 			downloading = true;
-			StartCoroutine(LoadAudio(url));	
+		//	StartCoroutine(LoadAudio(url));	
 		}
 
 		var dist = Vector3.Distance(cameraPosition, objectPosition);

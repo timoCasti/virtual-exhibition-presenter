@@ -88,9 +88,7 @@ namespace Unibas.DBIS.VREP.Core
         {
             foreach (var room in _exhibition.rooms)
             {
-                Debug.Log("Here we go  " + room.size);
                 var roomGameObject = ObjectFactory.BuildRoom(room);
-                Debug.Log("Here 2  "+ roomGameObject.name);
                 
                 //var exhibitionRoom = roomGameObject.GetComponent<CuboidExhibitionRoom>();
                 var exhibitionRoom = roomGameObject.GetComponent<PolygonalExhibitionRoom>();
