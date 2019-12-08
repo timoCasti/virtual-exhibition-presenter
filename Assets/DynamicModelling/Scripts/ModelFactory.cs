@@ -3,6 +3,7 @@ using System.Linq;
 using Boo.Lang;
 using Unibas.DBIS.DynamicModelling.Models;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Unibas.DBIS.DynamicModelling
 {
@@ -196,7 +197,7 @@ namespace Unibas.DBIS.DynamicModelling
          * A Material
          * String "Floor" or "Ceiling" necessary to face in correct direction
          */
-        public static GameObject CreatePolygonialMeshes(Vector3[] vertices, Material material, String FloororCeiling)
+        public static GameObject CreatePolygonalMeshes(Vector3[] vertices, Material material, String FloororCeiling)
         {
             GameObject go =new GameObject("PolygonalWall");
             MeshFilter meshFilter = go.AddComponent<MeshFilter>();
@@ -204,8 +205,7 @@ namespace Unibas.DBIS.DynamicModelling
             Mesh mesh = meshFilter.mesh;
 
             mesh.vertices = vertices;
-            
-
+           
             // transform Vector3 to Vector2 with x and z only, since height not needed
             Vector2[] vector2s=new Vector2[vertices.Length];
             for (int i = 0; i < vertices.Length; i++) {
@@ -496,6 +496,88 @@ namespace Unibas.DBIS.DynamicModelling
         {
             GameObject go=new GameObject("PolyRoom");
             
+            
+            //find vertices of ceiling and floor depends on the structure of the wallcoordinates
+            System.Collections.Generic.List<Vector3> floorvertices=new System.Collections.Generic.List<Vector3>();
+            System.Collections.Generic.List<Vector3> ceilingvertices=new System.Collections.Generic.List<Vector3>();
+            for (int i = 0; i < model.numberOfWalls; i++) {
+                if (floorvertices.Contains(model.walls[i].wallCoordinates[0])) {
+                    Debug.Log("Floor has same vertice multiple times");
+                }
+                else {
+                    floorvertices.Add(model.walls[i].wallCoordinates[0]);
+                }
+
+                if (ceilingvertices.Contains(model.walls[i].wallCoordinates[2])) {
+                    Debug.Log("Ceiling contains same vertice multiple times");
+                }
+                else {
+                    ceilingvertices.Add(model.walls[i].wallCoordinates[2]);
+                }
+            }
+            // convert list to array, since its needed as parameter
+            var ceilingArray = ceilingvertices.ToArray();
+            var floorArray=floorvertices.ToArray();
+            // Ceiling
+            GameObject ceilingAnchor = new GameObject("CeilingAnchor");
+            ceilingAnchor.transform.parent = go.transform;
+            GameObject ceiling = CreatePolygonalMeshes(ceilingArray, LoadMaterialByName( model.CeilingMaterial),"Ceiling");
+            ceiling.name = "Ceiling";
+            ceiling.transform.parent = ceilingAnchor.transform;
+            ceilingAnchor.transform.position = new Vector3(0, model.height, 0);
+            
+            // Floor
+            GameObject floorAnchor = new GameObject("FloorAnchor");
+            floorAnchor.transform.parent = go.transform;
+            GameObject floor = CreatePolygonalMeshes(floorArray, LoadMaterialByName(model.FloorMaterial),"Floor");
+            floor.name = "Floor";
+            floor.transform.parent = floorAnchor.transform;
+            floorAnchor.transform.position = new Vector3(0, 0, 0);
+
+
+            /*
+             * checks if walls face right direction which is a matter of which direction the room was drawn
+             * if room gets drawn counter clockwise walls would be visible outside the room
+             * therefore it gets checked here and swapped if necessary
+             * info: this approach is rather complicated and only practical correct.
+             * idea: check if a point very close to a wall is "inside" the floor or not
+             */
+            Mesh m=floor.GetComponentInChildren<MeshFilter>().mesh;
+            Vector3 point = model.walls[0].wallCoordinates[0];
+            Vector3 point2 = model.walls[0].wallCoordinates[1];
+            Vector3 mid = (point + point2) / 2f;
+            GameObject testWall = CreateFreeWall(model.walls[0].wallCoordinates);
+            Vector3[] normals = testWall.GetComponentInChildren<MeshFilter>().mesh.normals;
+            Object.Destroy(testWall);
+            Vector3 avg = (normals[0] + normals[1]) / 2f;
+            Vector3 inOut = mid + (avg * 0.1f);
+            Debug.Log("Point to test "+inOut);
+            int[] tri = m.triangles;
+            var vert = m.vertices;
+            bool b = false;
+            for (int i = 0; i < (tri.Length / 3); i++) {
+                if (point_inside_trigon(inOut, vert[tri[i * 3]], vert[tri[i * 3 + 1]], vert[tri[i * 3 + 2]])) {
+                    b = true;
+                }
+            }
+            /*
+             * Swaps the coordinates of the walls
+             * wallcoordinate[0] => wallcordinate[1] and wallcoordinate[2]->[3] and vice versa
+             */ 
+            if (b==false) {
+                Debug.Log("Swapped Direction of Wall");
+                for (int i = 0; i < model.walls.Length; i++) {
+                    Vector3 swap = model.walls[i].wallCoordinates[0];
+                    Vector3 swap2 = model.walls[i].wallCoordinates[2];
+                    model.walls[i].wallCoordinates[0] = model.walls[i].wallCoordinates[1];
+                    model.walls[i].wallCoordinates[2] = model.walls[i].wallCoordinates[3];
+                    model.walls[i].wallCoordinates[1] = swap;
+                    model.walls[i].wallCoordinates[3] = swap2;
+
+                }
+            }
+            
+            
             List<GameObject> goWall = new List<GameObject>();
             for (int i = 0; i < model.numberOfWalls; i++) {
                 String wallName = "Wall" + i;
@@ -504,44 +586,28 @@ namespace Unibas.DBIS.DynamicModelling
             }
             
             
-            //find vertices of ceiling and floor depends on the tructure of the wallcoordinates
-            Vector3[] floorvertices=new Vector3[model.numberOfWalls];
-            Vector3[] ceilingvertices=new Vector3[model.numberOfWalls];
-            for (int i = 0; i < model.numberOfWalls; i++) {
-                floorvertices[i] = model.walls[i].wallCoordinates[0];
-                ceilingvertices[i] = model.walls[i].wallCoordinates[2];
-            }
             
-            // Ceiling
-            GameObject ceilingAnchor = new GameObject("CeilingAnchor");
-            ceilingAnchor.transform.parent = go.transform;
+            
+            
 
-            GameObject ceiling = CreatePolygonialMeshes(ceilingvertices, LoadMaterialByName( model.CeilingMaterial),"Ceiling");
-            ceiling.name = "Ceiling";
-            ceiling.transform.parent = ceilingAnchor.transform;
-            
-            // North Aligned
-            ceilingAnchor.transform.position = new Vector3(0, model.height, 0);
-            //ceilingAnchor.transform.Rotate(Vector3.right, -90);
-            
-            // Floor
-            GameObject floorAnchor = new GameObject("FloorAnchor");
-            floorAnchor.transform.parent = go.transform;
-            GameObject floor = CreatePolygonialMeshes(floorvertices, LoadMaterialByName(model.FloorMaterial),"Floor");
-            floor.name = "Floor";
-            floor.transform.parent = floorAnchor.transform;
-
-            floorAnchor.transform.position = new Vector3(0, 0, 0);
-            //floorAnchor.transform.Rotate(Vector3.up, 90);
-            //floorAnchor.transform.Rotate(Vector3.forward,180);
-           
-            
             go.transform.position = model.Position;
             go.AddComponent<ModelContainer>().Model = model;
             
             return go;
         }
-        
+        public static bool point_inside_trigon(Vector3 s, Vector3 a, Vector3 b, Vector3 c)
+        {
+            var as_x = s.x-a.x;
+            var as_y = s.z-a.z;
+
+            bool s_ab = (b.x-a.x)*as_y-(b.z-a.z)*as_x > 0;
+
+            if((c.x-a.x)*as_y-(c.z-a.z)*as_x > 0 == s_ab) return false;
+
+            if((c.x-b.x)*(s.z-b.z)-(c.z-b.z)*(s.x-b.x) > 0 != s_ab) return false;
+
+            return true;
+        }
         
 
 
