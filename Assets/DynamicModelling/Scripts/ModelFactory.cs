@@ -551,7 +551,7 @@ namespace Unibas.DBIS.DynamicModelling
             Object.Destroy(testWall);
             Vector3 avg = (normals[0] + normals[1]) / 2f;
             Vector3 inOut = mid + (avg * 0.1f);
-            Debug.Log("Point to test "+inOut);
+            //Debug.Log("Point to test "+inOut);
             int[] tri = m.triangles;
             var vert = m.vertices;
             bool b = false;
@@ -583,12 +583,8 @@ namespace Unibas.DBIS.DynamicModelling
                 String wallName = "Wall" + i;
                 goWall.Add(CreateFreeWall(model.walls[i].wallCoordinates, LoadMaterialByName(model.walls[i].texture)));
                 goWall[i].name = wallName;
+                goWall[i].transform.parent = go.transform;
             }
-            
-            
-            
-            
-            
 
             go.transform.position = model.Position;
             go.AddComponent<ModelContainer>().Model = model;

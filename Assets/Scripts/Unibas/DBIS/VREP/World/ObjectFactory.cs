@@ -59,7 +59,7 @@ namespace World
 
             int numberOfWalls = roomData.walls.Length;
             
-            PolygonRoomModel poly=new PolygonRoomModel(CalculateRoomPosition(roomData),numberOfWalls,roomData.height,roomData.floor,roomData.ceiling,roomData.walls);
+            PolygonRoomModel poly=new PolygonRoomModel(roomData.position,numberOfWalls,roomData.height,roomData.floor,roomData.ceiling,roomData.walls);
             GameObject roompoly = ModelFactory.CreatePolygonalRoom(poly);
             var exRoom = roompoly.AddComponent<PolygonalExhibitionRoom>();
             exRoom.roomModel = poly;
@@ -81,6 +81,33 @@ namespace World
             exRoom.Walls = exhibitionWalls.ToList();
             exRoom.Populate();
             
+            // calculate Light positions based on trianlges of floor
+            var v = roompoly.GetComponentsInChildren<MeshFilter>();
+            Mesh fm = null;
+            for (int i = 0; i < v.Length; i++) {
+                if (string.Equals(v[i].name , "Floor")) {
+                    fm = v[i].mesh;
+                }
+
+            }
+            var tri = fm.triangles;
+            var vertices = fm.vertices;
+
+            for (int i = 0; i < tri.Length/3; i++) {
+                GameObject lPoly = new GameObject("RoomLight");
+                var lipo = lPoly.AddComponent<Light>();
+                lipo.type = LightType.Point;
+                lipo.range = 8;
+                lipo.color = Color.white;
+                lipo.intensity = 0.75f;
+                lipo.renderMode = LightRenderMode.ForcePixel;
+                //calculate middle of triangle
+                Vector3 mid= (vertices[tri[i*3]]+vertices[tri[i*3+1]]+vertices[tri[i*3+2]])/3f;
+                lipo.transform.parent = roompoly.transform;
+                lipo.transform.localPosition = new Vector3(mid.x, 2.5f, mid.z);
+                
+            }
+            /*
             GameObject lightPoly = new GameObject("RoomLight");
             var lp = lightPoly.AddComponent<Light>();
             lp.type = LightType.Point;
@@ -91,7 +118,13 @@ namespace World
            
             lp.transform.parent = roompoly.transform;
             lp.transform.localPosition = new Vector3(0, 2.5f, 0);
-            roompoly.name = "Room";
+            */
+            if (roomData.text != null) {
+                roompoly.name = roomData.text;
+            }
+            else {
+                roompoly.name = "Room";
+            }
 
             GameObject teleportAreaPoly = new GameObject("TeleportArea");
             var colPoly = teleportAreaPoly.AddComponent<BoxCollider>();
