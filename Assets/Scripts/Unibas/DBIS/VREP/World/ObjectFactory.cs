@@ -132,7 +132,8 @@ namespace World
             teleportAreaPoly.AddComponent<MeshRenderer>();
             var tpaPoly = teleportAreaPoly.AddComponent<TeleportArea>();
             tpaPoly.transform.parent = roompoly.transform;
-            tpaPoly.transform.localPosition = new Vector3(0, 0.01f, 0);
+            Vector3 posTele= (vertices[tri[0]]+vertices[tri[1]]+vertices[tri[2]])/3f;
+            tpaPoly.transform.localPosition = new Vector3(posTele.x, 0.01f, posTele.z);
             
             
             

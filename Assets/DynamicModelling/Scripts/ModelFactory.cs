@@ -182,6 +182,9 @@ namespace Unibas.DBIS.DynamicModelling
             //go.transform.position = Vector3.zero;
             //go.transform.Rotate(Vector3.up, -a);
             //go.transform.position = coordinates[0];
+            var boxCollider = go.AddComponent<BoxCollider>();
+            boxCollider.size = new Vector3(width,height,0.0001f);
+            
             return go;
             
             
@@ -585,7 +588,6 @@ namespace Unibas.DBIS.DynamicModelling
                 goWall[i].name = wallName;
                 goWall[i].transform.parent = go.transform;
             }
-
             go.transform.position = model.Position;
             go.AddComponent<ModelContainer>().Model = model;
             
