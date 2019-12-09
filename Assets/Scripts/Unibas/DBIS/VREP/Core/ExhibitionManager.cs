@@ -129,6 +129,7 @@ namespace Unibas.DBIS.VREP.Core
 
         public void GenerateExhibition()
         {
+            
             foreach (var room in _exhibition.rooms)
             {
                 var roomGameObject = ObjectFactory.BuildRoom(room);
@@ -154,7 +155,9 @@ namespace Unibas.DBIS.VREP.Core
                 var corridorGameObject = ObjectFactory.BuildCorridor(corridor);
                 var exhibitionCorridor = corridorGameObject.GetComponent<CuboidExhibitionCorridor>();
                 _corridors.Add(exhibitionCorridor);
-
+                
+                
+                /*
                 if (VREPController.Instance.Settings.CeilingLogoEnabled)
                 {
                     GameObject pref = Resources.Load<GameObject>("Objects/unibas");
@@ -166,7 +169,7 @@ namespace Unibas.DBIS.VREP.Core
                         new Vector3(-1.493f, corridor.size.y - .01f, 3.35f); // manually found values
                     logo.transform.localRotation = Quaternion.Euler(new Vector3(90, 180));
                     logo.transform.localScale = Vector3.one * 10000;
-                }
+                }*/
             }
 
             // For teleporting, each room needs to be created.

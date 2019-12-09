@@ -214,27 +214,27 @@ namespace Unibas.DBIS.DynamicModelling
         {
             GameObject root = new GameObject("CuboidRoom");
 
-            float halfSize = model.Size / 2f;
+            float halfSize = model.GetSize() / 2f;
 
             // North wall
-            GameObject north = CreateWall(model.Size, model.Height, model.NorthMaterial);
+            GameObject north = CreateWall(model.GetSize(), model.Height, model.NorthMaterial);
             north.name = "NorthWall";
             north.transform.parent = root.transform;
             north.transform.position = new Vector3(-halfSize, 0, halfSize);
             // East wall
-            GameObject east = CreateWall(model.Size, model.Height, model.EastMaterial);
+            GameObject east = CreateWall(model.GetSize(), model.Height, model.EastMaterial);
             east.name = "EastWall";
             east.transform.parent = root.transform;
             east.transform.position = new Vector3(halfSize, 0, halfSize);
             east.transform.Rotate(Vector3.up, 90);
             // South wall
-            GameObject south = CreateWall(model.Size, model.Height, model.SouthMaterial);
+            GameObject south = CreateWall(model.GetSize(), model.Height, model.SouthMaterial);
             south.name = "SouthWall";
             south.transform.parent = root.transform;
             south.transform.position = new Vector3(halfSize, 0, -halfSize);
             south.transform.Rotate(Vector3.up, 180);
             // West wall
-            GameObject west = CreateWall(model.Size, model.Height, model.WestMaterial);
+            GameObject west = CreateWall(model.GetSize(), model.Height, model.WestMaterial);
             west.name = "WestWall";
             west.transform.parent = root.transform;
             west.transform.position = new Vector3(-halfSize, 0, -halfSize);
@@ -244,7 +244,7 @@ namespace Unibas.DBIS.DynamicModelling
             GameObject floorAnchor = new GameObject("FloorAnchor");
             floorAnchor.transform.parent = root.transform;
 
-            GameObject floor = CreateWall(model.Size, model.Size, model.FloorMaterial);
+            GameObject floor = CreateWall(model.GetSize(), model.GetSize(), model.FloorMaterial);
             floor.name = "Floor";
             floor.transform.parent = floorAnchor.transform;
             // North Aligned
@@ -258,7 +258,7 @@ namespace Unibas.DBIS.DynamicModelling
             GameObject ceilingAnchor = new GameObject("CeilingAnchor");
             ceilingAnchor.transform.parent = root.transform;
 
-            GameObject ceiling = CreateWall(model.Size, model.Size, model.CeilingMaterial);
+            GameObject ceiling = CreateWall(model.GetSize(), model.GetSize(), model.CeilingMaterial);
             ceiling.name = "Ceiling";
             ceiling.transform.parent = ceilingAnchor.transform;
 
@@ -283,15 +283,15 @@ namespace Unibas.DBIS.DynamicModelling
         {
             GameObject root = new GameObject("CuboidCorridor");
 
-            float halfSize = model.Size / 2f;
+            float halfSize = model.GetSize() / 2f;
 
             // North wall
-            GameObject north = CreateWall(model.Size, model.Height, model.NorthMaterial);
+            GameObject north = CreateWall(model.GetSize(), model.Height, model.NorthMaterial);
             north.name = "NorthWall";
             north.transform.parent = root.transform;
             north.transform.position = new Vector3(-halfSize, 0, halfSize);
             // South wall
-            GameObject south = CreateWall(model.Size, model.Height, model.SouthMaterial);
+            GameObject south = CreateWall(model.GetSize(), model.Height, model.SouthMaterial);
             south.name = "SouthWall";
             south.transform.parent = root.transform;
             south.transform.position = new Vector3(halfSize, 0, -halfSize);
@@ -301,7 +301,7 @@ namespace Unibas.DBIS.DynamicModelling
             GameObject floorAnchor = new GameObject("FloorAnchor");
             floorAnchor.transform.parent = root.transform;
 
-            GameObject floor = CreateWall(model.Size, model.Size, model.FloorMaterial);
+            GameObject floor = CreateWall(model.GetSize(), model.GetSize(), model.FloorMaterial);
             floor.name = "Floor";
             floor.transform.parent = floorAnchor.transform;
             // North Aligned
@@ -315,7 +315,7 @@ namespace Unibas.DBIS.DynamicModelling
             GameObject ceilingAnchor = new GameObject("CeilingAnchor");
             ceilingAnchor.transform.parent = root.transform;
 
-            GameObject ceiling = CreateWall(model.Size, model.Size, model.CeilingMaterial);
+            GameObject ceiling = CreateWall(model.GetSize(), model.GetSize(), model.CeilingMaterial);
             ceiling.name = "Ceiling";
             ceiling.transform.parent = ceilingAnchor.transform;
 
@@ -331,6 +331,7 @@ namespace Unibas.DBIS.DynamicModelling
             
             root.AddComponent<ModelContainer>().Model = model;
             return root;
+            
         }
         
         

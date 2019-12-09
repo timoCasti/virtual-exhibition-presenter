@@ -106,7 +106,7 @@ namespace Unibas.DBIS.VREP.World
         /// Induces the walls to place their exhibits.
         /// </summary>
         public void PopulateWalls()
-        {
+        {   
             Walls.ForEach(ew => ew.AttachExhibits());
         }
 

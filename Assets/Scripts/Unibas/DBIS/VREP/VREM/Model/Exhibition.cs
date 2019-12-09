@@ -9,6 +9,7 @@ namespace DefaultNamespace.VREM.Model {
   /// </summary>
   [Serializable]
   public class Exhibition {
+    
 
     public string id;
     public string name;
