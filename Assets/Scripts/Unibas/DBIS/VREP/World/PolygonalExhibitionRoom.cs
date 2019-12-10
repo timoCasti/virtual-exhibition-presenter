@@ -40,7 +40,7 @@ namespace Unibas.DBIS.VREP.World
         /// </summary>
         public void OnRoomLeave()
         {
-            _audioLoader.Stop();
+//            _audioLoader.Stop();
         }
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace Unibas.DBIS.VREP.World
         /// </summary>
         public void OnRoomEnter()
         {
-            _audioLoader.Play();
+  //          _audioLoader.Play();
         }
 
         /// <summary>

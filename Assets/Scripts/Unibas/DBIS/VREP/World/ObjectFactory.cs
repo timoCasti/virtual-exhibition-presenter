@@ -116,15 +116,14 @@ namespace World
             }
 
             GameObject teleportAreaPoly = new GameObject("TeleportArea");
-            var colPoly = teleportAreaPoly.AddComponent<BoxCollider>();
-            colPoly.size = new Vector3(10, 0.01f, 10); // needs to be changed
+            //var colPoly = teleportAreaPoly.AddComponent<BoxCollider>();
+            //colPoly.size = new Vector3(10, 0.01f, 10); // needs to be changed
+            var colM = teleportAreaPoly.AddComponent<MeshCollider>();
+            colM.sharedMesh = fm; //transform.position=fm.
             teleportAreaPoly.AddComponent<MeshRenderer>();
             var tpaPoly = teleportAreaPoly.AddComponent<TeleportArea>();
             tpaPoly.transform.parent = roompoly.transform;
-            Vector3 posTele= (vertices[tri[0]]+vertices[tri[1]]+vertices[tri[2]])/3f;
-            tpaPoly.transform.localPosition = roomData.walls[0].wallCoordinates[0];//new Vector3(posTele.x, 0.01f, posTele.z);
-            
-            
+            tpaPoly.transform.localPosition = Vector3.zero;
             
             return roompoly;
         }

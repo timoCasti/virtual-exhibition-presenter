@@ -178,12 +178,10 @@ namespace Unibas.DBIS.DynamicModelling
             
             //postion wall
             float a = Vector3.Angle(coordinates[0]-coordinates[1], Vector3.right);
-
-            //go.transform.position = Vector3.zero;
-            //go.transform.Rotate(Vector3.up, -a);
-            //go.transform.position = coordinates[0];
-            //var boxCollider = go.AddComponent<BoxCollider>();
-            //boxCollider.size = new Vector3(width,height,0.0001f);
+        
+            //add collider for teleportation limits
+            var collider = go.AddComponent<MeshCollider>();
+            collider.sharedMesh = mesh;
             
             return go;
             
