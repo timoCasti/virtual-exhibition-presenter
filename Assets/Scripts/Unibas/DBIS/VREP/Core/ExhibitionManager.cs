@@ -179,7 +179,7 @@ namespace Unibas.DBIS.VREP.Core
                 var nextPos = new Vector3(posmid.x+.25f, 0, posmid.z+.2f);
                 var nd = next.GetEntryPoint();
                 var pd = prev.GetEntryPoint();
-                
+                Debug.Log("next  "+ nd + "  prev  "+pd);
                 //var backPos = new Vector3(-.25f, 0, .2f);
                 //var nextPos = new Vector3(.25f, 0, .2f);
 
