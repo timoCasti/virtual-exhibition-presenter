@@ -158,15 +158,49 @@ namespace Unibas.DBIS.VREP.Core
         // same method for polys
         private void CreateAndAttachTeleporters(PolygonalExhibitionRoom room)
             {
+                //var
+                for (int i = 0; i < room.roomModel.walls.Length; i++)
+                {
+                    
+                }
+                //find the room Gameobject to position teleport buttons correctly ( inside the room) !!!! DEPENDS ON ROOM-NAME !!!!
+                var roomGo=GameObject.Find(room.RoomData.text);
+                Mesh meschOfFloor = null;
+
+                var v = roomGo.GetComponentsInChildren<MeshFilter>();
+                for (int i = 0; i < v.Length; i++)
+                {
+                    if (string.Equals(v[i].name, "Floor")) ;
+                    {
+                        meschOfFloor = v[i].mesh;
+                    }
+                }
+
+                var pos = (meschOfFloor.vertices[meschOfFloor.triangles[0]] +meschOfFloor.vertices[meschOfFloor.triangles[1]] + meschOfFloor.vertices[meschOfFloor.triangles[2]])/3f;
+                
+                
+                    
+                
+                //Debug.Log("pos of go " +what.transform.position);
+                
                 var index = GetRoomIndex(room.RoomData);
                 var next = _rooms[GetNextRoomIndex(index)];
                 var prev = _rooms[GetPreviousRoomIndex(index)];
+                var thisRoom = _rooms[index];
+                //var backPos = next.GetPostionForTeleportButtons();
+                //var nextPos = prev.GetPostionForTeleportButtons();
+               // Debug.Log(pd);
+               // Debug.Log(nd);
 
+               
+                var posmid = thisRoom.GetPostionForTeleportButtons();
+                var backPos = new Vector3(posmid.x-.25f, 0, posmid.z-.2f);
+                var nextPos = new Vector3(posmid.x+.25f, 0, posmid.z+.2f);
                 var nd = next.GetEntryPoint();
                 var pd = prev.GetEntryPoint();
-
-                var backPos = new Vector3(-.25f, 0, .2f);
-                var nextPos = new Vector3(.25f, 0, .2f);
+                
+                //var backPos = new Vector3(-.25f, 0, .2f);
+                //var nextPos = new Vector3(.25f, 0, .2f);
 
                 // TODO Configurable TPBtnModel
                 var model = new SteamVRTeleportButton.TeleportButtonModel(0.1f, .02f, 1f,
