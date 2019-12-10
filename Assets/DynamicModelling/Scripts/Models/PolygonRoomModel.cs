@@ -15,7 +15,7 @@ namespace Unibas.DBIS.DynamicModelling.Models
         
         public int numberOfWalls;
         
-        public float size;
+        //public float size;
         public float height;
 
         //public Material[] materials;

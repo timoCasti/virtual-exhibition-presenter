@@ -182,8 +182,8 @@ namespace Unibas.DBIS.DynamicModelling
             //go.transform.position = Vector3.zero;
             //go.transform.Rotate(Vector3.up, -a);
             //go.transform.position = coordinates[0];
-            var boxCollider = go.AddComponent<BoxCollider>();
-            boxCollider.size = new Vector3(width,height,0.0001f);
+            //var boxCollider = go.AddComponent<BoxCollider>();
+            //boxCollider.size = new Vector3(width,height,0.0001f);
             
             return go;
             
@@ -429,14 +429,14 @@ namespace Unibas.DBIS.DynamicModelling
             GameObject root = new GameObject("PolygonalRoom");
             
             // math: from size to radius
-            float rad = (float) (model.size / (2 * (Math.Sin((Math.PI / model.numberOfWalls)))));
+            //float rad = (float) (model.size / (2 * (Math.Sin((Math.PI / model.numberOfWalls)))));
 
             //var walls = model.GetWalls();
             List<GameObject> goWall = new List<GameObject>();
             for (int i = 0; i < model.numberOfWalls; i++) {
                 String wallName = "Wall" + i;
-                goWall.Add(CreateWall(model.size,model.height,model.walls[i].texture));
-                goWall[i].name = wallName;
+               // goWall.Add(CreateWall(model.size,model.height,model.walls[i].texture));
+               // goWall[i].name = wallName;
             }
             // Position walls
 
@@ -448,8 +448,8 @@ namespace Unibas.DBIS.DynamicModelling
             for (int i = 0; i < model.numberOfWalls; i++) {
                 goWall[i].name = i.ToString();
                 goWall[i].transform.parent = root.transform;
-                goWall[i].transform.position=new Vector3((float) (rad * Math.Sin((2 * Math.PI / model.numberOfWalls) * i)),0,
-                    (float) (rad * Math.Cos((2 * Math.PI / model.numberOfWalls) * i)));
+                //goWall[i].transform.position=new Vector3((float) (rad * Math.Sin((2 * Math.PI / model.numberOfWalls) * i)),0,
+              //      (float) (rad * Math.Cos((2 * Math.PI / model.numberOfWalls) * i)));
               
                 goWall[i].transform.Rotate(Vector3.up,(((1f/model.numberOfWalls)*360f*i) + ((1f/model.numberOfWalls)*360f)/2f));
                 //aussen winkel (((model.numberOfWalls-2)*180/model.numberOfWalls)*i)+((model.numberOfWalls-2)*180/model.numberOfWalls)/2) 
@@ -458,9 +458,9 @@ namespace Unibas.DBIS.DynamicModelling
             GameObject ceilingAnchor = new GameObject("CeilingAnchor");
             ceilingAnchor.transform.parent = root.transform;
 
-            GameObject ceiling = CreatePolygonalWall(model.numberOfWalls, rad,LoadMaterialByName( model.CeilingMaterial));
-            ceiling.name = "Ceiling";
-            ceiling.transform.parent = ceilingAnchor.transform;
+            //GameObject ceiling = CreatePolygonalWall(model.numberOfWalls, rad,LoadMaterialByName( model.CeilingMaterial));
+            //ceiling.name = "Ceiling";
+            //ceiling.transform.parent = ceilingAnchor.transform;
             
             // North Aligned
             ceilingAnchor.transform.position = new Vector3(0, model.height, 0);
@@ -475,9 +475,9 @@ namespace Unibas.DBIS.DynamicModelling
             GameObject floorAnchor = new GameObject("FloorAnchor");
             floorAnchor.transform.parent = root.transform;
             //var floorsize = Vector3.Distance(model.GetWallAt(0).Start, model.Position);
-            GameObject floor = CreatePolygonalWall(model.numberOfWalls,rad, LoadMaterialByName(model.FloorMaterial));
-            floor.name = "Floor";
-            floor.transform.parent = floorAnchor.transform;
+            //GameObject floor = CreatePolygonalWall(model.numberOfWalls,rad, LoadMaterialByName(model.FloorMaterial));
+            //floor.name = "Floor";
+            //floor.transform.parent = floorAnchor.transform;
             // North Aligned
             //
             //Not sure if 0 0 0 is right!!!!!! done with -halfsize for x and z in cuboid
@@ -778,8 +778,8 @@ namespace Unibas.DBIS.DynamicModelling
 
             // TODO Highly experimental!
 
-            var boxCollider = go.AddComponent<BoxCollider>();
-            boxCollider.size = new Vector3(width,height,0.0001f);
+            //var boxCollider = go.AddComponent<BoxCollider>();
+            //boxCollider.size = new Vector3(width,height,0.0001f);
 
             return go;
         }

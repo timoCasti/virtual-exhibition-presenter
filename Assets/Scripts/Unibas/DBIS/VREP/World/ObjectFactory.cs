@@ -94,7 +94,7 @@ namespace World
             var vertices = fm.vertices;
 
             for (int i = 0; i < tri.Length/3; i++) {
-                GameObject lPoly = new GameObject("RoomLight");
+                GameObject lPoly = new GameObject("RoomLight "+i);
                 var lipo = lPoly.AddComponent<Light>();
                 lipo.type = LightType.Point;
                 lipo.range = 8;
@@ -107,18 +107,7 @@ namespace World
                 lipo.transform.localPosition = new Vector3(mid.x, 2.5f, mid.z);
                 
             }
-            /*
-            GameObject lightPoly = new GameObject("RoomLight");
-            var lp = lightPoly.AddComponent<Light>();
-            lp.type = LightType.Point;
-            lp.range = 8;
-            lp.color = Color.white;
-            lp.intensity = 1.5f;
-            lp.renderMode = LightRenderMode.ForcePixel;
-           
-            lp.transform.parent = roompoly.transform;
-            lp.transform.localPosition = new Vector3(0, 2.5f, 0);
-            */
+          
             if (roomData.text != null) {
                 roompoly.name = roomData.text;
             }
@@ -128,12 +117,12 @@ namespace World
 
             GameObject teleportAreaPoly = new GameObject("TeleportArea");
             var colPoly = teleportAreaPoly.AddComponent<BoxCollider>();
-            colPoly.size = new Vector3(poly.size, 0.01f, poly.size);
+            colPoly.size = new Vector3(10, 0.01f, 10); // needs to be changed
             teleportAreaPoly.AddComponent<MeshRenderer>();
             var tpaPoly = teleportAreaPoly.AddComponent<TeleportArea>();
             tpaPoly.transform.parent = roompoly.transform;
             Vector3 posTele= (vertices[tri[0]]+vertices[tri[1]]+vertices[tri[2]])/3f;
-            tpaPoly.transform.localPosition = new Vector3(posTele.x, 0.01f, posTele.z);
+            tpaPoly.transform.localPosition = roomData.walls[0].wallCoordinates[0];//new Vector3(posTele.x, 0.01f, posTele.z);
             
             
             
@@ -203,18 +192,19 @@ namespace World
             return anchor;
         }
         
+        //creates anchors for regular polgonal rooms
         private static GameObject CreateAnchorPoly(int Wallnumber, GameObject room, PolygonRoomModel model)
         {
             GameObject anchor = new GameObject(Wallnumber + " Anchor ");
             anchor.transform.parent = room.transform;
             Vector3 pos = Vector3.zero;
             
-            float rad = (float) (model.size / (2 * (Math.Sin((Math.PI / model.numberOfWalls)))));
+            //float rad = (float) (model.size / (2 * (Math.Sin((Math.PI / model.numberOfWalls)))));
             
             var a = 0f;
-            var sizeHalf = model.size / 2f;
+            //var sizeHalf = model.size / 2f;
             
-            pos=new Vector3((float) (rad * Math.Sin((2 * Math.PI / model.numberOfWalls) * Wallnumber)),0,(float) (rad * Math.Cos((2 * Math.PI / model.numberOfWalls) * Wallnumber)));
+            //pos=new Vector3((float) (rad * Math.Sin((2 * Math.PI / model.numberOfWalls) * Wallnumber)),0,(float) (rad * Math.Cos((2 * Math.PI / model.numberOfWalls) * Wallnumber)));
             
             //a = (((model.numberOfWalls - 2) * 180 / model.numberOfWalls)*Wallnumber)+(((model.numberOfWalls - 2) * 180 / model.numberOfWalls)/2);
             a = (((1f / model.numberOfWalls) * 360f * Wallnumber) + ((1f / model.numberOfWalls) * 360f) / 2f);
@@ -241,10 +231,7 @@ namespace World
             Vector3 v = new Vector3(model.walls[Wallnumber].wallCoordinates[0].x-model.walls[Wallnumber].wallCoordinates[1].x,0,model.walls[Wallnumber].wallCoordinates[0].y-model.walls[Wallnumber].wallCoordinates[1].y);
             Vector3 v2 = new Vector3(model.walls[wall2].wallCoordinates[0].x - model.walls[wall2].wallCoordinates[1].x,0,model.walls[wall2].wallCoordinates[0].y-model.walls[wall2].wallCoordinates[1].y);
 
-            
-            
-            
-            
+
             float angleTry = Vector3.Angle(v, v2);
             a = Vector3.Angle(model.walls[Wallnumber].wallCoordinates[0] - model.walls[Wallnumber].wallCoordinates[1], Vector3.right);
             
