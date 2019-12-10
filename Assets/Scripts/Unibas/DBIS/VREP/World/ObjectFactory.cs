@@ -65,6 +65,7 @@ namespace World
             exRoom.roomModel = poly;
             exRoom.Model = roompoly;
             exRoom.RoomData = roomData;
+            
 
 
             GameObject[] anchors = new GameObject[numberOfWalls];

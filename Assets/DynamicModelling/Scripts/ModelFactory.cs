@@ -9,6 +9,7 @@ namespace Unibas.DBIS.DynamicModelling
 {
     public static class ModelFactory
     {
+        
         /// <summary>
         /// Quad of sorts:
         ///

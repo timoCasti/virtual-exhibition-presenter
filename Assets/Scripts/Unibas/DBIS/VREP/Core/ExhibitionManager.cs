@@ -174,7 +174,7 @@ namespace Unibas.DBIS.VREP.Core
                // Debug.Log(nd);
 
                
-                var posmid = thisRoom.GetPostionForTeleportButtons();
+                var posmid = thisRoom.GetPositionForTeleportButtons();
                 var backPos = new Vector3(posmid.x-.25f, 0, posmid.z-.2f);
                 var nextPos = new Vector3(posmid.x+.25f, 0, posmid.z+.2f);
                 var nd = next.GetEntryPoint();
