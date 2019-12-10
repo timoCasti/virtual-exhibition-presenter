@@ -116,6 +116,26 @@ namespace Unibas.DBIS.VREP.World
             return transform.position + RoomData.entrypoint;
         }
 
+        public Vector3 GetPostionForTeleportButtons()
+        {
+            var roomGo=GameObject.Find(this.RoomData.text);
+            Mesh meschOfFloor = null;
+
+            var v = roomGo.GetComponentsInChildren<MeshFilter>();
+            for (int i = 0; i < v.Length; i++)
+            {
+                if (string.Equals(v[i].name, "Floor")) ;
+                {
+                    meschOfFloor = v[i].mesh;
+                }
+            }
+
+            var pos = (meschOfFloor.vertices[meschOfFloor.triangles[0]] +meschOfFloor.vertices[meschOfFloor.triangles[1]] + meschOfFloor.vertices[meschOfFloor.triangles[2]])/3f;
+
+            return pos;
+        }
+        
+
         public void RestoreWallExhibits() {
             Walls.ForEach(w => w.RestoreDisplayals());
         }
