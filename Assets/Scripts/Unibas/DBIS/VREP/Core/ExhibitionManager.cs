@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using DefaultNamespace;
 using DefaultNamespace.VREM.Model;
@@ -119,6 +120,8 @@ namespace Unibas.DBIS.VREP.Core
         }
 
 
+      
+        
         private void CreateAndAttachTeleporters(CuboidExhibitionRoom room)
         {
             var index = GetRoomIndex(room.RoomData);
@@ -158,29 +161,7 @@ namespace Unibas.DBIS.VREP.Core
         // same method for polys
         private void CreateAndAttachTeleporters(PolygonalExhibitionRoom room)
             {
-                //var
-                for (int i = 0; i < room.roomModel.walls.Length; i++)
-                {
-                    
-                }
-                //find the room Gameobject to position teleport buttons correctly ( inside the room) !!!! DEPENDS ON ROOM-NAME !!!!
-                var roomGo=GameObject.Find(room.RoomData.text);
-                Mesh meschOfFloor = null;
-
-                var v = roomGo.GetComponentsInChildren<MeshFilter>();
-                for (int i = 0; i < v.Length; i++)
-                {
-                    if (string.Equals(v[i].name, "Floor")) ;
-                    {
-                        meschOfFloor = v[i].mesh;
-                    }
-                }
-
-                var pos = (meschOfFloor.vertices[meschOfFloor.triangles[0]] +meschOfFloor.vertices[meschOfFloor.triangles[1]] + meschOfFloor.vertices[meschOfFloor.triangles[2]])/3f;
-                
-                
-                    
-                
+         
                 //Debug.Log("pos of go " +what.transform.position);
                 
                 var index = GetRoomIndex(room.RoomData);

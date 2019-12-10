@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using DefaultNamespace;
 using Unibas.DBIS.DynamicModelling.Models;
@@ -130,9 +131,41 @@ namespace Unibas.DBIS.VREP.World
                 }
             }
 
-            var pos = (meschOfFloor.vertices[meschOfFloor.triangles[0]] +meschOfFloor.vertices[meschOfFloor.triangles[1]] + meschOfFloor.vertices[meschOfFloor.triangles[2]])/3f;
+            
+            //var pos = (meschOfFloor.vertices[meschOfFloor.triangles[0]] +meschOfFloor.vertices[meschOfFloor.triangles[1]] + meschOfFloor.vertices[meschOfFloor.triangles[2]])/3f;
 
+            int iteration = 0;
+            Vector3 pos = new Vector3();
+            var posVar=new Vector3();
+            var sizeF = AreaOfTriangle(meschOfFloor.vertices[meschOfFloor.triangles[0]],meschOfFloor.vertices[meschOfFloor.triangles[1]], meschOfFloor.vertices[meschOfFloor.triangles[2]]);
+            for (int i = 0; i < meschOfFloor.vertices.Length; i++) {
+                posVar = (meschOfFloor.vertices[meschOfFloor.triangles[0]] +meschOfFloor.vertices[meschOfFloor.triangles[1]] + meschOfFloor.vertices[meschOfFloor.triangles[2]])/3f;
+                var sizeVar=AreaOfTriangle(meschOfFloor.vertices[meschOfFloor.triangles[i*3]],meschOfFloor.vertices[meschOfFloor.triangles[i*3+1]],meschOfFloor.vertices[meschOfFloor.triangles[i*3+2]]);
+                if(sizeVar>sizeF) {
+                    sizeF = sizeVar;
+                    iteration = i;
+                }
+            }
+            
+            pos = (meschOfFloor.vertices[meschOfFloor.triangles[iteration*3]] +meschOfFloor.vertices[meschOfFloor.triangles[iteration*3+1]] + meschOfFloor.vertices[meschOfFloor.triangles[iteration*3+2]])/3f;
+
+            
+            
+            
             return pos;
+        }
+        
+        // method to calculate surface of triangles
+        public double AreaOfTriangle(Vector3 pt1, Vector3 pt2, Vector3 pt3)
+        {
+            //d = (Math.Pow(x2 - x1)2 + (y2 - y1)2 + (z2 - z1)2)1/2
+            double a = Math.Pow(Math.Pow((pt2.x - pt1.x), 2) + Math.Pow((pt2.y - pt1.y), 2) + Math.Pow((pt2.z - pt1.z), 2), (1 / 2f));      //pt1.DistanceTo(pt2);
+            double b = Math.Pow(Math.Pow((pt2.x - pt3.x), 2) + Math.Pow((pt2.y - pt3.y), 2) + Math.Pow((pt2.z - pt3.z), 2), (1 / 2f));  
+            //pt2.DistanceTo(pt3);
+            double c =Math.Pow(Math.Pow((pt3.x - pt1.x), 2) + Math.Pow((pt3.y - pt1.y), 2) + Math.Pow((pt3.z - pt1.z), 2), (1 / 2f));  
+            //pt3.DistanceTo(pt1);
+            double s = (a + b + c) / 2;
+            return Math.Sqrt(s * (s-a) * (s-b) * (s-c));
         }
         
 
