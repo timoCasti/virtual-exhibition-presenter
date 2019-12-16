@@ -22,10 +22,11 @@ namespace DefaultNamespace.VREM.Model {
 
     public string ambient;
 
-    public Exhibit[] exhibits;    
-    
+    public Exhibit[] exhibits;
+     
     
     public string GetURLEncodedAudioPath() {
+      
       if (!string.IsNullOrEmpty(ambient))
       {
         return ServerSettings.SERVER_ID+"content/get/"+ ambient.Substring(0).Replace("/", "%2F").Replace(" ", "%20");

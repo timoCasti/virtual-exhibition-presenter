@@ -34,6 +34,11 @@ namespace Unibas.DBIS.VREP.Core
             return _rooms[index];
         }
 
+        public CuboidExhibitionCorridor GetCorridorByIndex(int index)
+        {
+            return _corridors[index];
+        }
+
         public void RestoreExhibits() {
             _rooms.ForEach(r => r.RestoreWallExhibits());
         }
@@ -53,6 +58,29 @@ namespace Unibas.DBIS.VREP.Core
             for (int i = 0; i < _exhibition.rooms.Length; i++)
             {
                 if (room.Equals(_exhibition.rooms[i]))
+                {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
+        
+        private int GetNextCorridorIndex(int pos)
+        {
+            return (pos + 1) % _exhibition.corridors.Length;
+        }
+
+        private int GetPreviousCorridorIndex(int pos)
+        {
+            return (pos - 1 + _exhibition.corridors.Length) % _exhibition.corridors.Length;
+        }
+
+        private int GetCorridorIndex(DefaultNamespace.VREM.Model.Corridor corridor)
+        {
+            for (int i = 0; i < _exhibition.corridors.Length; i++)
+            {
+                if (corridor.Equals(_exhibition.corridors[i]))
                 {
                     return i;
                 }
@@ -84,9 +112,34 @@ namespace Unibas.DBIS.VREP.Core
 
             return _exhibition.rooms[GetPreviousRoomIndex(pos)];
         }
+        
+        private DefaultNamespace.VREM.Model.Corridor GetNext(DefaultNamespace.VREM.Model.Corridor corridor)
+        {
+            var pos = GetCorridorIndex(corridor);
+            if (pos == -1)
+            {
+                // TODO This should not happen
+                return null;
+            }
+
+            return _exhibition.corridors[GetNextCorridorIndex(pos)];
+        }
+
+        private DefaultNamespace.VREM.Model.Corridor GetPrevious(DefaultNamespace.VREM.Model.Corridor corridor)
+        {
+            var pos = GetCorridorIndex(corridor);
+            if (pos == -1)
+            {
+                // TODO This should not happen
+                return null;
+            }
+
+            return _exhibition.corridors[GetPreviousCorridorIndex(pos)];
+        }
 
         public void GenerateExhibition()
         {
+            
             foreach (var room in _exhibition.rooms)
             {
                 var roomGameObject = ObjectFactory.BuildRoom(room);
@@ -110,6 +163,28 @@ namespace Unibas.DBIS.VREP.Core
                     logo.transform.localScale = Vector3.one * 10000;
                 }
                 */
+            }
+            
+            foreach (var corridor in _exhibition.corridors)
+            {
+                var corridorGameObject = ObjectFactory.BuildCorridor(corridor);
+                var exhibitionCorridor = corridorGameObject.GetComponent<CuboidExhibitionCorridor>();
+                _corridors.Add(exhibitionCorridor);
+                
+                
+                /*
+                if (VREPController.Instance.Settings.CeilingLogoEnabled)
+                {
+                    GameObject pref = Resources.Load<GameObject>("Objects/unibas");
+                    var logo = GameObject.Instantiate(pref);
+                    logo.name = "UnibasLogo";
+                    logo.transform.SetParent(exhibitionCorridor.transform, false);
+                    //logo.transform.localPosition = new Vector3(-1.493f, room.size.y-.01f, -0.642f); // manually found values
+                    logo.transform.localPosition =
+                        new Vector3(-1.493f, corridor.size.y - .01f, 3.35f); // manually found values
+                    logo.transform.localRotation = Quaternion.Euler(new Vector3(90, 180));
+                    logo.transform.localScale = Vector3.one * 10000;
+                }*/
             }
 
             // For teleporting, each room needs to be created.
@@ -217,5 +292,54 @@ namespace Unibas.DBIS.VREP.Core
                 lobbyTpBtn.OnTeleportStart = room.OnRoomLeave;
             }
         }
+        
+        /*
+        private void CreateAndAttachTeleporters(CuboidCorridor corridor)
+        {
+            var index = GetCorridorIndex(corridor.CorridorData);
+            var next = _corridors[GetNextCorridorIndex(index)];
+            var prev = _corridors[GetPreviousCorridorIndex(index)];
+
+            var nd = next.GetEntryPoint();
+            var pd = prev.GetEntryPoint();
+
+            var backPos = new Vector3(-.25f, 0, .2f);
+            var nextPos = new Vector3(.25f, 0, .2f);
+
+            // TODO Configurable TPBtnModel
+            var model = new SteamVRTeleportButton.TeleportButtonModel(0.1f, .02f, 1f,
+                TexturingUtility.LoadMaterialByName("none"),
+                TexturingUtility.LoadMaterialByName("NMetal"), TexturingUtility.LoadMaterialByName("NPlastic"));
+
+            if (_exhibition.corridors.Length > 1)
+            {
+                // back teleporter
+                var backTpBtn = SteamVRTeleportButton.Create(corridor.gameObject, backPos, pd, model
+                    ,
+                    Resources.Load<Sprite>("Sprites/UI/chevron-left"));
+
+                backTpBtn.OnTeleportStart = corridor.OnCorridorLeave;
+                backTpBtn.OnTeleportEnd = prev.OnCorridorEnter;
+
+                // back teleporter
+                var nextTpBtn = SteamVRTeleportButton.Create(corridor.gameObject, nextPos, nd,
+                    model,
+                    Resources.Load<Sprite>("Sprites/UI/chevron-right"));
+
+                nextTpBtn.OnTeleportStart = corridor.OnCorridorLeave;
+                nextTpBtn.OnTeleportEnd = next.OnCorridorEnter;
+            }
+
+
+            if (VREPController.Instance.Settings.StartInLobby)
+            {
+                var lobbyTpBtn = SteamVRTeleportButton.Create(corridor.gameObject, new Vector3(0, 0, .2f),
+                    VREPController.Instance.LobbySpawn,
+                    model,
+                    "Lobby");
+                lobbyTpBtn.OnTeleportStart = corridor.OnCorridorLeave;
+            }
+        }
+        */
     }
 }
