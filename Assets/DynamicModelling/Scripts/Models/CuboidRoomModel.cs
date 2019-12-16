@@ -55,5 +55,10 @@ namespace Unibas.DBIS.DynamicModelling.Models
         {
             return this.Size.x * this.Size.y;
         }
+
+        public Vector2 GetSize_vector()
+        {
+            return this.Size;
+        }
     }
 }
