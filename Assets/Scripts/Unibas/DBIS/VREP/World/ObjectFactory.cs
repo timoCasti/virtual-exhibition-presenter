@@ -58,8 +58,10 @@ namespace World
             }
 
             int numberOfWalls = roomData.walls.Length;
+
+            float scaleCeiling = 1f;
             
-            PolygonRoomModel poly=new PolygonRoomModel(roomData.position,numberOfWalls,roomData.height,roomData.floor,roomData.ceiling,roomData.walls);
+            PolygonRoomModel poly=new PolygonRoomModel(roomData.position,numberOfWalls,scaleCeiling,roomData.height,roomData.floor,roomData.ceiling,roomData.walls);
             GameObject roompoly = ModelFactory.CreatePolygonalRoom(poly);
             var exRoom = roompoly.AddComponent<PolygonalExhibitionRoom>();
             exRoom.roomModel = poly;
@@ -235,12 +237,40 @@ namespace World
             float angleTry = Vector3.Angle(v, v2);
             a = Vector3.Angle(model.walls[Wallnumber].wallCoordinates[0] - model.walls[Wallnumber].wallCoordinates[1], Vector3.right);
             
-            // get the normal of the Mesh of the wall to adjust the angle of the anchor
+            // get the normal of the Mesh of the wall to adjust the angle of the anchor (Mesh gets created agein since its hard to receive the right one)
             string wallname = "Wall" + Wallnumber;
-            GameObject gogo = GameObject.Find(wallname);
-            Vector3 nor = gogo.GetComponentInChildren<MeshFilter>().mesh.normals[0];
-            Vector3 vec = Quaternion.FromToRotation(Vector3.back, nor).eulerAngles;
-            anchor.transform.Rotate(Vector3.up,vec.y);
+            
+
+            room.GetComponentsInChildren<MeshFilter>();
+            var coordinates=model.walls[Wallnumber].wallCoordinates;
+            GameObject go = new GameObject("FreeWall");
+            MeshFilter meshFilter = go.AddComponent<MeshFilter>();
+            MeshRenderer meshRenderer = go.AddComponent<MeshRenderer>();
+            Mesh mesh = meshFilter.mesh;
+            mesh.vertices = coordinates;
+            int[] tri = new int[6];
+            tri[0] = 0;
+            tri[1] = 2;
+            tri[2] = 1;
+            tri[3] = 2;
+            tri[4] = 3;
+            tri[5] = 1;
+            mesh.triangles = tri;
+
+            mesh.RecalculateBounds();
+            mesh.RecalculateNormals();
+            mesh.RecalculateTangents();
+            
+            //nor old
+            //Vector3 nor = gogo.GetComponentInChildren<MeshFilter>().mesh.normals[0];
+            Vector3 nor = mesh.normals[0];
+            GameObject.DestroyImmediate(go);
+            //var ro = gogo.GetComponentInChildren<MeshFilter>().transform.rotation;
+            Vector3 vec1 = Quaternion.FromToRotation(Vector3.back, nor).eulerAngles;
+            var vec2 = Quaternion.FromToRotation(Vector3.back, nor);
+            anchor.transform.Rotate(Vector3.up,vec1.y);
+            anchor.transform.Rotate(Vector3.right,vec1.x);
+            //anchor.transform.Rotate(Vector3.back,vec1.z);
             anchor.transform.localPosition = pos;
 
             return anchor;

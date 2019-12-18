@@ -496,12 +496,11 @@ namespace Unibas.DBIS.DynamicModelling
 
         public static GameObject CreatePolygonalRoom(PolygonRoomModel model)
         {
+            
             GameObject go=new GameObject("PolyRoom");
-            
-            
             //find vertices of ceiling and floor depends on the structure of the wallcoordinates
-            System.Collections.Generic.List<Vector3> floorvertices=new System.Collections.Generic.List<Vector3>();
-            System.Collections.Generic.List<Vector3> ceilingvertices=new System.Collections.Generic.List<Vector3>();
+            var floorvertices=new System.Collections.Generic.List<Vector3>();
+            var ceilingvertices=new System.Collections.Generic.List<Vector3>();
             for (int i = 0; i < model.numberOfWalls; i++) {
                 if (floorvertices.Contains(model.walls[i].wallCoordinates[0])) {
                     Debug.Log("Floor has same vertice multiple times");
@@ -517,9 +516,40 @@ namespace Unibas.DBIS.DynamicModelling
                     ceilingvertices.Add(model.walls[i].wallCoordinates[2]);
                 }
             }
+           
+            
+            // ceiling scaling
+            var scaling = 0f; // Hardcode for testing
+            Vector3 midOfCeiling=new Vector3(0,0,0);
+            for (int i = 0; i < ceilingvertices.Count; i++) {
+                midOfCeiling += ceilingvertices[i];
+
+            }
+
+            Vector3 scalevector0;
+            Vector3 scalevector1;
+            Vector3 scalevector2;
+            midOfCeiling = midOfCeiling / ceilingvertices.Count;
+            //Debug.Log("mid   "+ midOfCeiling);
+            for (int i = 0; i < model.walls.Length; i++) {
+                scalevector0 = ceilingvertices[i]-midOfCeiling;
+                scalevector1 = model.walls[i].wallCoordinates[2]- midOfCeiling;
+                scalevector2 = model.walls[i].wallCoordinates[3]- midOfCeiling;
+                //Debug.Log(model.walls[i].wallCoordinates.Length);
+                //Debug.Log("point before  "+ ceilingvertices[i]);
+                
+                ceilingvertices[i] = midOfCeiling+ (scalevector1 * scaling);
+               
+                //Debug.Log("Sacled ceiling point " + i + "    " + ceilingvertices[i]);
+                model.walls[i].wallCoordinates[2] = midOfCeiling+ (scalevector1* scaling);
+                model.walls[i].wallCoordinates[3] = midOfCeiling+ (scalevector2* scaling);
+
+            }
+            
             // convert list to array, since its needed as parameter
             var ceilingArray = ceilingvertices.ToArray();
             var floorArray=floorvertices.ToArray();
+            
             // Ceiling
             GameObject ceilingAnchor = new GameObject("CeilingAnchor");
             ceilingAnchor.transform.parent = go.transform;
