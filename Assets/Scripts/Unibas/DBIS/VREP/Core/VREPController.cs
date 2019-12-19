@@ -131,11 +131,11 @@ namespace Unibas.DBIS.VREP
                 json = jtf.text;
             }
 
-//            Debug.Log(json);
+            Debug.Log(json);
             Exhibition ex = JsonUtility.FromJson<Exhibition>(json);
             Debug.Log(json);
             Debug.Log(ex);
-  //          Debug.Log(_buildingManager);
+            Debug.Log(_buildingManager);
             // TODO create lobby
             
             _exhibitionManager = new ExhibitionManager(ex);

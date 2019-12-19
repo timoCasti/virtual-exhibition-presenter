@@ -72,11 +72,10 @@ namespace World {
       }
     }
 
-    /*
     public WallOrientation GetOrientation()
     {
       return WallData.GetOrientation();
     }
-*/
+
   }
 }

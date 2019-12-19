@@ -5,9 +5,10 @@
   "LobbyFloorLogoEnabled": true,
   "LobbyCeilingLogoEnabled": true,
   "CeilingLogoEnabled": true,
-  "PlaygroundEnabled": false,
+  "PlaygroundEnabled": true,
   "RequestExhibitions": false,
   "exhibitionIds": [
-    "5de82b59312f732fc81eaa51"
+    "5d9eab8351cf690f102da633"
+    
   ]
 }

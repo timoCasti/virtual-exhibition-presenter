@@ -86,22 +86,16 @@ public class Room : MonoBehaviour {
 				throw new ArgumentOutOfRangeException("orientation", orientation, null);
 		}
 	}
-	// new way to get wall without orientation same 
-	private Wall GetWallwithName(int Wallnumber)
-	{
-		string mywall = "Wall" + Wallnumber;
-		return GetWall(mywall);
-	}
 
 
 	/// <summary>
 	/// 
 	/// </summary>
 	/// <param name="url">url to access image</param>
-	/// <param name="wall">wall orientation</param> got replaced with int since no orientation
+	/// <param name="wall">wall orientation</param>
 	/// <param name="x">x coordinate for corresponding wall based on left lower anchor</param>
 	/// <param name="y">x coordinate for corresponding wall based on left lower anchor</param>
-	public Displayal Display(string url,  int wall, float x, float y, float w, float h, bool lightOn =  true, string audioUrl  = null) {
+	public Displayal Display(string url,  WallOrientation wall, float x, float y, float w, float h, bool lightOn =  true, string audioUrl  = null) {
 		Debug.Log(string.Format("{0}, {1}, {2}/{3}, {4}/{5}",url,wall,x,y,w,h));
 		GameObject displayal = Instantiate(PlanePrefab);
 
@@ -131,14 +125,9 @@ public class Room : MonoBehaviour {
 		ImageLoader image = displayal.transform.Find("Plane").gameObject.AddComponent<ImageLoader>(); // Displayal
 		//ImageLoader image = displayal.AddComponent<ImageLoader>();// ImageDisplayPlane
 		image.ReloadImage(url);
-		/*
 		Debug.Log(GetWallForOrientation(wall));
 		Vector3 pos = GetWallForOrientation(wall).CalculatePosition(transform.position,new Vector2(x,y));
 		Vector3 rot = GetWallForOrientation(wall).CalculateRotation();
-		*/
-		Debug.Log(GetWallwithName(wall));
-		Vector3 pos = GetWallwithName(wall).CalculatePosition(transform.position,new Vector2(x,y));
-		Vector3 rot = GetWallwithName(wall).CalculateRotation();
 		displayal.transform.position = pos;
 		displayal.transform.rotation = Quaternion.Euler(rot);
 		displayal.transform.localScale = ScalingUtility.convertMeters2PlaneScaleSize(w, h);
@@ -260,15 +249,6 @@ public class Room : MonoBehaviour {
 	}
 
 	private void PopulateWalls(DefaultNamespace.VREM.Model.Wall[] walls) {
-
-		foreach (var wall in walls) {
-			LoadExhibits(wall);
-			GetWallwithName(wall.wallNumber).LoadMaterial(TexturingUtility.Translate(wall.texture));
-			
-			
-		}
-
-		/*
 		foreach (var wall in walls) {
 			if (wall.direction == "NORTH") {
 				LoadExhibits(wall, WallOrientation.NORTH);
@@ -290,14 +270,12 @@ public class Room : MonoBehaviour {
 				GetWallForOrientation(WallOrientation.WEST).LoadMaterial(TexturingUtility.Translate(wall.texture));
 			}
 		}
-		*/
 	}
 
-	//Wallorientation got removed since its in wall //replaced with int Wallnumber
-	private void LoadExhibits(DefaultNamespace.VREM.Model.Wall wall) {
+	private void LoadExhibits(DefaultNamespace.VREM.Model.Wall wall, WallOrientation orientation) {
 		foreach (Exhibit e in wall.exhibits) {
 			Debug.Log(string.Format("E: {0}/{1} at {2}/{3}", e.position.x, e.position.y, e.size.x, e.size.y));
-			var disp = Display(e.GetURLEncodedPath(), wall.wallNumber, e.position.x, e.position.y, e.size.x, e.size.y, e.light, e.GetURLEncodedAudioPath());
+			var disp = Display(e.GetURLEncodedPath(), orientation, e.position.x, e.position.y, e.size.x, e.size.y, e.light, e.GetURLEncodedAudioPath());
 			disp.SetExhibitModel(e);
 		}
 	}

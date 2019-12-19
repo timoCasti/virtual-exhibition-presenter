@@ -1,15 +1,11 @@
 using System;
-using System.Linq;
-using Boo.Lang;
 using Unibas.DBIS.DynamicModelling.Models;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace Unibas.DBIS.DynamicModelling
 {
     public static class ModelFactory
     {
-        
         /// <summary>
         /// Quad of sorts:
         ///
@@ -24,7 +20,7 @@ namespace Unibas.DBIS.DynamicModelling
         /// <param name="d"></param>
         /// <param name="material"></param>
         /// <returns></returns>
-        public static GameObject CreateFreeform(Vector3 a, Vector3 b, Vector3 c, Vector3 d,
+        public static GameObject CreateFreeformQuad(Vector3 a, Vector3 b, Vector3 c, Vector3 d,
             Material material = null)
         {
             GameObject go = new GameObject("FreeformQuad");
@@ -103,160 +99,6 @@ namespace Unibas.DBIS.DynamicModelling
 
             return go;
         }
-        /*
-         * Creates a wall based on 4 coordinates (Vector3)
-         * para:  Vector3 [] coordinates // the coordinates of the walls vertices ( 4! )
-         *        Material material // material of the wall can be null
-         * returns the Wall as GameObject
-         */
-        public static GameObject CreateFreeWall(Vector3[] coordinates, Material material = null)
-        {
-            GameObject go = new GameObject("FreeWall");
-            MeshFilter meshFilter = go.AddComponent<MeshFilter>();
-            MeshRenderer meshRenderer = go.AddComponent<MeshRenderer>();
-            Mesh mesh = meshFilter.mesh;
-            
-            mesh.vertices = coordinates;
-
-            int[] tri = new int[6];
-            tri[0] = 0;
-            tri[1] = 2;
-            tri[2] = 1;
-
-            tri[3] = 2;
-            tri[4] = 3;
-            tri[5] = 1;
-            mesh.triangles = tri;
-
-            Vector3[] normals = new Vector3[4];
-            normals[0] = -Vector3.forward;
-            normals[1] = -Vector3.forward;
-            normals[2] = -Vector3.forward;
-            normals[3] = -Vector3.forward;
-            mesh.normals = normals;
-
-            Vector2[] uv = new Vector2[4];
-
-            float width = Vector3.Distance(coordinates[0],coordinates[1]);
-            float height = Vector3.Distance(coordinates[0], coordinates[3]);
-                        
-            float xUnit = 1;
-            float yUnit = 1;
-
-            if (width > height)
-            {
-                xUnit = width / height;
-            }
-            else
-            {
-                yUnit = height / width;
-            }
-
-            uv[0] = new Vector2(0, 0);
-            uv[1] = new Vector2(xUnit, 0);
-            uv[2] = new Vector2(0, yUnit);
-            uv[3] = new Vector2(xUnit, yUnit);
-            
-            mesh.uv = uv;
-
-            
-            mesh.RecalculateBounds();
-            mesh.RecalculateNormals();
-            mesh.RecalculateTangents();
-
-            if (material != null)
-            {
-                meshRenderer.material.CopyPropertiesFromMaterial(material);
-                //meshRenderer.material.SetTextureScale("_MainTex", new Vector2(1,1));
-                meshRenderer.material.name = material.name + "(Instance)";
-            }
-            else
-            {
-                meshRenderer.material = new Material(Shader.Find("Standard"));
-                meshRenderer.material.color = Color.white;
-            }
-            
-            
-            //postion wall
-            float a = Vector3.Angle(coordinates[0]-coordinates[1], Vector3.right);
-        
-            //add collider for teleportation limits
-            var collider = go.AddComponent<MeshCollider>();
-            collider.sharedMesh = mesh;
-            
-            return go;
-            
-            
-            
-            
-
-            return go;
-        }
-        /*
-         * Creates the "walls" for ceiling or floor out of various amounts of vertices
-         *
-         * gets all vertices of floor or ceiling as Vector3[]
-         * A Material
-         * String "Floor" or "Ceiling" necessary to face in correct direction
-         */
-        public static GameObject CreatePolygonalMeshes(Vector3[] vertices, Material material, String FloororCeiling)
-        {
-            GameObject go =new GameObject("PolygonalWall");
-            MeshFilter meshFilter = go.AddComponent<MeshFilter>();
-            MeshRenderer meshRenderer = go.AddComponent<MeshRenderer>();
-            Mesh mesh = meshFilter.mesh;
-
-            mesh.vertices = vertices;
-           
-            // transform Vector3 to Vector2 with x and z only, since height not needed
-            Vector2[] vector2s=new Vector2[vertices.Length];
-            for (int i = 0; i < vertices.Length; i++) {
-                vector2s[i].x = vertices[i].x;
-                vector2s[i].y = vertices[i].z;
-            }
-            // Method which calculates polygons triangluars
-            Triangulator tr = new Triangulator(vector2s);
-            int[] indices = tr.Triangulate();
-
-            if (string.Equals(FloororCeiling, "Floor")) {
-                System.Array.Reverse(indices);
-            }
- 
-            // Create the Vector3 vertices  ??
-            Vector3[] verticesOfpoly = new Vector3[vector2s.Length];
-            for (int i=0; i<vertices.Length; i++) {
-                vertices[i] = new Vector3(vector2s[i].x, vector2s[i].y, 0);
-            }
-
-            mesh.triangles = indices;
-            
-            //Maybe we need normals and uv
-            
-            mesh.RecalculateBounds();
-            mesh.RecalculateNormals();
-            mesh.RecalculateTangents();
-            
-            
-            
-            if (material != null)
-            {
-                meshRenderer.material.CopyPropertiesFromMaterial(material);
-                //meshRenderer.material.SetTextureScale("_MainTex", new Vector2(1,1));
-                meshRenderer.material.name = material.name + "(Instance)";
-            }
-            else
-            {
-                meshRenderer.material = new Material(Shader.Find("Standard"));
-                meshRenderer.material.color = Color.white;
-            }
-            
-            
-
-            return go;
-        }
-        
-        
-        
 
         /// <summary>
         /// Creates a wall between two positions
@@ -281,7 +123,22 @@ namespace Unibas.DBIS.DynamicModelling
             return go;
         }
 
-        
+        public static GameObject CreateWall(WallModel model)
+        {
+            float width = Vector3.Distance(model.Start, model.End);
+            float a = Vector3.Angle(model.Start - model.End, Vector3.right);
+            GameObject go = new GameObject("PositionedWall");
+            GameObject wall = CreateWall(width, model.Height, model.Material);
+
+            wall.transform.parent = go.transform;
+            wall.transform.position = Vector3.zero;
+            wall.transform.Rotate(Vector3.up, -a);
+            go.transform.position = model.Start;
+            go.AddComponent<ModelContainer>().Model = model;
+            return go;
+        }
+
+
         /// <summary>
         /// 
         /// </summary>
@@ -477,191 +334,6 @@ namespace Unibas.DBIS.DynamicModelling
             
         }
         
-     /*
-      * Method to create regular polygonaial rooms not used anymore.
-      */
-        public static GameObject CreateRegularPolygonalRoom(PolygonRoomModel model)
-        {
-            GameObject root = new GameObject("PolygonalRoom");
-            
-            // math: from size to radius
-            //float rad = (float) (model.size / (2 * (Math.Sin((Math.PI / model.numberOfWalls)))));
-
-            //var walls = model.GetWalls();
-            List<GameObject> goWall = new List<GameObject>();
-            for (int i = 0; i < model.numberOfWalls; i++) {
-                String wallName = "Wall" + i;
-               // goWall.Add(CreateWall(model.size,model.height,model.walls[i].texture));
-               // goWall[i].name = wallName;
-            }
-            // Position walls
-
-            
-            //var n = model.numberOfWalls;
-            //var x = 1f / n;
-            //double alpha = ((x* 360f) *0.5f);
-            
-            for (int i = 0; i < model.numberOfWalls; i++) {
-                goWall[i].name = i.ToString();
-                goWall[i].transform.parent = root.transform;
-                //goWall[i].transform.position=new Vector3((float) (rad * Math.Sin((2 * Math.PI / model.numberOfWalls) * i)),0,
-              //      (float) (rad * Math.Cos((2 * Math.PI / model.numberOfWalls) * i)));
-              
-                goWall[i].transform.Rotate(Vector3.up,(((1f/model.numberOfWalls)*360f*i) + ((1f/model.numberOfWalls)*360f)/2f));
-                //aussen winkel (((model.numberOfWalls-2)*180/model.numberOfWalls)*i)+((model.numberOfWalls-2)*180/model.numberOfWalls)/2) 
-            }
-            // Ceiling
-            GameObject ceilingAnchor = new GameObject("CeilingAnchor");
-            ceilingAnchor.transform.parent = root.transform;
-
-            //GameObject ceiling = CreatePolygonalWall(model.numberOfWalls, rad,LoadMaterialByName( model.CeilingMaterial));
-            //ceiling.name = "Ceiling";
-            //ceiling.transform.parent = ceilingAnchor.transform;
-            
-            // North Aligned
-            ceilingAnchor.transform.position = new Vector3(0, model.height, 0);
-            ceilingAnchor.transform.Rotate(Vector3.right, -90);
-            
-            // No idea why ceiling has to be rotated, only needs to be rotated if numberofwalls is odd
-            if (model.numberOfWalls % 2 == 1) {
-                ceilingAnchor.transform.Rotate(Vector3.back, ((1f / model.numberOfWalls) * 360f) / 2f);
-            }
-
-            // Floor
-            GameObject floorAnchor = new GameObject("FloorAnchor");
-            floorAnchor.transform.parent = root.transform;
-            //var floorsize = Vector3.Distance(model.GetWallAt(0).Start, model.Position);
-            //GameObject floor = CreatePolygonalWall(model.numberOfWalls,rad, LoadMaterialByName(model.FloorMaterial));
-            //floor.name = "Floor";
-            //floor.transform.parent = floorAnchor.transform;
-            // North Aligned
-            //
-            //Not sure if 0 0 0 is right!!!!!! done with -halfsize for x and z in cuboid
-            // pretty sure its wrong since wall coordinates are still all positive since not my logic
-            //
-            floorAnchor.transform.position = new Vector3(0, 0, 0);
-            floorAnchor.transform.Rotate(Vector3.right, 90);
-           
-        
-    
-
-            root.transform.position = model.Position;
-            
-            root.AddComponent<ModelContainer>().Model = model;
-            return root;
-        }
-
-        public static GameObject CreatePolygonalRoom(PolygonRoomModel model)
-        {
-            GameObject go=new GameObject("PolyRoom");
-            
-            
-            //find vertices of ceiling and floor depends on the structure of the wallcoordinates
-            System.Collections.Generic.List<Vector3> floorvertices=new System.Collections.Generic.List<Vector3>();
-            System.Collections.Generic.List<Vector3> ceilingvertices=new System.Collections.Generic.List<Vector3>();
-            for (int i = 0; i < model.numberOfWalls; i++) {
-                if (floorvertices.Contains(model.walls[i].wallCoordinates[0])) {
-                    Debug.Log("Floor has same vertice multiple times");
-                }
-                else {
-                    floorvertices.Add(model.walls[i].wallCoordinates[0]);
-                }
-
-                if (ceilingvertices.Contains(model.walls[i].wallCoordinates[2])) {
-                    Debug.Log("Ceiling contains same vertice multiple times");
-                }
-                else {
-                    ceilingvertices.Add(model.walls[i].wallCoordinates[2]);
-                }
-            }
-            // convert list to array, since its needed as parameter
-            var ceilingArray = ceilingvertices.ToArray();
-            var floorArray=floorvertices.ToArray();
-            // Ceiling
-            GameObject ceilingAnchor = new GameObject("CeilingAnchor");
-            ceilingAnchor.transform.parent = go.transform;
-            GameObject ceiling = CreatePolygonalMeshes(ceilingArray, LoadMaterialByName( model.CeilingMaterial),"Ceiling");
-            ceiling.name = "Ceiling";
-            ceiling.transform.parent = ceilingAnchor.transform;
-            ceilingAnchor.transform.position = new Vector3(0, model.height, 0);
-            
-            // Floor
-            GameObject floorAnchor = new GameObject("FloorAnchor");
-            floorAnchor.transform.parent = go.transform;
-            GameObject floor = CreatePolygonalMeshes(floorArray, LoadMaterialByName(model.FloorMaterial),"Floor");
-            floor.name = "Floor";
-            floor.transform.parent = floorAnchor.transform;
-            floorAnchor.transform.position = new Vector3(0, 0, 0);
-
-
-            /*
-             * checks if walls face right direction which is a matter of which direction the room was drawn
-             * if room gets drawn counter clockwise walls would be visible outside the room
-             * therefore it gets checked here and swapped if necessary
-             * info: this approach is rather complicated and only practical correct.
-             * idea: check if a point very close to a wall is "inside" the floor or not
-             */
-            Mesh m=floor.GetComponentInChildren<MeshFilter>().mesh;
-            Vector3 point = model.walls[0].wallCoordinates[0];
-            Vector3 point2 = model.walls[0].wallCoordinates[1];
-            Vector3 mid = (point + point2) / 2f;
-            GameObject testWall = CreateFreeWall(model.walls[0].wallCoordinates);
-            Vector3[] normals = testWall.GetComponentInChildren<MeshFilter>().mesh.normals;
-            Object.Destroy(testWall);
-            Vector3 avg = (normals[0] + normals[1]) / 2f;
-            Vector3 inOut = mid + (avg * 0.1f);
-            //Debug.Log("Point to test "+inOut);
-            int[] tri = m.triangles;
-            var vert = m.vertices;
-            bool b = false;
-            for (int i = 0; i < (tri.Length / 3); i++) {
-                if (point_inside_trigon(inOut, vert[tri[i * 3]], vert[tri[i * 3 + 1]], vert[tri[i * 3 + 2]])) {
-                    b = true;
-                }
-            }
-            /*
-             * Swaps the coordinates of the walls
-             * wallcoordinate[0] => wallcordinate[1] and wallcoordinate[2]->[3] and vice versa
-             */ 
-            if (b==false) {
-                Debug.Log("Swapped Direction of Wall");
-                for (int i = 0; i < model.walls.Length; i++) {
-                    Vector3 swap = model.walls[i].wallCoordinates[0];
-                    Vector3 swap2 = model.walls[i].wallCoordinates[2];
-                    model.walls[i].wallCoordinates[0] = model.walls[i].wallCoordinates[1];
-                    model.walls[i].wallCoordinates[2] = model.walls[i].wallCoordinates[3];
-                    model.walls[i].wallCoordinates[1] = swap;
-                    model.walls[i].wallCoordinates[3] = swap2;
-
-                }
-            }
-            
-            
-            List<GameObject> goWall = new List<GameObject>();
-            for (int i = 0; i < model.numberOfWalls; i++) {
-                String wallName = "Wall" + i;
-                goWall.Add(CreateFreeWall(model.walls[i].wallCoordinates, LoadMaterialByName(model.walls[i].texture)));
-                goWall[i].name = wallName;
-                goWall[i].transform.parent = go.transform;
-            }
-            go.transform.position = model.Position;
-            go.AddComponent<ModelContainer>().Model = model;
-            
-            return go;
-        }
-        public static bool point_inside_trigon(Vector3 s, Vector3 a, Vector3 b, Vector3 c)
-        {
-            var as_x = s.x-a.x;
-            var as_y = s.z-a.z;
-
-            bool s_ab = (b.x-a.x)*as_y-(b.z-a.z)*as_x > 0;
-
-            if((c.x-a.x)*as_y-(c.z-a.z)*as_x > 0 == s_ab) return false;
-
-            if((c.x-b.x)*(s.z-b.z)-(c.z-b.z)*(s.x-b.x) > 0 != s_ab) return false;
-
-            return true;
-        }
         
 
 
@@ -693,71 +365,6 @@ namespace Unibas.DBIS.DynamicModelling
             }
 
             return null;
-        }
-
-        public static GameObject CreatePolygonalWall(int corners, float sizeRadius ,Material mat)
-        {
-            GameObject go =new GameObject("PolygonalWall");
-            MeshFilter meshFilter = go.AddComponent<MeshFilter>();
-            MeshRenderer meshRenderer = go.AddComponent<MeshRenderer>();
-            Mesh mesh = meshFilter.mesh;
-
-            // Math for polygon
-            Vector3[] vertices = new Vector3[corners];
-            for (int i = 1; i <= corners; i++) {
-                vertices[i - 1] = new Vector3((float) (sizeRadius * Math.Sin((2 * Math.PI / corners) * i)),
-                    (float) (sizeRadius * Math.Cos((2 * Math.PI / corners) * i)), 0);
-            }
-            
-            mesh.vertices = vertices;
-
-            // There are n-2 Trinagles in a polygon, every Trinagle defined by 3 vertices
-            int numberOfTrinagles = corners - 2;
-            int numberOfTrinaglePoints = (corners - 2) * 3;
-            int[] tri = new int[numberOfTrinaglePoints];
-            
-            // trinangles
-            for (int i = 0; i < numberOfTrinagles; i++) {
-                int mult = i * 3;
-                tri[mult] = 0;
-                tri[mult + 1] = i + 1;
-                tri[mult + 2] = i + 2;
-            }
-            mesh.triangles = tri;
-            
-            // normals
-            Vector3[] normals = new Vector3[corners];
-            for (int i = 0; i < corners; i++) {
-                normals[i] = -Vector3.forward;
-
-            }
-            mesh.normals = normals;
-            
-            // texture coordinates = uv
-            Vector2[] uv=new Vector2[corners];
-            for (int i = 0; i < corners; i++) {
-                uv[i] = new Vector2(vertices[i].x, vertices[i].y);
-            }
-            mesh.uv = uv;
-            
-            
-            mesh.RecalculateBounds();
-            mesh.RecalculateNormals();
-            mesh.RecalculateTangents();
-
-            if (mat != null)
-            {
-                meshRenderer.material.CopyPropertiesFromMaterial(mat);
-                //meshRenderer.material.SetTextureScale("_MainTex", new Vector2(1,1));
-                meshRenderer.material.name = mat.name;
-            }
-            else
-            {
-                meshRenderer.material = new Material(Shader.Find("Standard"));
-                meshRenderer.material.color = Color.white;
-            }
-
-            return go;
         }
 
         public static GameObject CreateWall(float width, float height, Material mat = null)
@@ -834,8 +441,8 @@ namespace Unibas.DBIS.DynamicModelling
 
             // TODO Highly experimental!
 
-            //var boxCollider = go.AddComponent<BoxCollider>();
-            //boxCollider.size = new Vector3(width,height,0.0001f);
+            var boxCollider = go.AddComponent<BoxCollider>();
+            boxCollider.size = new Vector3(width,height,0.0001f);
 
             return go;
         }
@@ -1039,116 +646,4 @@ namespace Unibas.DBIS.DynamicModelling
             return root;
         }
     }
-    
-    /*
-     * calculates triangles of polygons
-     * http://wiki.unity3d.com/index.php/Triangulator
-     */
-    public class Triangulator
-{
-    private List<Vector2> m_points = new List<Vector2>();
- 
-    public Triangulator (Vector2[] points) {
-        m_points = new List<Vector2>(points);
-    }
- 
-    public int[] Triangulate() {
-        List<int> indices = new List<int>();
- 
-        int n = m_points.Count;
-        if (n < 3)
-            return indices.ToArray();
- 
-        int[] V = new int[n];
-        if (Area() > 0) {
-            for (int v = 0; v < n; v++)
-                V[v] = v;
-        }
-        else {
-            for (int v = 0; v < n; v++)
-                V[v] = (n - 1) - v;
-        }
- 
-        int nv = n;
-        int count = 2 * nv;
-        for (int v = nv - 1; nv > 2; ) {
-            if ((count--) <= 0)
-                return indices.ToArray();
- 
-            int u = v;
-            if (nv <= u)
-                u = 0;
-            v = u + 1;
-            if (nv <= v)
-                v = 0;
-            int w = v + 1;
-            if (nv <= w)
-                w = 0;
- 
-            if (Snip(u, v, w, nv, V)) {
-                int a, b, c, s, t;
-                a = V[u];
-                b = V[v];
-                c = V[w];
-                indices.Add(a);
-                indices.Add(b);
-                indices.Add(c);
-                for (s = v, t = v + 1; t < nv; s++, t++)
-                    V[s] = V[t];
-                nv--;
-                count = 2 * nv;
-            }
-        }
- 
-        indices.Reverse();
-        return indices.ToArray();
-    }
- 
-    private float Area () {
-        int n = m_points.Count;
-        float A = 0.0f;
-        for (int p = n - 1, q = 0; q < n; p = q++) {
-            Vector2 pval = m_points[p];
-            Vector2 qval = m_points[q];
-            A += pval.x * qval.y - qval.x * pval.y;
-        }
-        return (A * 0.5f);
-    }
- 
-    private bool Snip (int u, int v, int w, int n, int[] V) {
-        int p;
-        Vector2 A = m_points[V[u]];
-        Vector2 B = m_points[V[v]];
-        Vector2 C = m_points[V[w]];
-        if (Mathf.Epsilon > (((B.x - A.x) * (C.y - A.y)) - ((B.y - A.y) * (C.x - A.x))))
-            return false;
-        for (p = 0; p < n; p++) {
-            if ((p == u) || (p == v) || (p == w))
-                continue;
-            Vector2 P = m_points[V[p]];
-            if (InsideTriangle(A, B, C, P))
-                return false;
-        }
-        return true;
-    }
- 
-    private bool InsideTriangle (Vector2 A, Vector2 B, Vector2 C, Vector2 P) {
-        float ax, ay, bx, by, cx, cy, apx, apy, bpx, bpy, cpx, cpy;
-        float cCROSSap, bCROSScp, aCROSSbp;
- 
-        ax = C.x - B.x; ay = C.y - B.y;
-        bx = A.x - C.x; by = A.y - C.y;
-        cx = B.x - A.x; cy = B.y - A.y;
-        apx = P.x - A.x; apy = P.y - A.y;
-        bpx = P.x - B.x; bpy = P.y - B.y;
-        cpx = P.x - C.x; cpy = P.y - C.y;
- 
-        aCROSSbp = ax * bpy - ay * bpx;
-        cCROSSap = cx * apy - cy * apx;
-        bCROSScp = bx * cpy - by * cpx;
- 
-        return ((aCROSSbp >= 0.0f) && (bCROSScp >= 0.0f) && (cCROSSap >= 0.0f));
-    }
-}
-    
 }
