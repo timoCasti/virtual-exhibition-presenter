@@ -519,7 +519,8 @@ namespace Unibas.DBIS.DynamicModelling
            
             
             // ceiling scaling
-            var scaling = 0f; // Hardcode for testing
+            var scaling = model.ceiling_scale; // Hardcode for testing
+            
             Vector3 midOfCeiling=new Vector3(0,0,0);
             for (int i = 0; i < ceilingvertices.Count; i++) {
                 midOfCeiling += ceilingvertices[i];
@@ -535,14 +536,13 @@ namespace Unibas.DBIS.DynamicModelling
                 scalevector0 = ceilingvertices[i]-midOfCeiling;
                 scalevector1 = model.walls[i].wallCoordinates[2]- midOfCeiling;
                 scalevector2 = model.walls[i].wallCoordinates[3]- midOfCeiling;
-                //Debug.Log(model.walls[i].wallCoordinates.Length);
-                //Debug.Log("point before  "+ ceilingvertices[i]);
                 
-                ceilingvertices[i] = midOfCeiling+ (scalevector1 * scaling);
+                ceilingvertices[i] = midOfCeiling+ (scalevector1 * (float) scaling);
                
-                //Debug.Log("Sacled ceiling point " + i + "    " + ceilingvertices[i]);
-                model.walls[i].wallCoordinates[2] = midOfCeiling+ (scalevector1* scaling);
-                model.walls[i].wallCoordinates[3] = midOfCeiling+ (scalevector2* scaling);
+                model.walls[i].wallCoordinates[2].x = midOfCeiling.x+ (scalevector1.x* (float) scaling);
+                model.walls[i].wallCoordinates[2].z = midOfCeiling.z+ (scalevector1.z* (float) scaling);
+                model.walls[i].wallCoordinates[3].x = midOfCeiling.x+ (scalevector2.x* (float) scaling);
+                model.walls[i].wallCoordinates[3].z = midOfCeiling.z+ (scalevector2.z* (float) scaling);
 
             }
             
@@ -556,7 +556,7 @@ namespace Unibas.DBIS.DynamicModelling
             GameObject ceiling = CreatePolygonalMeshes(ceilingArray, LoadMaterialByName( model.CeilingMaterial),"Ceiling");
             ceiling.name = "Ceiling";
             ceiling.transform.parent = ceilingAnchor.transform;
-            ceilingAnchor.transform.position = new Vector3(0, model.height, 0);
+            //ceilingAnchor.transform.position = new Vector3(0, model.height, 0);
             
             // Floor
             GameObject floorAnchor = new GameObject("FloorAnchor");

@@ -61,7 +61,7 @@ namespace World
 
             float scaleCeiling = 1f;
             
-            PolygonRoomModel poly=new PolygonRoomModel(roomData.position,numberOfWalls,scaleCeiling,roomData.height,roomData.floor,roomData.ceiling,roomData.walls);
+            PolygonRoomModel poly=new PolygonRoomModel(roomData.position,numberOfWalls,roomData.ceiling_scale,roomData.height,roomData.floor,roomData.ceiling,roomData.walls);
             GameObject roompoly = ModelFactory.CreatePolygonalRoom(poly);
             var exRoom = roompoly.AddComponent<PolygonalExhibitionRoom>();
             exRoom.roomModel = poly;

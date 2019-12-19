@@ -9,7 +9,7 @@ namespace Unibas.DBIS.DynamicModelling.Models
     {
         public Vector3 Position;
 
-        public float scaleCeiling;
+        public double ceiling_scale;
         
         //private List<DefaultNamespace.VREM.Model.Wall> _walls;
 
@@ -41,7 +41,7 @@ namespace Unibas.DBIS.DynamicModelling.Models
             Position = position;
             numberOfWalls = NumberOfWalls;
            // size = Size;
-            scaleCeiling = scale;
+            ceiling_scale = scale;
             height = Height;
             FloorMaterial = floor;
             CeilingMaterial = ceiling;
