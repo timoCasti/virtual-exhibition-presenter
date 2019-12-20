@@ -260,6 +260,8 @@ namespace World
             mesh.RecalculateBounds();
             mesh.RecalculateNormals();
             mesh.RecalculateTangents();
+
+            var pos2 = meshFilter.transform.position;
             
             //nor old
             //Vector3 nor = gogo.GetComponentInChildren<MeshFilter>().mesh.normals[0];
@@ -271,6 +273,9 @@ namespace World
             anchor.transform.Rotate(Vector3.up,vec1.y);
             anchor.transform.Rotate(Vector3.right,vec1.x);
             //anchor.transform.Rotate(Vector3.back,vec1.z);
+            
+//            Debug.Log("postion2  "+ pos2);
+  //          Debug.Log("postion  "+ pos);
             anchor.transform.localPosition = pos;
 
             return anchor;

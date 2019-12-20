@@ -231,6 +231,18 @@ namespace Unibas.DBIS.DynamicModelling
             mesh.triangles = indices;
             
             //Maybe we need normals and uv
+            /*Vector2[] uvs = new Vector2[vertices.Length];
+
+            for (int i = 0; i < uvs.Length; i++)
+            {
+                uvs[i] = new Vector2(vertices[i].x, vertices[i].z);
+                Debug.Log(uvs[i]);
+            }
+            */
+            mesh.uv = vector2s;
+            
+            
+            
             
             mesh.RecalculateBounds();
             mesh.RecalculateNormals();
