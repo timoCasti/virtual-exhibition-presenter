@@ -77,13 +77,16 @@ namespace World
             var sa = CreateAnchor(WallOrientation.SOUTH, room, modelData);
             var wa = CreateAnchor(WallOrientation.WEST, room, modelData);
 
-            var nw = CreateExhibitionWall(WallOrientation.NORTH, roomData, na);
-            var ew = CreateExhibitionWall(WallOrientation.EAST, roomData, ea);
-            var sw = CreateExhibitionWall(WallOrientation.SOUTH, roomData, sa);
-            var ww = CreateExhibitionWall(WallOrientation.WEST, roomData, wa);
+            int numberOfWalls = roomData.walls.Length;
+
+            float scaleCeiling = 1f;
             
-            er.Walls = new List<ExhibitionWall>(new []{nw,ew,sw,ww});
-            er.Populate();
+            PolygonRoomModel poly=new PolygonRoomModel(roomData.position,numberOfWalls,roomData.ceiling_scale,roomData.height,roomData.floor,roomData.ceiling,roomData.walls);
+            GameObject roompoly = ModelFactory.CreatePolygonalRoom(poly);
+            var exRoom = roompoly.AddComponent<PolygonalExhibitionRoom>();
+            exRoom.roomModel = poly;
+            exRoom.Model = roompoly;
+            exRoom.RoomData = roomData;
             
             GameObject light = new GameObject("RoomLight");
             var l = light.AddComponent<Light>();
@@ -291,6 +294,71 @@ namespace World
             }
             anchor.transform.Rotate(Vector3.up, a);
             anchor.transform.localPosition = pos;
+            return anchor;
+        }
+        
+        private static GameObject CreateAnchorFreePoly(int Wallnumber, GameObject room, PolygonRoomModel model)
+        {
+            GameObject anchor = new GameObject(" Anchor " + Wallnumber);
+            anchor.transform.parent = room.transform;
+            Vector3 pos = Vector3.zero;
+            
+            
+            var a = 0f;
+
+            pos = model.walls[Wallnumber].wallCoordinates[0];
+
+            int wall2 = (Wallnumber + 1);
+            if (wall2 == model.walls.Length) {
+                wall2 = 0;}
+            Vector3 v = new Vector3(model.walls[Wallnumber].wallCoordinates[0].x-model.walls[Wallnumber].wallCoordinates[1].x,0,model.walls[Wallnumber].wallCoordinates[0].y-model.walls[Wallnumber].wallCoordinates[1].y);
+            Vector3 v2 = new Vector3(model.walls[wall2].wallCoordinates[0].x - model.walls[wall2].wallCoordinates[1].x,0,model.walls[wall2].wallCoordinates[0].y-model.walls[wall2].wallCoordinates[1].y);
+
+
+            float angleTry = Vector3.Angle(v, v2);
+            a = Vector3.Angle(model.walls[Wallnumber].wallCoordinates[0] - model.walls[Wallnumber].wallCoordinates[1], Vector3.right);
+            
+            // get the normal of the Mesh of the wall to adjust the angle of the anchor (Mesh gets created agein since its hard to receive the right one)
+            string wallname = "Wall" + Wallnumber;
+            
+
+            room.GetComponentsInChildren<MeshFilter>();
+            var coordinates=model.walls[Wallnumber].wallCoordinates;
+            GameObject go = new GameObject("FreeWall");
+            MeshFilter meshFilter = go.AddComponent<MeshFilter>();
+            MeshRenderer meshRenderer = go.AddComponent<MeshRenderer>();
+            Mesh mesh = meshFilter.mesh;
+            mesh.vertices = coordinates;
+            int[] tri = new int[6];
+            tri[0] = 0;
+            tri[1] = 2;
+            tri[2] = 1;
+            tri[3] = 2;
+            tri[4] = 3;
+            tri[5] = 1;
+            mesh.triangles = tri;
+
+            mesh.RecalculateBounds();
+            mesh.RecalculateNormals();
+            mesh.RecalculateTangents();
+
+            var pos2 = meshFilter.transform.position;
+            
+            //nor old
+            //Vector3 nor = gogo.GetComponentInChildren<MeshFilter>().mesh.normals[0];
+            Vector3 nor = mesh.normals[0];
+            GameObject.DestroyImmediate(go);
+            //var ro = gogo.GetComponentInChildren<MeshFilter>().transform.rotation;
+            Vector3 vec1 = Quaternion.FromToRotation(Vector3.back, nor).eulerAngles;
+            var vec2 = Quaternion.FromToRotation(Vector3.back, nor);
+            anchor.transform.Rotate(Vector3.up,vec1.y);
+            anchor.transform.Rotate(Vector3.right,vec1.x);
+            //anchor.transform.Rotate(Vector3.back,vec1.z);
+            
+//            Debug.Log("postion2  "+ pos2);
+  //          Debug.Log("postion  "+ pos);
+            anchor.transform.localPosition = pos;
+
             return anchor;
         }
         

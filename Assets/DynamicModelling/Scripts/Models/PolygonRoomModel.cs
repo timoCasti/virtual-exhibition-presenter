@@ -7,9 +7,8 @@ namespace Unibas.DBIS.DynamicModelling.Models
     public class PolygonRoomModel : IModel
     {
         public Vector3 Position;
-        private List<WallModel> _walls;
-        public Material FloorMaterial;
-        public Material CeilingMaterial;
+
+        public double ceiling_scale;
         
         public PolygonRoomModel(Vector3 position, List<WallModel> walls, Material floorMaterial, Material ceilingMaterial)
         {
@@ -18,6 +17,19 @@ namespace Unibas.DBIS.DynamicModelling.Models
             FloorMaterial = floorMaterial;
             CeilingMaterial = ceilingMaterial;
         }
+        
+        public PolygonRoomModel(Vector3 position, int NumberOfWalls, float scale, float Height, string floor, string ceiling, DefaultNamespace.VREM.Model.Wall[] walls)
+        {
+            Position = position;
+            numberOfWalls = NumberOfWalls;
+           // size = Size;
+            ceiling_scale = scale;
+            height = Height;
+            FloorMaterial = floor;
+            CeilingMaterial = ceiling;
+            this.walls = walls;
+        }
+        
 
         public WallModel[] GetWalls()
         {

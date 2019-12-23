@@ -11,6 +11,11 @@ namespace DefaultNamespace.VREM.Model {
     public Vector3 size;
     public Vector3 position;
     public Vector3 entrypoint;
+
+    public float ceiling_scale;
+    
+    public float height; // replaces size, since size is defined in walls now
+    //for cuboid rooms we define north=0,east=1,south=2,west=3 , since orientation died
     public Wall[] walls;
 
     public string floor;

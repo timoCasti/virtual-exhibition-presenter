@@ -100,6 +100,158 @@ namespace Unibas.DBIS.DynamicModelling
             return go;
         }
 
+            int[] tri = new int[6];
+            tri[0] = 0;
+            tri[1] = 2;
+            tri[2] = 1;
+
+            tri[3] = 2;
+            tri[4] = 3;
+            tri[5] = 1;
+            mesh.triangles = tri;
+
+            Vector3[] normals = new Vector3[4];
+            normals[0] = -Vector3.forward;
+            normals[1] = -Vector3.forward;
+            normals[2] = -Vector3.forward;
+            normals[3] = -Vector3.forward;
+            mesh.normals = normals;
+
+            Vector2[] uv = new Vector2[4];
+
+            float width = Vector3.Distance(coordinates[0],coordinates[1]);
+            float height = Vector3.Distance(coordinates[0], coordinates[3]);
+                        
+            float xUnit = 1;
+            float yUnit = 1;
+
+            if (width > height)
+            {
+                xUnit = width / height;
+            }
+            else
+            {
+                yUnit = height / width;
+            }
+
+            uv[0] = new Vector2(0, 0);
+            uv[1] = new Vector2(xUnit, 0);
+            uv[2] = new Vector2(0, yUnit);
+            uv[3] = new Vector2(xUnit, yUnit);
+            
+            mesh.uv = uv;
+
+            
+            mesh.RecalculateBounds();
+            mesh.RecalculateNormals();
+            mesh.RecalculateTangents();
+
+            if (material != null)
+            {
+                meshRenderer.material.CopyPropertiesFromMaterial(material);
+                //meshRenderer.material.SetTextureScale("_MainTex", new Vector2(1,1));
+                meshRenderer.material.name = material.name + "(Instance)";
+            }
+            else
+            {
+                meshRenderer.material = new Material(Shader.Find("Standard"));
+                meshRenderer.material.color = Color.white;
+            }
+            
+            
+            //postion wall
+            float a = Vector3.Angle(coordinates[0]-coordinates[1], Vector3.right);
+        
+            //add collider for teleportation limits
+            var collider = go.AddComponent<MeshCollider>();
+            collider.sharedMesh = mesh;
+            
+            return go;
+            
+            
+            
+            
+
+            return go;
+        }
+        /*
+         * Creates the "walls" for ceiling or floor out of various amounts of vertices
+         *
+         * gets all vertices of floor or ceiling as Vector3[]
+         * A Material
+         * String "Floor" or "Ceiling" necessary to face in correct direction
+         */
+        public static GameObject CreatePolygonalMeshes(Vector3[] vertices, Material material, String FloororCeiling)
+        {
+            GameObject go =new GameObject("PolygonalWall");
+            MeshFilter meshFilter = go.AddComponent<MeshFilter>();
+            MeshRenderer meshRenderer = go.AddComponent<MeshRenderer>();
+            Mesh mesh = meshFilter.mesh;
+
+            mesh.vertices = vertices;
+           
+            // transform Vector3 to Vector2 with x and z only, since height not needed
+            Vector2[] vector2s=new Vector2[vertices.Length];
+            for (int i = 0; i < vertices.Length; i++) {
+                vector2s[i].x = vertices[i].x;
+                vector2s[i].y = vertices[i].z;
+            }
+            // Method which calculates polygons triangluars
+            Triangulator tr = new Triangulator(vector2s);
+            int[] indices = tr.Triangulate();
+
+            if (string.Equals(FloororCeiling, "Floor")) {
+                System.Array.Reverse(indices);
+            }
+ 
+            // Create the Vector3 vertices  ??
+            Vector3[] verticesOfpoly = new Vector3[vector2s.Length];
+            for (int i=0; i<vertices.Length; i++) {
+                vertices[i] = new Vector3(vector2s[i].x, vector2s[i].y, 0);
+            }
+
+            mesh.triangles = indices;
+            
+            //Maybe we need normals and uv
+            /*Vector2[] uvs = new Vector2[vertices.Length];
+
+            for (int i = 0; i < uvs.Length; i++)
+            {
+                uvs[i] = new Vector2(vertices[i].x, vertices[i].z);
+                Debug.Log(uvs[i]);
+            }
+            */
+            mesh.uv = vector2s;
+            
+            
+            
+            
+            mesh.RecalculateBounds();
+            mesh.RecalculateNormals();
+            mesh.RecalculateTangents();
+            
+            
+            
+            if (material != null)
+            {
+                meshRenderer.material.CopyPropertiesFromMaterial(material);
+                //meshRenderer.material.SetTextureScale("_MainTex", new Vector2(1,1));
+                meshRenderer.material.name = material.name + "(Instance)";
+            }
+            else
+            {
+                meshRenderer.material = new Material(Shader.Find("Standard"));
+                meshRenderer.material.color = Color.white;
+            }
+            
+            
+
+            return go;
+        }
+        
+        
+        
+
         /// <summary>
         /// Creates a wall between two positions
         /// </summary>
@@ -311,6 +463,68 @@ namespace Unibas.DBIS.DynamicModelling
             //floorAnchor.transform.position = new Vector3(-halfSize, 0, halfSize);
             //floorAnchor.transform.Rotate(Vector3f.back,90);
 
+            root.transform.position = model.Position;
+            
+            root.AddComponent<ModelContainer>().Model = model;
+            return root;
+        }
+
+        public static GameObject CreatePolygonalRoom(PolygonRoomModel model)
+        {
+            
+            GameObject go=new GameObject("PolyRoom");
+            //find vertices of ceiling and floor depends on the structure of the wallcoordinates
+            var floorvertices=new System.Collections.Generic.List<Vector3>();
+            var ceilingvertices=new System.Collections.Generic.List<Vector3>();
+            for (int i = 0; i < model.numberOfWalls; i++) {
+                if (floorvertices.Contains(model.walls[i].wallCoordinates[0])) {
+                    Debug.Log("Floor has same vertice multiple times");
+                }
+                else {
+                    floorvertices.Add(model.walls[i].wallCoordinates[0]);
+                }
+
+                if (ceilingvertices.Contains(model.walls[i].wallCoordinates[2])) {
+                    Debug.Log("Ceiling contains same vertice multiple times");
+                }
+                else {
+                    ceilingvertices.Add(model.walls[i].wallCoordinates[2]);
+                }
+            }
+           
+            
+            // ceiling scaling
+            var scaling = model.ceiling_scale; // Hardcode for testing
+            
+            Vector3 midOfCeiling=new Vector3(0,0,0);
+            for (int i = 0; i < ceilingvertices.Count; i++) {
+                midOfCeiling += ceilingvertices[i];
+
+            }
+
+            Vector3 scalevector0;
+            Vector3 scalevector1;
+            Vector3 scalevector2;
+            midOfCeiling = midOfCeiling / ceilingvertices.Count;
+            //Debug.Log("mid   "+ midOfCeiling);
+            for (int i = 0; i < model.walls.Length; i++) {
+                scalevector0 = ceilingvertices[i]-midOfCeiling;
+                scalevector1 = model.walls[i].wallCoordinates[2]- midOfCeiling;
+                scalevector2 = model.walls[i].wallCoordinates[3]- midOfCeiling;
+                
+                ceilingvertices[i] = midOfCeiling+ (scalevector1 * (float) scaling);
+               
+                model.walls[i].wallCoordinates[2].x = midOfCeiling.x+ (scalevector1.x* (float) scaling);
+                model.walls[i].wallCoordinates[2].z = midOfCeiling.z+ (scalevector1.z* (float) scaling);
+                model.walls[i].wallCoordinates[3].x = midOfCeiling.x+ (scalevector2.x* (float) scaling);
+                model.walls[i].wallCoordinates[3].z = midOfCeiling.z+ (scalevector2.z* (float) scaling);
+
+            }
+            
+            // convert list to array, since its needed as parameter
+            var ceilingArray = ceilingvertices.ToArray();
+            var floorArray=floorvertices.ToArray();
+            
             // Ceiling
             GameObject ceilingAnchor = new GameObject("CeilingAnchor");
             ceilingAnchor.transform.parent = root.transform;
@@ -318,7 +532,7 @@ namespace Unibas.DBIS.DynamicModelling
             GameObject ceiling = CreateWall(model.GetSize(), model.GetSize(), model.CeilingMaterial);
             ceiling.name = "Ceiling";
             ceiling.transform.parent = ceilingAnchor.transform;
-
+            //ceilingAnchor.transform.position = new Vector3(0, model.height, 0);
             
             // North Aligned
             ceilingAnchor.transform.position = new Vector3(-halfSize, model.Height, halfSize);
