@@ -99,6 +99,15 @@ namespace Unibas.DBIS.DynamicModelling
 
             return go;
         }
+        
+        public static GameObject CreateFreeWall(Vector3[] coordinates, Material material = null)
+        {
+            GameObject go = new GameObject("FreeWall");
+            MeshFilter meshFilter = go.AddComponent<MeshFilter>();
+            MeshRenderer meshRenderer = go.AddComponent<MeshRenderer>();
+            Mesh mesh = meshFilter.mesh;
+            
+            mesh.vertices = coordinates;
 
             int[] tri = new int[6];
             tri[0] = 0;
