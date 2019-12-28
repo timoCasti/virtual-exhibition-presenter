@@ -41,10 +41,22 @@ namespace World
             float x = room.position.x, y = room.position.y, z = room.position.z;
             var off = Settings.RoomOffset;
             //return new Vector3(x * room.size.x + x * off, y * room.size.y + y * off, z * room.size.z + z * off);
-            return new Vector3(0,0,0);
+            //return new Vector3(x * room.size.x + x * off, y * room.size.y + y * off, z * room.size.z + z * off);
+            return new Vector3(x + x * off, y + y * off, z + z * off);
         }
 
-        
+        public static Vector3 CalculateCorridorPosition(DefaultNamespace.VREM.Model.Corridor corridor)
+        {
+            float x = corridor.position.x, y = corridor.position.y, z = corridor.position.z;
+
+            return new Vector3()
+            {
+                x = x * corridor.size.x,
+                y = y * corridor.size.y,
+                z = z * corridor.size.z
+            };
+        }
+
         public static GameObject BuildRoom(DefaultNamespace.VREM.Model.Room roomData)
         {
             Material[] mats = new Material[roomData.walls.Length+2];
@@ -67,6 +79,13 @@ namespace World
             exRoom.RoomData = roomData;
             
 
+ /*           GameObject teleportArea = new GameObject("TeleportArea");
+            var col = teleportArea.AddComponent<BoxCollider>();
+            col.size = new Vector3(modelData.GetSize(), 0.01f, modelData.GetSize());
+            teleportArea.AddComponent<MeshRenderer>();
+            var tpa = teleportArea.AddComponent<TeleportArea>();
+            tpa.transform.parent = room.transform;
+            tpa.transform.localPosition = new Vector3(0, 0.01f, 0);*/
 
             GameObject[] anchors = new GameObject[numberOfWalls];
 
@@ -128,6 +147,64 @@ namespace World
             
             return roompoly;
         }
+        
+        //TODO
+        public static GameObject BuildCorridor(DefaultNamespace.VREM.Model.Corridor corridorData)
+        {
+            //corridorData.CalculateSizeAndPosition();
+
+            Material[] mats = new Material[corridorData.walls.Length+2];
+            Material[] matsWallonly = new Material[corridorData.walls.Length];
+            mats[0] = TexturingUtility.LoadMaterialByName(corridorData.floor);
+            mats[1] = TexturingUtility.LoadMaterialByName(corridorData.ceiling);
+
+            for (int i = 0; i < corridorData.walls.Length; i++) {
+                mats[2 + i] = TexturingUtility.LoadMaterialByName(corridorData.walls[i].texture);
+                matsWallonly[i] = TexturingUtility.LoadMaterialByName(corridorData.walls[i].texture);
+            }
+
+            CuboidCorridorModel modelData = new CuboidCorridorModel(CalculateCorridorPosition(corridorData),
+                corridorData.size.x, corridorData.size.y,
+                mats[0], mats[1], mats[2], mats[3]);
+            GameObject corridor = ModelFactory.CreateCorridor(modelData);
+            var er = corridor.AddComponent<CuboidExhibitionCorridor>();
+
+            er.CorridorModel = modelData;
+            er.Model = corridor;
+            er.CorridorData = corridorData;
+            var na = CreateAnchor(WallOrientation.NORTH, corridor, modelData);
+            var sa = CreateAnchor(WallOrientation.SOUTH, corridor, modelData);
+            
+            var nw = CreateCorridorWall(0, corridorData, na);
+            var sw = CreateCorridorWall(1, corridorData, sa);
+
+            er.Walls = new List<CorridorWall>(new []{nw,sw});
+            er.Populate();
+            
+            GameObject light = new GameObject("RoomLight");
+            var l = light.AddComponent<Light>();
+            l.type = LightType.Point;
+            l.range = 8;
+            l.color = Color.white;
+            l.intensity = 1.5f;
+            l.renderMode = LightRenderMode.ForcePixel;
+            //l.lightmapBakeType = LightmapBakeType.Mixed; // Build fails with this line uncommented, even though unity automatically upgrades to this one.
+            //l.lightmappingMode = LightmappingMode.Mixed; // Build fails with this line uncommented. it is obsolete
+            // Results in mode Realtime (in Unity editor inspector)
+            l.transform.parent = corridor.transform;
+            l.transform.localPosition = new Vector3(0, 2.5f, 0);
+            corridor.name = "Corridor";
+            //todo lock
+            GameObject teleportArea = new GameObject("TeleportArea");
+            var col = teleportArea.AddComponent<BoxCollider>();
+            col.size = new Vector3(modelData.GetSize(), 0.01f, modelData.GetSize());
+            teleportArea.AddComponent<MeshRenderer>();
+            var tpa = teleportArea.AddComponent<TeleportArea>();
+            tpa.transform.parent = corridor.transform;
+            tpa.transform.localPosition = new Vector3(0, 0.01f, 0);
+
+            return corridor;
+        }
 
         private static ExhibitionWall CreateExhibitionWall(int orientation, DefaultNamespace.VREM.Model.Room room, GameObject anchor)
         {
@@ -138,9 +215,18 @@ namespace World
             return wall;
         }
         
-     
-        
+        //TODO
+        private static CorridorWall CreateCorridorWall(int wallnumber,
+            DefaultNamespace.VREM.Model.Corridor corridor, GameObject anchor)
+        {
+            var wall = anchor.AddComponent<CorridorWall>();
+            wall.Anchor = anchor;
+            wall.WallModel = null;
+            wall.WallData = corridor.GetWall(wallnumber);
+            return wall;
+        }
 
+        //not used for polygon rooms
         /*
         private static Material GetMaterialForWallOrientation(WallOrientation orientation,
             DefaultNamespace.VREM.Model.Room roomData)
@@ -158,14 +244,39 @@ namespace World
             throw new ArgumentException("Couldn't find material for orientation " + orientation + " in room at " +
                                         roomData.position);
         }
-*/
+        */
+       /* private static Material GetMaterialForWallOrientation(WallOrientation orientation,
+            DefaultNamespace.VREM.Model.Corridor corridorData)
+        {
+            foreach (DefaultNamespace.VREM.Model.Wall wallData in corridorData.walls)
+            {
+                WallOrientation wor = (WallOrientation) Enum.Parse(typeof(WallOrientation), wallData.direction, true);
+                if (wor.Equals(orientation))
+                {
+                    Debug.Log("Material "+wallData.texture+" for corridor " + corridorData.position);
+                    return TexturingUtility.LoadMaterialByName(wallData.texture, true);
+                }
+            }
+
+            throw new ArgumentException("Couldn't find material for orientation " + orientation + " in corridor at " +
+                                        corridorData.position);
+        }*/
+        
+        /// <summary>
+        /// Anchor for room
+        /// </summary>
+        /// <param name="orientation"></param>
+        /// <param name="room"></param>
+        /// <param name="model"></param>
+        /// <returns>GameObject Anchor</returns>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
         private static GameObject CreateAnchor(WallOrientation orientation, GameObject room, CuboidRoomModel model)
         {
             GameObject anchor = new GameObject(orientation + "Anchor");
             anchor.transform.parent = room.transform;
             Vector3 pos = Vector3.zero;
             var a = 0f;
-            var sizeHalf = model.Size / 2f;
+            var sizeHalf = model.GetSize() / 2f;
             switch (orientation)
             {
                 case WallOrientation.NORTH:
@@ -183,6 +294,39 @@ namespace World
                 case WallOrientation.WEST:
                     pos = new Vector3(-sizeHalf, 0, -sizeHalf);
                     a = 270;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException("orientation", orientation, null);
+            }
+            anchor.transform.Rotate(Vector3.up, a);
+            anchor.transform.localPosition = pos;
+            return anchor;
+        }
+        
+        /// <summary>
+        /// Anchor for corridor
+        /// </summary>
+        /// <param name="orientation"></param>
+        /// <param name="corridor"></param>
+        /// <param name="model"></param>
+        /// <returns>GameObject Anchor</returns>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        private static GameObject CreateAnchor(WallOrientation orientation, GameObject corridor, CuboidCorridorModel model)
+        {
+            GameObject anchor = new GameObject(orientation + "Anchor");
+            anchor.transform.parent = corridor.transform;
+            Vector3 pos = Vector3.zero;
+            var a = 0f;
+            var sizeHalf = model.GetSize() / 2f;
+            switch (orientation)
+            {
+                case WallOrientation.NORTH:
+                    pos = new Vector3(-sizeHalf, 0, sizeHalf);
+                    a = 0;
+                    break;
+                case WallOrientation.SOUTH:
+                    pos = new Vector3(sizeHalf, 0, -sizeHalf);
+                    a = 180;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException("orientation", orientation, null);

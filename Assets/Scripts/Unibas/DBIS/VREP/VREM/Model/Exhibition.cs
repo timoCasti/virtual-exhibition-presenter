@@ -9,13 +9,15 @@ namespace DefaultNamespace.VREM.Model {
   /// </summary>
   [Serializable]
   public class Exhibition {
+    
 
     public string id;
     public string name;
     public string description;
 
     public Room[] rooms;
-    
+
+    public Corridor[] corridors;
 
   }
 }

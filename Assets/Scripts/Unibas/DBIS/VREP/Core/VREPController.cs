@@ -12,9 +12,9 @@ namespace Unibas.DBIS.VREP
     {
         private VREMClient _vremClient;
         private BuildingManager _buildingManager;
-        public String ExhibitionId = "5c17b10ea6abfddbb3fa66ae";
+        public String ExhibitionId = "5d9eab8351cf690f102da633";
 
-        public Vector3 LobbySpawn = new Vector3(0, -9, 0);
+        public Vector3 LobbySpawn = new Vector3(10, -9, 0);
 
         public Settings Settings;
 
