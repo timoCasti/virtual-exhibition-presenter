@@ -142,8 +142,35 @@ namespace Unibas.DBIS.DynamicModelling
                         
             float xUnit = 1;
             float yUnit = 1;
+            var shorty = 100f;
+            var j = 0;
+             Vector2[] vector2sWall=new Vector2[coordinates.Length];
+             for (int i = 0; i < coordinates.Length; i++) {
+                 vector2sWall[i].x = coordinates[i].x;
+                 vector2sWall[i].y = coordinates[i].z;
+                 if (i != coordinates.Length - 1) {
+                     j = i + 1;
+                 }
+                 else {
+                     j = 0;
+                 }
 
-            if (width > height)
+                 var calc = Vector2.Distance(vector2sWall[i], vector2sWall[j]);
+                 if (calc < shorty) {
+                     shorty = calc;
+                 }
+             }
+             for (int i = 0; i <vector2sWall.Length; i++) {
+                 vector2sWall[i]= vector2sWall[i]/ shorty;
+//                 Debug.Log(" Vector  "+i+ "  "+vector2sWall[i]);
+
+             }
+
+             mesh.uv = vector2sWall;
+
+
+             /*
+             if (width > height)
             {
                 xUnit = width / height;
             }
@@ -157,7 +184,8 @@ namespace Unibas.DBIS.DynamicModelling
             uv[2] = new Vector2(0, yUnit);
             uv[3] = new Vector2(xUnit, yUnit);
             
-            mesh.uv = uv;
+            mesh.uv = uv;*/
+            
 
             
             mesh.RecalculateBounds();
@@ -209,10 +237,25 @@ namespace Unibas.DBIS.DynamicModelling
             mesh.vertices = vertices;
            
             // transform Vector3 to Vector2 with x and z only, since height not needed
+            var shorty = 1000f;
+            var j = 0;
             Vector2[] vector2s=new Vector2[vertices.Length];
             for (int i = 0; i < vertices.Length; i++) {
                 vector2s[i].x = vertices[i].x;
                 vector2s[i].y = vertices[i].z;
+                if (i != vertices.Length - 1) {
+                     j = i + 1;
+                }
+                else {
+                     j = 0;
+                }
+
+                var calc = Vector2.Distance(vector2s[i], vector2s[j]);
+                if (calc < shorty) {
+                    shorty = calc;
+                }
+                
+
             }
             // Method which calculates polygons triangluars
             Triangulator tr = new Triangulator(vector2s);
@@ -239,6 +282,16 @@ namespace Unibas.DBIS.DynamicModelling
                 Debug.Log(uvs[i]);
             }
             */
+            
+//            Debug.Log(shorty+"  Shorty");
+            
+
+            for (int i = 0; i <vector2s.Length; i++) {
+                vector2s[i]= vector2s[i]/ shorty;
+
+            }
+            
+           
             mesh.uv = vector2s;
             
             
