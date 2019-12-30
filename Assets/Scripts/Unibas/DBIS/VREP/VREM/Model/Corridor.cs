@@ -56,6 +56,35 @@ namespace DefaultNamespace.VREM.Model
             return connectsRoom;
         }
         
+        /// <summary>
+        /// calculate position of corridor depending on the rooms which have to be connected
+        /// </summary>
+        public void CalculatePosition()
+        {
+            Room room0 = connectsRoom[0];
+            Room room1 = connectsRoom[1];
+
+            int smallestDist = 99999;
+            Wall wall0_smallestdis;
+            Wall wall1_smallestdis;
+            
+            
+            //is this the most efficient way?
+            foreach(Wall wall0 in room0.walls)
+            {
+                foreach (Vector3 wallCoord0 in wall0.wallCoordinates)
+                {
+                    foreach (Wall wall1 in room1.walls )
+                    {
+                        foreach (Vector3 wallCoord1 in wall1.wallCoordinates )
+                        {
+                            
+                        }
+                    }
+                }
+            }
+        }
+        
         /**
          * calculate size and position of corridor based on the rooms to connect
          */

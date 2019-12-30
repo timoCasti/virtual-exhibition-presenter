@@ -282,7 +282,7 @@ namespace Unibas.DBIS.DynamicModelling
             return go;
         }
 
-        
+        /*
         /// <summary>
         /// 
         /// </summary>
@@ -352,8 +352,9 @@ namespace Unibas.DBIS.DynamicModelling
             //ceilingAnchor.transform.Rotate( Vector3.back, -90);
 
             return root;
-        }
-
+        }*/
+        
+        /*
         public static GameObject CreateCuboidRoom(CuboidRoomModel model)
         {
             GameObject root = new GameObject("CuboidRoom");
@@ -418,7 +419,7 @@ namespace Unibas.DBIS.DynamicModelling
             
             root.AddComponent<ModelContainer>().Model = model;
             return root;
-        }
+        }*/
         
         /**
          * Creates corridor model
