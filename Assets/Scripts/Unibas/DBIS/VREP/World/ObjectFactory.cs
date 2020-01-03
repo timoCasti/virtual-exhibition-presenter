@@ -152,12 +152,22 @@ namespace World
         public static GameObject BuildCorridor(DefaultNamespace.VREM.Model.Corridor corridorData)
         {
             //corridorData.CalculateSizeAndPosition();
-
+            //corridorData.CalculatePosition();
+            
+            Debug.Log("ObjectFactory BuildCorridor");
+            Debug.Log(corridorData.connectsRoom);//NULL
+            //This is ok
+            Debug.Log(corridorData.size);
+            Debug.Log(corridorData.position);
+            Debug.Log(corridorData.entrypoint);
+            
             Material[] mats = new Material[corridorData.walls.Length+2];
             Material[] matsWallonly = new Material[corridorData.walls.Length];
             mats[0] = TexturingUtility.LoadMaterialByName(corridorData.floor);
             mats[1] = TexturingUtility.LoadMaterialByName(corridorData.ceiling);
-
+            
+            corridorData.CalculatePosition();
+            //calculate Position before loop!
             for (int i = 0; i < corridorData.walls.Length; i++) {
                 mats[2 + i] = TexturingUtility.LoadMaterialByName(corridorData.walls[i].texture);
                 matsWallonly[i] = TexturingUtility.LoadMaterialByName(corridorData.walls[i].texture);
@@ -167,11 +177,16 @@ namespace World
                 corridorData.size.x, corridorData.size.y,
                 mats[0], mats[1], mats[2], mats[3]);
             GameObject corridor = ModelFactory.CreateCorridor(modelData);
+            
             var er = corridor.AddComponent<CuboidExhibitionCorridor>();
 
             er.CorridorModel = modelData;
+
+            //corridor.CalculatePosition();
             er.Model = corridor;
             er.CorridorData = corridorData;
+            //er.CorridorData.CalculatePosition();
+            
             var na = CreateAnchor(WallOrientation.NORTH, corridor, modelData);
             var sa = CreateAnchor(WallOrientation.SOUTH, corridor, modelData);
             

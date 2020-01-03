@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using World;
@@ -61,30 +62,86 @@ namespace DefaultNamespace.VREM.Model
         /// </summary>
         public void CalculatePosition()
         {
+            //connects room is NULL
             Room room0 = connectsRoom[0];
             Room room1 = connectsRoom[1];
 
-            int smallestDist = 99999;
-            Wall wall0_smallestdis;
-            Wall wall1_smallestdis;
             
+            List<DistanceAndCoordinate> distanceList = new List<DistanceAndCoordinate>();
             
             //is this the most efficient way?
-            foreach(Wall wall0 in room0.walls)
+            //find neares corners in the rooms to connect
+            foreach (Wall wall0 in room0.walls)
             {
                 foreach (Vector3 wallCoord0 in wall0.wallCoordinates)
                 {
-                    foreach (Wall wall1 in room1.walls )
+                    if (wallCoord0.y.Equals(0))
                     {
-                        foreach (Vector3 wallCoord1 in wall1.wallCoordinates )
+                        foreach (Wall wall1 in room1.walls)
                         {
-                            
+                            foreach (Vector3 wallCoord1 in wall1.wallCoordinates)
+                            {
+                                if (wallCoord1.y.Equals(0))
+                                {
+                                    var dist = Vector3.Distance(wallCoord0, wallCoord1);
+                                    distanceList.Add(new DistanceAndCoordinate(wallCoord0, wallCoord1, dist));
+                                }
+                            }
                         }
                     }
                 }
             }
+
+            float lowestDist = distanceList.Min(dist => dist.distance);
+            DistanceAndCoordinate lowestDistanceCoord = distanceList.Find(x => x.distance.Equals(lowestDist));
+            distanceList.Remove(lowestDistanceCoord);
+
+            //find the second connection with the second lowest distance with two different corners
+            bool found = false;
+            float secondlowestDist = distanceList.Min(dist => dist.distance);
+            DistanceAndCoordinate secondLowestDistanceCoord = distanceList.Find(x => x.distance.Equals(secondlowestDist));
+            while (!found)
+            {
+                secondlowestDist = distanceList.Min(dist => dist.distance);
+                secondLowestDistanceCoord = distanceList.Find(x => x.distance.Equals(secondlowestDist));
+                distanceList.Remove(secondLowestDistanceCoord);
+                
+                if (!HaveTheSameCorners(lowestDistanceCoord, secondLowestDistanceCoord))
+                {
+                    found = true;
+                }
+            }//end while
+            
+            //assign new coordinates to the walls
+            walls[0].wallCoordinates[0]=lowestDistanceCoord.wallCoord0;
+            walls[0].wallCoordinates[1]=lowestDistanceCoord.wallCoord0;
+            walls[0].wallCoordinates[1].y = 5;
+            walls[0].wallCoordinates[2]=lowestDistanceCoord.wallCoord1;
+            walls[0].wallCoordinates[3]=lowestDistanceCoord.wallCoord1;
+            walls[0].wallCoordinates[3].y = 5;
+            
+            walls[1].wallCoordinates[0]=secondLowestDistanceCoord.wallCoord0;
+            walls[1].wallCoordinates[1]=secondLowestDistanceCoord.wallCoord0;
+            walls[1].wallCoordinates[1].y = 5;
+            walls[1].wallCoordinates[2]=secondLowestDistanceCoord.wallCoord1;
+            walls[1].wallCoordinates[3]=secondLowestDistanceCoord.wallCoord1;
+            walls[1].wallCoordinates[3].y = 5;
+            
+            Console.WriteLine("----Test {0}", walls[1].wallCoordinates[0]);
+            
+            //calculate position and size
+
+        }//CalculatePosition
+
+        //check if two distance and corner pairs have the same corners
+        //returns true if one corner has the same coordinates.
+        private bool HaveTheSameCorners(DistanceAndCoordinate dc0, DistanceAndCoordinate dc1)
+        {
+            return dc0.wallCoord0.Equals(dc1.wallCoord0) ||
+                   dc0.wallCoord0.Equals(dc1.wallCoord1) ||
+                    dc0.wallCoord1.Equals(dc1.wallCoord0) ||
+                    dc0.wallCoord1.Equals(dc1.wallCoord1);
         }
-        
         /**
          * calculate size and position of corridor based on the rooms to connect
          */
@@ -154,5 +211,22 @@ namespace DefaultNamespace.VREM.Model
             this.size=corridorSize;
         }*/
 
+    }//end class corridor
+
+    //Local class to combine coordinates and distance 
+    public class DistanceAndCoordinate
+    {
+        public Vector3 wallCoord0;
+        public Vector3 wallCoord1;
+        public float distance;
+
+        public DistanceAndCoordinate(Vector3 wallcoord0, Vector3 wallcoord1, float dist)
+        {
+            wallCoord0 = wallcoord0;
+            wallCoord1 = wallcoord1;
+            distance = dist;
+        }
     }
+
+
 }
