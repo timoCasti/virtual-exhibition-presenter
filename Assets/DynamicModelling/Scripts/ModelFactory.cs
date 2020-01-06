@@ -160,11 +160,12 @@ namespace Unibas.DBIS.DynamicModelling
                      shorty = calc;
                  }
              }
+             /*
              for (int i = 0; i <vector2sWall.Length; i++) {
                  vector2sWall[i]= vector2sWall[i]/ shorty;
 //                 Debug.Log(" Vector  "+i+ "  "+vector2sWall[i]);
 
-             }
+             }*/
 
              mesh.uv = vector2sWall;
 
@@ -195,7 +196,7 @@ namespace Unibas.DBIS.DynamicModelling
             if (material != null)
             {
                 meshRenderer.material.CopyPropertiesFromMaterial(material);
-                //meshRenderer.material.SetTextureScale("_MainTex", new Vector2(1,1));
+                meshRenderer.material.SetTextureScale("_MainTex", new Vector2(0.5f,0.5f));
                 meshRenderer.material.name = material.name + "(Instance)";
             }
             else
@@ -273,7 +274,7 @@ namespace Unibas.DBIS.DynamicModelling
 
             mesh.triangles = indices;
             
-            //Maybe we need normals and uv
+           
             /*Vector2[] uvs = new Vector2[vertices.Length];
 
             for (int i = 0; i < uvs.Length; i++)
@@ -286,10 +287,12 @@ namespace Unibas.DBIS.DynamicModelling
 //            Debug.Log(shorty+"  Shorty");
             
 
-            for (int i = 0; i <vector2s.Length; i++) {
+            /*for (int i = 0; i <vector2s.Length; i++) {
                 vector2s[i]= vector2s[i]/ shorty;
 
-            }
+            }*/
+            
+            
             
            
             mesh.uv = vector2s;
@@ -306,13 +309,14 @@ namespace Unibas.DBIS.DynamicModelling
             if (material != null)
             {
                 meshRenderer.material.CopyPropertiesFromMaterial(material);
-                //meshRenderer.material.SetTextureScale("_MainTex", new Vector2(1,1));
+                meshRenderer.material.SetTextureScale("_MainTex", new Vector2(0.5f,0.5f));
                 meshRenderer.material.name = material.name + "(Instance)";
             }
             else
             {
                 meshRenderer.material = new Material(Shader.Find("Standard"));
                 meshRenderer.material.color = Color.white;
+                
             }
             
             
