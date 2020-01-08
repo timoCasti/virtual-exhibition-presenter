@@ -13,7 +13,10 @@ namespace Unibas.DBIS.DynamicModelling.Models
         public Material CeilingMaterial;
         public Material NorthMaterial;
         public Material SouthMaterial;
+        
 
+        
+        
         public CuboidCorridorModel(Vector3 position, float size, float height)
         {
             Position = position;
@@ -34,7 +37,7 @@ namespace Unibas.DBIS.DynamicModelling.Models
         }
 
         public CuboidCorridorModel(Vector3 position, float size, float height, Material floorMaterial = null,
-            Material ceilingMaterial = null, Material northMaterial = null, Material southMaterial = null)
+            Material ceilingMaterial = null, Material northMaterial = null, Material southMaterial = null )
         {
             Position = position;
             Size = new Vector2(size,size);
@@ -43,6 +46,7 @@ namespace Unibas.DBIS.DynamicModelling.Models
             CeilingMaterial = ceilingMaterial;
             NorthMaterial = northMaterial;
             SouthMaterial = southMaterial;
+            
         }
         
         public float GetSize()

@@ -140,6 +140,19 @@ namespace Unibas.DBIS.VREP.Core
 
         public void GenerateExhibition()
         {
+            Debug.Log("ExhibitionManager GenerateExhibition");
+            foreach (Corridor c in _exhibition.corridors)
+            {
+                Debug.Log(c);
+                Debug.Log(c.connects);//NULL
+                //This is ok
+                Debug.Log(c.size);
+                Debug.Log(c.position);
+                Debug.Log(c.entrypoint);
+            }
+            //Debug.Log(_exhibition.corridors.);//NULL
+            //This is ok
+            
             
             foreach (var room in _exhibition.rooms)
             {
@@ -168,8 +181,10 @@ namespace Unibas.DBIS.VREP.Core
             
             foreach (var corridor in _exhibition.corridors)
             {
-                Debug.Log("Generate Corridor corridor");
                 //corridor.CalculatePosition();
+                Debug.Log("Generate Corridor corridor-----------------------");
+                Debug.Log(corridor.connects);//NULL
+                
                 var corridorGameObject = ObjectFactory.BuildCorridor(corridor);
                 
                 var exhibitionCorridor = corridorGameObject.GetComponent<CuboidExhibitionCorridor>();

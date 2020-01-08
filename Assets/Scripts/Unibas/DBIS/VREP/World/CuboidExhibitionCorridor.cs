@@ -48,6 +48,7 @@ namespace Unibas.DBIS.VREP.World
         /// </summary>
         public void Populate()
         {
+            Debug.LogWarning("Populate Wall in Corridor");
             PopulateCorridor();
             PopulateWalls();
         }
@@ -76,6 +77,7 @@ namespace Unibas.DBIS.VREP.World
         /// </summary>
         public void PopulateCorridor()
         {
+            
             Debug.LogWarning("Cannot place 3d objects yet");
             /*
              * GameObject parent = new GameObject("Model Anchor");
@@ -94,7 +96,6 @@ namespace Unibas.DBIS.VREP.World
         /// </summary>
         public void PopulateWalls()
         {
-            
             //Walls.ForEach(ew => ew.AttachExhibits());
         }
         /*
@@ -117,7 +118,6 @@ namespace Unibas.DBIS.VREP.World
             if (!string.IsNullOrEmpty(CorridorData.GetURLEncodedAudioPath()))
             {
                 Debug.Log("add audio to room");
-
 
                 if (_audioLoader == null)
                 {

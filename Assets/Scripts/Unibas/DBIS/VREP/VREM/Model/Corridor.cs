@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 using World;
 
@@ -23,7 +24,7 @@ namespace DefaultNamespace.VREM.Model
 
         public Exhibit[] exhibits; 
         
-        public Room[] connectsRoom;
+        [FormerlySerializedAs("connectsRoom")] public Room[] connects;
     
     
         public string GetURLEncodedAudioPath() {
@@ -54,7 +55,7 @@ namespace DefaultNamespace.VREM.Model
 
         public Room[] GetConnectsRoom()
         {
-            return connectsRoom;
+            return connects;
         }
         
         /// <summary>
@@ -63,8 +64,8 @@ namespace DefaultNamespace.VREM.Model
         public void CalculatePosition()
         {
             //connects room is NULL
-            Room room0 = connectsRoom[0];
-            Room room1 = connectsRoom[1];
+            Room room0 = connects[0];
+            Room room1 = connects[1];
 
             
             List<DistanceAndCoordinate> distanceList = new List<DistanceAndCoordinate>();
@@ -127,7 +128,16 @@ namespace DefaultNamespace.VREM.Model
             walls[1].wallCoordinates[3]=secondLowestDistanceCoord.wallCoord1;
             walls[1].wallCoordinates[3].y = 5;
             
-            Console.WriteLine("----Test {0}", walls[1].wallCoordinates[0]);
+            /*
+            public Vector3 size;
+            public Vector3 position;
+            public Vector3 entrypoint;
+             */
+            
+            size = CrossProduct(lowestDistanceCoord.wallCoord0, secondLowestDistanceCoord.wallCoord0);
+            position = PositionFromDAC(lowestDistanceCoord,secondLowestDistanceCoord);
+            entrypoint = position;
+            Console.WriteLine("----Test n Corridor {0}", walls[1].wallCoordinates[0]);
             
             //calculate position and size
 
@@ -210,6 +220,33 @@ namespace DefaultNamespace.VREM.Model
             this.position=corridorPosition;
             this.size=corridorSize;
         }*/
+
+        private Vector3 PositionFromDAC(DistanceAndCoordinate d1, DistanceAndCoordinate d2)
+        {
+            Vector3 v1 = d1.wallCoord0;
+            Vector3 v2 = d1.wallCoord1;
+            Vector3 v3 = d2.wallCoord0;
+            Vector3 v4 = d2.wallCoord1;
+            
+            float x = (v1.x + v2.x + v3.x + v4.x) / 4;
+            float y = (v1.y + v2.y + v3.y + v4.y) / 4;
+            float z = (v1.z + v2.z + v3.z + v4.z) / 4;
+            return new Vector3(x,y,z);
+        }
+        private Vector3 CrossProduct(Vector3 v1, Vector3 v2)
+        {
+            
+            /*
+            float x = v1.y * v2.z - v2.y * v1.z;
+            float y = (v1.x * v2.z - v2.x * v1.z) * -1;
+            float z = v1.x * v2.y - v2.x * v1.y;
+            */
+            float x = (v1.x + v2.x) / 2;
+            float y = (v1.y + v2.y ) / 2;
+            float z = (v1.z + v2.z ) / 2;
+            
+            return new Vector3(x, y, z);
+        }
 
     }//end class corridor
 

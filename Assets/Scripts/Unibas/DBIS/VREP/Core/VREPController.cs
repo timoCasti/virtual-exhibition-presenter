@@ -137,6 +137,7 @@ namespace Unibas.DBIS.VREP
             Debug.Log(ex);
   //          Debug.Log(_buildingManager);
             // TODO create lobby
+            Debug.Log("VREPController");
             
             _exhibitionManager = new ExhibitionManager(ex);
             _exhibitionManager.GenerateExhibition();

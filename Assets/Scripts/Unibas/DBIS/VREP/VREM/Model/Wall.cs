@@ -23,6 +23,7 @@ namespace DefaultNamespace.VREM.Model {
      *wC[0] *--------* wC[1]
      */
     
+    
 /*
     public WallOrientation GetOrientation()
     {
