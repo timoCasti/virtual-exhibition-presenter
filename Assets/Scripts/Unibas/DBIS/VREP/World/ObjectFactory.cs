@@ -182,9 +182,10 @@ namespace World
                 matsWallonly[i] = TexturingUtility.LoadMaterialByName(corridorData.walls[i].texture);
             }
 
+            
             CuboidCorridorModel cuboidCorridorModelData = new CuboidCorridorModel(CalculateCorridorPosition(corridorData),
                 corridorData.size.x, corridorData.size.y,
-                mats[0], mats[1], mats[2], mats[3]);
+                mats[0], mats[1], mats[2], mats[3], corridorData.walls);
             
             GameObject corridor = ModelFactory.CreateCorridor(cuboidCorridorModelData);
             
@@ -199,8 +200,8 @@ namespace World
             
             //var na = CreateAnchor(WallOrientation.NORTH, corridor, corridorModelData);
             //var sa = CreateAnchor(WallOrientation.SOUTH, corridor, corridorModelData);
-            var na = CreateAnchorCorridors(WallOrientation.NORTH, corridor, cuboidCorridorModelData, corridorData.GetWall(0));
-            var sa = CreateAnchorCorridors(WallOrientation.SOUTH, corridor, cuboidCorridorModelData, corridorData.GetWall(1));
+            var na = CreateAnchorCorridors(0, corridor, cuboidCorridorModelData, corridorData.GetWall(0));
+            var sa = CreateAnchorCorridors(1, corridor, cuboidCorridorModelData, corridorData.GetWall(1));
             
             var nw = CreateCorridorWall(0, corridorData, na);
             var sw = CreateCorridorWall(1, corridorData, sa);
@@ -365,16 +366,20 @@ namespace World
         }
         
         //creates anchor for corridors
-        private static GameObject CreateAnchorCorridors(WallOrientation orientation, GameObject corridor, CuboidCorridorModel model, DefaultNamespace.VREM.Model.Wall wall)
+        private static GameObject CreateAnchorCorridors(/*WallOrientation orientation,*/
+            int Wallnumber, GameObject corridor, CuboidCorridorModel model, DefaultNamespace.VREM.Model.Wall wall)
         {
+            //todo walorientation 0 1
             Debug.Log("ObjectFactory CreateAnchorCorridors");
-            GameObject anchor = new GameObject(orientation + "Anchor");
-            //anchor.transform.parent = corridor.transform;
+            GameObject anchor = new GameObject(Wallnumber + "Anchor");
+            anchor.transform.parent = corridor.transform;
             //Vector3 pos = Vector3.zero;
             //Vector3 pos = corridor;
-            Vector3 pos = wall.wallCoordinates[0];
+            //Vector3 pos; // = wall.wallCoordinates[0];
+            Vector3 pos = model.walls[Wallnumber].wallCoordinates[0];
             var a = 0f;
             var sizeHalf = model.GetSize() / 2f;
+            /*
             switch (orientation)
             {
                 case WallOrientation.NORTH:
@@ -387,7 +392,16 @@ namespace World
                     break;
                 default:
                     throw new ArgumentOutOfRangeException("orientation", orientation, null);
-            }
+            }*/
+            string wallname = "Wall" + Wallnumber;
+            GameObject gogo = GameObject.Find(wallname);
+            Vector3 nor = gogo.GetComponentInChildren<MeshFilter>().mesh.normals[0];
+            Vector3 vec = Quaternion.FromToRotation(Vector3.back, nor).eulerAngles;
+            anchor.transform.Rotate(Vector3.up,vec.y);
+            anchor.transform.localPosition = pos;
+            Debug.Log(anchor.ToString());
+            return anchor;
+            
             Debug.Log(a.ToString());
             anchor.transform.Rotate(Vector3.up, a);
             anchor.transform.localPosition = pos;
@@ -428,8 +442,10 @@ namespace World
             pos = model.walls[Wallnumber].wallCoordinates[0];
 
             int wall2 = (Wallnumber + 1);
-            if (wall2 == model.walls.Length) {
-                wall2 = 0;}
+            if (wall2 == model.walls.Length)
+            {
+                wall2 = 0;
+            }
             Vector3 v = new Vector3(model.walls[Wallnumber].wallCoordinates[0].x-model.walls[Wallnumber].wallCoordinates[1].x,0,model.walls[Wallnumber].wallCoordinates[0].y-model.walls[Wallnumber].wallCoordinates[1].y);
             Vector3 v2 = new Vector3(model.walls[wall2].wallCoordinates[0].x - model.walls[wall2].wallCoordinates[1].x,0,model.walls[wall2].wallCoordinates[0].y-model.walls[wall2].wallCoordinates[1].y);
 
