@@ -113,7 +113,7 @@ namespace DefaultNamespace.VREM.Model
                 }
             }//end while
             
-            //assign new coordinates to the walls
+            //assign new coordinates to the corridor walls
             walls[0].wallCoordinates[0]=lowestDistanceCoord.wallCoord0;
             walls[0].wallCoordinates[1]=lowestDistanceCoord.wallCoord0;
             walls[0].wallCoordinates[1].y = 5;
@@ -125,21 +125,16 @@ namespace DefaultNamespace.VREM.Model
             walls[1].wallCoordinates[1]=secondLowestDistanceCoord.wallCoord0;
             walls[1].wallCoordinates[1].y = 5;
             walls[1].wallCoordinates[2]=secondLowestDistanceCoord.wallCoord1;
-            walls[1].wallCoordinates[3]=secondLowestDistanceCoord.wallCoord1;
-            walls[1].wallCoordinates[3].y = 5;
-            
-            /*
-            public Vector3 size;
-            public Vector3 position;
-            public Vector3 entrypoint;
-             */
-            
+            walls[1].wallCoordinates[3]=secondLowestDistanceCoord.wallCoord1;                   
+            walls[1].wallCoordinates[3].y = 5;     
+                  
+            //calculate position and size        
             size = CrossProduct(lowestDistanceCoord.wallCoord0, secondLowestDistanceCoord.wallCoord0);
             position = PositionFromDAC(lowestDistanceCoord,secondLowestDistanceCoord);
             entrypoint = position;
             Console.WriteLine("----Test n Corridor {0}", walls[1].wallCoordinates[0]);
             
-            //calculate position and size
+            
 
         }//CalculatePosition
 

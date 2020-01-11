@@ -150,7 +150,7 @@ namespace World
             return roompoly;
         }
         
-        //TODO
+        //TODO finish
         public static GameObject BuildCorridor(DefaultNamespace.VREM.Model.Corridor corridorData)
         {
             //corridorData.CalculateSizeAndPosition();
@@ -168,7 +168,10 @@ namespace World
             mats[0] = TexturingUtility.LoadMaterialByName(corridorData.floor);
             mats[1] = TexturingUtility.LoadMaterialByName(corridorData.ceiling);
             
+            //calculate the position of corridor based on the rooms to connect
             corridorData.CalculatePosition();
+            
+            //todo remove log
             Debug.Log("ObjectFactory BuildCorridor after CalculatePosition");
             Debug.Log(corridorData.connects);//NULL
             //This is ok
@@ -176,7 +179,7 @@ namespace World
             Debug.Log(corridorData.position);
             Debug.Log(corridorData.entrypoint);
             
-            //calculate Position before loop!
+            //calculate Position before this loop!
             for (int i = 0; i < corridorData.walls.Length; i++) {
                 mats[2 + i] = TexturingUtility.LoadMaterialByName(corridorData.walls[i].texture);
                 matsWallonly[i] = TexturingUtility.LoadMaterialByName(corridorData.walls[i].texture);
