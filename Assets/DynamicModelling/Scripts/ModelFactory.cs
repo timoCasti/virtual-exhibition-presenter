@@ -1,6 +1,6 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
-using Boo.Lang;
 using Unibas.DBIS.DynamicModelling.Models;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -9,7 +9,6 @@ namespace Unibas.DBIS.DynamicModelling
 {
     public static class ModelFactory
     {
-        
         /// <summary>
         /// Quad of sorts:
         ///
@@ -88,14 +87,12 @@ namespace Unibas.DBIS.DynamicModelling
             mesh.RecalculateNormals();
             mesh.RecalculateTangents();
 
-            if (material != null)
-            {
+            if (material != null) {
                 meshRenderer.material.CopyPropertiesFromMaterial(material);
                 //meshRenderer.material.SetTextureScale("_MainTex", new Vector2(1,1));
                 meshRenderer.material.name = material.name + "(Instance)";
             }
-            else
-            {
+            else {
                 meshRenderer.material = new Material(Shader.Find("Standard"));
                 meshRenderer.material.color = Color.white;
             }
@@ -103,6 +100,7 @@ namespace Unibas.DBIS.DynamicModelling
 
             return go;
         }
+
         /*
          * Creates a wall based on 4 coordinates (Vector3)
          * para:  Vector3 [] coordinates // the coordinates of the walls vertices ( 4! )
@@ -115,7 +113,7 @@ namespace Unibas.DBIS.DynamicModelling
             MeshFilter meshFilter = go.AddComponent<MeshFilter>();
             MeshRenderer meshRenderer = go.AddComponent<MeshRenderer>();
             Mesh mesh = meshFilter.mesh;
-            
+
             mesh.vertices = coordinates;
 
             int[] tri = new int[6];
@@ -137,90 +135,172 @@ namespace Unibas.DBIS.DynamicModelling
 
             Vector2[] uv = new Vector2[4];
 
-            float width = Vector3.Distance(coordinates[0],coordinates[1]);
+            float width = Vector3.Distance(coordinates[0], coordinates[1]);
             float height = Vector3.Distance(coordinates[0], coordinates[3]);
-                        
+
             float xUnit = 1;
             float yUnit = 1;
             var shorty = 100f;
             var j = 0;
-             Vector2[] vector2sWall=new Vector2[coordinates.Length];
-             for (int i = 0; i < coordinates.Length; i++) {
-                 vector2sWall[i].x = coordinates[i].x;
-                 vector2sWall[i].y = coordinates[i].z;
-                 if (i != coordinates.Length - 1) {
-                     j = i + 1;
-                 }
-                 else {
-                     j = 0;
-                 }
+            Vector2[] vector2sWall = new Vector2[coordinates.Length];
+            for (int i = 0; i < coordinates.Length; i++) {
+                vector2sWall[i].x = coordinates[i].x;
+                vector2sWall[i].y = coordinates[i].z;
+                if (i != coordinates.Length - 1) {
+                    j = i + 1;
+                }
+                else {
+                    j = 0;
+                }
 
-                 var calc = Vector2.Distance(vector2sWall[i], vector2sWall[j]);
-                 if (calc < shorty) {
-                     shorty = calc;
-                 }
-             }
-             /*
-             for (int i = 0; i <vector2sWall.Length; i++) {
-                 vector2sWall[i]= vector2sWall[i]/ shorty;
+                var calc = Vector2.Distance(vector2sWall[i], vector2sWall[j]);
+                if (calc < shorty) {
+                    shorty = calc;
+                }
+            }
+            var uv2 = new Vector2[coordinates.Length];
+            
+           
+            
+            //math for uv coordinates
+
+            Vector3 normal = Vector3.Cross(coordinates[1] - coordinates[0], coordinates[2] - coordinates[0]).normalized;
+            //Debug.Log(normal);
+            Vector3 u;
+            if (Math.Abs(Vector3.Dot(Vector3.forward, normal)) < 0.2f) {
+                u = Vector3.ProjectOnPlane(Vector3.right, normal);
+            }
+            else {
+                u = Vector3.ProjectOnPlane(Vector3.forward, normal);
+            }
+
+            Vector3 v = Vector3.Cross(u, normal).normalized;
+
+            Debug.Log("u   "+u);
+            Debug.Log(v);
+            
+            uv2[0]=new Vector2(Vector3.Dot(coordinates[0],u),Vector3.Dot(coordinates[0],v));
+            uv2[1]=new Vector2(Vector3.Dot(coordinates[1],u),Vector3.Dot(coordinates[1],v));
+            uv2[2]=new Vector2(Vector3.Dot(coordinates[2],u),Vector3.Dot(coordinates[2],v));
+            uv2[3]=new Vector2(Vector3.Dot(coordinates[3],u),Vector3.Dot(coordinates[3],v));
+            //uv[0]=new Vector2(0,0);
+      
+            Debug.Log(uv2[0]+"   "+uv2[1]+"   "+uv2[2]+"   "+uv2[3]+"   ");
+            mesh.uv = uv2;
+            
+            
+
+            uv2[0]=new Vector2(0,0);
+            uv2[1]=new Vector2(width,0);
+            uv2[2]=new Vector2(width,height);
+            uv2[3]=new Vector2(0,height);
+            mesh.uv = uv2;
+
+            var uv3 = new Vector2[coordinates.Length];
+            
+            uv3[0]=new Vector2(0,0);
+            uv3[1]=new Vector2(width,0);
+            mesh.RecalculateNormals();
+            Mesh meshcalc = mesh;
+            Vector3[] abc=new Vector3[4];
+            abc[0]=new Vector3(0,0,0);
+            abc[1] = coordinates[1] - coordinates[0];
+            abc[2] = coordinates[2] - coordinates[0];
+            abc[3] = coordinates[3] - coordinates[0];
+            
+            Mesh meshi2=new Mesh();
+            meshi2.vertices = abc;
+            meshi2.RecalculateNormals();
+            
+            MeshRenderer mr=new MeshRenderer();
+            
+            GameObject go2 = new GameObject("Calc");
+            MeshFilter meshFilter2 = go.AddComponent<MeshFilter>();
+            MeshRenderer meshRenderer2 = go.AddComponent<MeshRenderer>();
+            Mesh mesh2 = meshFilter.mesh;
+            mesh2.vertices = abc;
+
+            mesh2.triangles = tri;
+            mesh2.RecalculateNormals();
+            Vector3 normi = mesh2.normals[0];
+//            meshRenderer2.transform.eulerAngles = normi;
+            var bla=new Vector3(0,1,0);
+            var vli=new List<Vector3>();
+            vli.Add(bla);
+            vli.Add(bla);
+            vli.Add(bla);
+            vli.Add(bla);
+            
+            mesh2.SetNormals(vli);
+            mesh2.RecalculateTangents();
+            mesh2.RecalculateBounds();
+            //Debug.Log("DADADA  "+ coordinates[2]);
+            Debug.Log("alles für nüt?   "+mesh2.vertices[0]+ "  "+mesh2.vertices[1]+ "  "+mesh2.vertices[2]+ "  "+mesh2.vertices[3]+ "  ");
+
+            for (int i = 0; i < coordinates.Length; i++) {
+                uv3[i].x = mesh2.vertices[i].x;
+                uv3[i].y = mesh2.vertices[i].y;
+            }
+
+            mesh.uv = uv3;
+            Object.Destroy(GameObject.Find("Calc"));
+            /*
+            for (int i = 0; i <vector2sWall.Length; i++) {
+                vector2sWall[i]= vector2sWall[i]/ shorty;
 //                 Debug.Log(" Vector  "+i+ "  "+vector2sWall[i]);
 
-             }*/
+            }*/
 
-             mesh.uv = vector2sWall;
-
-
-             /*
-             if (width > height)
-            {
-                xUnit = width / height;
-            }
-            else
-            {
-                yUnit = height / width;
-            }
-
-            uv[0] = new Vector2(0, 0);
-            uv[1] = new Vector2(xUnit, 0);
-            uv[2] = new Vector2(0, yUnit);
-            uv[3] = new Vector2(xUnit, yUnit);
-            
-            mesh.uv = uv;*/
-            
+            //mesh.uv = vector2sWall;
 
             
+
+            /*
+            if (width > height)
+           {
+               xUnit = width / height;
+           }
+           else
+           {
+               yUnit = height / width;
+           }
+
+           uv[0] = new Vector2(0, 0);
+           uv[1] = new Vector2(xUnit, 0);
+           uv[2] = new Vector2(0, yUnit);
+           uv[3] = new Vector2(xUnit, yUnit);
+           
+           mesh.uv = uv;*/
+
+
             mesh.RecalculateBounds();
             mesh.RecalculateNormals();
             mesh.RecalculateTangents();
 
-            if (material != null)
-            {
+            if (material != null) {
                 meshRenderer.material.CopyPropertiesFromMaterial(material);
-                meshRenderer.material.SetTextureScale("_MainTex", new Vector2(0.5f,0.5f));
+                meshRenderer.material.SetTextureScale("_MainTex", new Vector2(0.5f, 0.5f));
                 meshRenderer.material.name = material.name + "(Instance)";
             }
-            else
-            {
+            else {
                 meshRenderer.material = new Material(Shader.Find("Standard"));
                 meshRenderer.material.color = Color.white;
             }
-            
-            
+
+
             //postion wall
-            float a = Vector3.Angle(coordinates[0]-coordinates[1], Vector3.right);
-        
+            float a = Vector3.Angle(coordinates[0] - coordinates[1], Vector3.right);
+
             //add collider for teleportation limits
             var collider = go.AddComponent<MeshCollider>();
             collider.sharedMesh = mesh;
-            
+
             return go;
-            
-            
-            
-            
+
 
             return go;
         }
+
         /*
          * Creates the "walls" for ceiling or floor out of various amounts of vertices
          *
@@ -228,53 +308,59 @@ namespace Unibas.DBIS.DynamicModelling
          * A Material
          * String "Floor" or "Ceiling" necessary to face in correct direction
          */
-        public static GameObject CreatePolygonalMeshes(Vector3[] vertices, Material material, String FloororCeiling)
+        public static GameObject CreatePolygonalMeshes(Vector3[] vertices, Material material, String FloororCeiling,
+            bool swap)
         {
-            GameObject go =new GameObject("PolygonalWall");
+            GameObject go = new GameObject("PolygonalWall");
             MeshFilter meshFilter = go.AddComponent<MeshFilter>();
             MeshRenderer meshRenderer = go.AddComponent<MeshRenderer>();
             Mesh mesh = meshFilter.mesh;
 
             mesh.vertices = vertices;
-           
+
             // transform Vector3 to Vector2 with x and z only, since height not needed
             var shorty = 1000f;
             var j = 0;
-            Vector2[] vector2s=new Vector2[vertices.Length];
+            Vector2[] vector2s = new Vector2[vertices.Length];
             for (int i = 0; i < vertices.Length; i++) {
                 vector2s[i].x = vertices[i].x;
                 vector2s[i].y = vertices[i].z;
                 if (i != vertices.Length - 1) {
-                     j = i + 1;
+                    j = i + 1;
                 }
                 else {
-                     j = 0;
+                    j = 0;
                 }
 
                 var calc = Vector2.Distance(vector2s[i], vector2s[j]);
                 if (calc < shorty) {
                     shorty = calc;
                 }
-                
-
             }
+
             // Method which calculates polygons triangluars
             Triangulator tr = new Triangulator(vector2s);
             int[] indices = tr.Triangulate();
 
-            if (string.Equals(FloororCeiling, "Floor")) {
+
+            // Corrects the "Direction of Cailing and Floor
+            if (string.Equals(FloororCeiling, "Ceiling") && !swap) {
                 System.Array.Reverse(indices);
             }
- 
+            else if (swap) {
+                System.Array.Reverse(indices);
+            }
+
+
             // Create the Vector3 vertices  ??
             Vector3[] verticesOfpoly = new Vector3[vector2s.Length];
-            for (int i=0; i<vertices.Length; i++) {
+            for (int i = 0; i < vertices.Length; i++) {
                 vertices[i] = new Vector3(vector2s[i].x, vector2s[i].y, 0);
             }
 
             mesh.triangles = indices;
-            
-           
+
+
             /*Vector2[] uvs = new Vector2[vertices.Length];
 
             for (int i = 0; i < uvs.Length; i++)
@@ -283,49 +369,38 @@ namespace Unibas.DBIS.DynamicModelling
                 Debug.Log(uvs[i]);
             }
             */
-            
+
 //            Debug.Log(shorty+"  Shorty");
-            
+
 
             /*for (int i = 0; i <vector2s.Length; i++) {
                 vector2s[i]= vector2s[i]/ shorty;
 
             }*/
-            
-            
-            
-           
+
+
             mesh.uv = vector2s;
-            
-            
-            
-            
+
+
             mesh.RecalculateBounds();
             mesh.RecalculateNormals();
             mesh.RecalculateTangents();
-            
-            
-            
-            if (material != null)
-            {
+
+
+            if (material != null) {
                 meshRenderer.material.CopyPropertiesFromMaterial(material);
-                meshRenderer.material.SetTextureScale("_MainTex", new Vector2(0.5f,0.5f));
+                meshRenderer.material.SetTextureScale("_MainTex", new Vector2(0.5f, 0.5f));
                 meshRenderer.material.name = material.name + "(Instance)";
             }
-            else
-            {
+            else {
                 meshRenderer.material = new Material(Shader.Find("Standard"));
                 meshRenderer.material.color = Color.white;
-                
             }
-            
-            
+
 
             return go;
         }
-        
-        
-        
+
 
         /// <summary>
         /// Creates a wall between two positions
@@ -350,7 +425,7 @@ namespace Unibas.DBIS.DynamicModelling
             return go;
         }
 
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -474,7 +549,7 @@ namespace Unibas.DBIS.DynamicModelling
             ceiling.name = "Ceiling";
             ceiling.transform.parent = ceilingAnchor.transform;
 
-            
+
             // North Aligned
             ceilingAnchor.transform.position = new Vector3(-halfSize, model.Height, halfSize);
             ceilingAnchor.transform.Rotate(Vector3.right, -90);
@@ -483,19 +558,19 @@ namespace Unibas.DBIS.DynamicModelling
             //ceilingAnchor.transform.Rotate( Vector3.back, -90);
 
             root.transform.position = model.Position;
-            
+
             root.AddComponent<ModelContainer>().Model = model;
             return root;
         }
-        
-        
-     /*
-      * Method to create regular polygonaial rooms not used anymore.
-      */
+
+
+        /*
+         * Method to create regular polygonaial rooms not used anymore.
+         */
         public static GameObject CreateRegularPolygonalRoom(PolygonRoomModel model)
         {
             GameObject root = new GameObject("PolygonalRoom");
-            
+
             // math: from size to radius
             //float rad = (float) (model.size / (2 * (Math.Sin((Math.PI / model.numberOfWalls)))));
 
@@ -503,25 +578,27 @@ namespace Unibas.DBIS.DynamicModelling
             List<GameObject> goWall = new List<GameObject>();
             for (int i = 0; i < model.numberOfWalls; i++) {
                 String wallName = "Wall" + i;
-               // goWall.Add(CreateWall(model.size,model.height,model.walls[i].texture));
-               // goWall[i].name = wallName;
+                // goWall.Add(CreateWall(model.size,model.height,model.walls[i].texture));
+                // goWall[i].name = wallName;
             }
             // Position walls
 
-            
+
             //var n = model.numberOfWalls;
             //var x = 1f / n;
             //double alpha = ((x* 360f) *0.5f);
-            
+
             for (int i = 0; i < model.numberOfWalls; i++) {
                 goWall[i].name = i.ToString();
                 goWall[i].transform.parent = root.transform;
                 //goWall[i].transform.position=new Vector3((float) (rad * Math.Sin((2 * Math.PI / model.numberOfWalls) * i)),0,
-              //      (float) (rad * Math.Cos((2 * Math.PI / model.numberOfWalls) * i)));
-              
-                goWall[i].transform.Rotate(Vector3.up,(((1f/model.numberOfWalls)*360f*i) + ((1f/model.numberOfWalls)*360f)/2f));
+                //      (float) (rad * Math.Cos((2 * Math.PI / model.numberOfWalls) * i)));
+
+                goWall[i].transform.Rotate(Vector3.up,
+                    (((1f / model.numberOfWalls) * 360f * i) + ((1f / model.numberOfWalls) * 360f) / 2f));
                 //aussen winkel (((model.numberOfWalls-2)*180/model.numberOfWalls)*i)+((model.numberOfWalls-2)*180/model.numberOfWalls)/2) 
             }
+
             // Ceiling
             GameObject ceilingAnchor = new GameObject("CeilingAnchor");
             ceilingAnchor.transform.parent = root.transform;
@@ -529,11 +606,11 @@ namespace Unibas.DBIS.DynamicModelling
             //GameObject ceiling = CreatePolygonalWall(model.numberOfWalls, rad,LoadMaterialByName( model.CeilingMaterial));
             //ceiling.name = "Ceiling";
             //ceiling.transform.parent = ceilingAnchor.transform;
-            
+
             // North Aligned
             ceilingAnchor.transform.position = new Vector3(0, model.height, 0);
             ceilingAnchor.transform.Rotate(Vector3.right, -90);
-            
+
             // No idea why ceiling has to be rotated, only needs to be rotated if numberofwalls is odd
             if (model.numberOfWalls % 2 == 1) {
                 ceilingAnchor.transform.Rotate(Vector3.back, ((1f / model.numberOfWalls) * 360f) / 2f);
@@ -553,23 +630,20 @@ namespace Unibas.DBIS.DynamicModelling
             //
             floorAnchor.transform.position = new Vector3(0, 0, 0);
             floorAnchor.transform.Rotate(Vector3.right, 90);
-           
-        
-    
+
 
             root.transform.position = model.Position;
-            
+
             root.AddComponent<ModelContainer>().Model = model;
             return root;
         }
 
         public static GameObject CreatePolygonalRoom(PolygonRoomModel model)
         {
-            
-            GameObject go=new GameObject("PolyRoom");
+            GameObject go = new GameObject("PolyRoom");
             //find vertices of ceiling and floor depends on the structure of the wallcoordinates
-            var floorvertices=new System.Collections.Generic.List<Vector3>();
-            var ceilingvertices=new System.Collections.Generic.List<Vector3>();
+            var floorvertices = new System.Collections.Generic.List<Vector3>();
+            var ceilingvertices = new System.Collections.Generic.List<Vector3>();
             for (int i = 0; i < model.numberOfWalls; i++) {
                 if (floorvertices.Contains(model.walls[i].wallCoordinates[0])) {
                     Debug.Log("Floor has same vertice multiple times");
@@ -585,15 +659,13 @@ namespace Unibas.DBIS.DynamicModelling
                     ceilingvertices.Add(model.walls[i].wallCoordinates[2]);
                 }
             }
-           
-            
+
+
             // ceiling scaling
-            var scaling = model.ceiling_scale; // Hardcode for testing
-            
-            Vector3 midOfCeiling=new Vector3(0,0,0);
+            var scaling = model.ceiling_scale;
+            Vector3 midOfCeiling = new Vector3(0, 0, 0);
             for (int i = 0; i < ceilingvertices.Count; i++) {
                 midOfCeiling += ceilingvertices[i];
-
             }
 
             Vector3 scalevector0;
@@ -602,38 +674,30 @@ namespace Unibas.DBIS.DynamicModelling
             midOfCeiling = midOfCeiling / ceilingvertices.Count;
             //Debug.Log("mid   "+ midOfCeiling);
             for (int i = 0; i < model.walls.Length; i++) {
-                scalevector0 = ceilingvertices[i]-midOfCeiling;
-                scalevector1 = model.walls[i].wallCoordinates[2]- midOfCeiling;
-                scalevector2 = model.walls[i].wallCoordinates[3]- midOfCeiling;
-                
-                ceilingvertices[i] = midOfCeiling+ (scalevector1 * (float) scaling);
-               
-                model.walls[i].wallCoordinates[2].x = midOfCeiling.x+ (scalevector1.x* (float) scaling);
-                model.walls[i].wallCoordinates[2].z = midOfCeiling.z+ (scalevector1.z* (float) scaling);
-                model.walls[i].wallCoordinates[3].x = midOfCeiling.x+ (scalevector2.x* (float) scaling);
-                model.walls[i].wallCoordinates[3].z = midOfCeiling.z+ (scalevector2.z* (float) scaling);
+                scalevector0 = ceilingvertices[i] - midOfCeiling;
+                scalevector1 = model.walls[i].wallCoordinates[2] - midOfCeiling;
+                scalevector2 = model.walls[i].wallCoordinates[3] - midOfCeiling;
 
+                ceilingvertices[i] = midOfCeiling + (scalevector1 * (float) scaling);
+
+                model.walls[i].wallCoordinates[2].x = midOfCeiling.x + (scalevector1.x * (float) scaling);
+                model.walls[i].wallCoordinates[2].z = midOfCeiling.z + (scalevector1.z * (float) scaling);
+                model.walls[i].wallCoordinates[3].x = midOfCeiling.x + (scalevector2.x * (float) scaling);
+                model.walls[i].wallCoordinates[3].z = midOfCeiling.z + (scalevector2.z * (float) scaling);
             }
-            
+
             // convert list to array, since its needed as parameter
             var ceilingArray = ceilingvertices.ToArray();
-            var floorArray=floorvertices.ToArray();
-            
-            // Ceiling
-            GameObject ceilingAnchor = new GameObject("CeilingAnchor");
-            ceilingAnchor.transform.parent = go.transform;
-            GameObject ceiling = CreatePolygonalMeshes(ceilingArray, LoadMaterialByName( model.CeilingMaterial),"Ceiling");
-            ceiling.name = "Ceiling";
-            ceiling.transform.parent = ceilingAnchor.transform;
-            //ceilingAnchor.transform.position = new Vector3(0, model.height, 0);
-            
+            var floorArray = floorvertices.ToArray();
+
+
             // Floor
-            GameObject floorAnchor = new GameObject("FloorAnchor");
-            floorAnchor.transform.parent = go.transform;
-            GameObject floor = CreatePolygonalMeshes(floorArray, LoadMaterialByName(model.FloorMaterial),"Floor");
-            floor.name = "Floor";
-            floor.transform.parent = floorAnchor.transform;
-            floorAnchor.transform.position = new Vector3(0, 0, 0);
+            GameObject floorAnchorTest = new GameObject("FloorAnchorTest");
+            floorAnchorTest.transform.parent = go.transform;
+            GameObject floortest =
+                CreatePolygonalMeshes(floorArray, LoadMaterialByName(model.FloorMaterial), "Floor", false);
+            floortest.name = "Floor";
+            floortest.transform.parent = floorAnchorTest.transform;
 
 
             /*
@@ -643,7 +707,7 @@ namespace Unibas.DBIS.DynamicModelling
              * info: this approach is rather complicated and only practical correct.
              * idea: check if a point very close to a wall is "inside" the floor or not
              */
-            Mesh m=floor.GetComponentInChildren<MeshFilter>().mesh;
+            Mesh m = floortest.GetComponentInChildren<MeshFilter>().mesh;
             Vector3 point = model.walls[0].wallCoordinates[0];
             Vector3 point2 = model.walls[0].wallCoordinates[1];
             Vector3 mid = (point + point2) / 2f;
@@ -661,11 +725,14 @@ namespace Unibas.DBIS.DynamicModelling
                     b = true;
                 }
             }
+
+            var turneCeilingFloor = "ceiling";
             /*
              * Swaps the coordinates of the walls
              * wallcoordinate[0] => wallcordinate[1] and wallcoordinate[2]->[3] and vice versa
-             */ 
-            if (b==false) {
+             */
+            if (b == false) {
+                turneCeilingFloor = "floor";
                 Debug.Log("Swapped Direction of Wall");
                 for (int i = 0; i < model.walls.Length; i++) {
                     Vector3 swap = model.walls[i].wallCoordinates[0];
@@ -674,11 +741,18 @@ namespace Unibas.DBIS.DynamicModelling
                     model.walls[i].wallCoordinates[2] = model.walls[i].wallCoordinates[3];
                     model.walls[i].wallCoordinates[1] = swap;
                     model.walls[i].wallCoordinates[3] = swap2;
-
                 }
             }
-            
-            
+
+            // Ceiling
+            GameObject ceilingAnchor = new GameObject("CeilingAnchor");
+            ceilingAnchor.transform.parent = go.transform;
+            GameObject ceiling =
+                CreatePolygonalMeshes(ceilingArray, LoadMaterialByName(model.CeilingMaterial), "Ceiling", b);
+            ceiling.name = "Ceiling";
+            ceiling.transform.parent = ceilingAnchor.transform;
+
+
             List<GameObject> goWall = new List<GameObject>();
             for (int i = 0; i < model.numberOfWalls; i++) {
                 String wallName = "Wall" + i;
@@ -686,25 +760,26 @@ namespace Unibas.DBIS.DynamicModelling
                 goWall[i].name = wallName;
                 goWall[i].transform.parent = go.transform;
             }
+
             go.transform.position = model.Position;
             go.AddComponent<ModelContainer>().Model = model;
-            
+
             return go;
         }
+
         public static bool point_inside_trigon(Vector3 s, Vector3 a, Vector3 b, Vector3 c)
         {
-            var as_x = s.x-a.x;
-            var as_y = s.z-a.z;
+            var as_x = s.x - a.x;
+            var as_y = s.z - a.z;
 
-            bool s_ab = (b.x-a.x)*as_y-(b.z-a.z)*as_x > 0;
+            bool s_ab = (b.x - a.x) * as_y - (b.z - a.z) * as_x > 0;
 
-            if((c.x-a.x)*as_y-(c.z-a.z)*as_x > 0 == s_ab) return false;
+            if ((c.x - a.x) * as_y - (c.z - a.z) * as_x > 0 == s_ab) return false;
 
-            if((c.x-b.x)*(s.z-b.z)-(c.z-b.z)*(s.x-b.x) > 0 != s_ab) return false;
+            if ((c.x - b.x) * (s.z - b.z) - (c.z - b.z) * (s.x - b.x) > 0 != s_ab) return false;
 
             return true;
         }
-        
 
 
         /// <summary>
@@ -718,16 +793,13 @@ namespace Unibas.DBIS.DynamicModelling
         /// <returns></returns>
         public static GameObject CreateWall(float width, float height, string materialName = null)
         {
-
             return CreateWall(width, height, LoadMaterialByName(materialName));
         }
 
         private static Material LoadMaterialByName(string materialName)
         {
-            if (!string.IsNullOrEmpty(materialName))
-            {
-                if (!materialName.EndsWith("Material"))
-                {
+            if (!string.IsNullOrEmpty(materialName)) {
+                if (!materialName.EndsWith("Material")) {
                     materialName = materialName + "Material";
                 }
 
@@ -737,9 +809,9 @@ namespace Unibas.DBIS.DynamicModelling
             return null;
         }
 
-        public static GameObject CreatePolygonalWall(int corners, float sizeRadius ,Material mat)
+        public static GameObject CreatePolygonalWall(int corners, float sizeRadius, Material mat)
         {
-            GameObject go =new GameObject("PolygonalWall");
+            GameObject go = new GameObject("PolygonalWall");
             MeshFilter meshFilter = go.AddComponent<MeshFilter>();
             MeshRenderer meshRenderer = go.AddComponent<MeshRenderer>();
             Mesh mesh = meshFilter.mesh;
@@ -750,14 +822,14 @@ namespace Unibas.DBIS.DynamicModelling
                 vertices[i - 1] = new Vector3((float) (sizeRadius * Math.Sin((2 * Math.PI / corners) * i)),
                     (float) (sizeRadius * Math.Cos((2 * Math.PI / corners) * i)), 0);
             }
-            
+
             mesh.vertices = vertices;
 
             // There are n-2 Trinagles in a polygon, every Trinagle defined by 3 vertices
             int numberOfTrinagles = corners - 2;
             int numberOfTrinaglePoints = (corners - 2) * 3;
             int[] tri = new int[numberOfTrinaglePoints];
-            
+
             // trinangles
             for (int i = 0; i < numberOfTrinagles; i++) {
                 int mult = i * 3;
@@ -765,36 +837,36 @@ namespace Unibas.DBIS.DynamicModelling
                 tri[mult + 1] = i + 1;
                 tri[mult + 2] = i + 2;
             }
+
             mesh.triangles = tri;
-            
+
             // normals
             Vector3[] normals = new Vector3[corners];
             for (int i = 0; i < corners; i++) {
                 normals[i] = -Vector3.forward;
-
             }
+
             mesh.normals = normals;
-            
+
             // texture coordinates = uv
-            Vector2[] uv=new Vector2[corners];
+            Vector2[] uv = new Vector2[corners];
             for (int i = 0; i < corners; i++) {
                 uv[i] = new Vector2(vertices[i].x, vertices[i].y);
             }
+
             mesh.uv = uv;
-            
-            
+
+
             mesh.RecalculateBounds();
             mesh.RecalculateNormals();
             mesh.RecalculateTangents();
 
-            if (mat != null)
-            {
+            if (mat != null) {
                 meshRenderer.material.CopyPropertiesFromMaterial(mat);
                 //meshRenderer.material.SetTextureScale("_MainTex", new Vector2(1,1));
                 meshRenderer.material.name = mat.name;
             }
-            else
-            {
+            else {
                 meshRenderer.material = new Material(Shader.Find("Standard"));
                 meshRenderer.material.color = Color.white;
             }
@@ -842,12 +914,10 @@ namespace Unibas.DBIS.DynamicModelling
             float xUnit = 1;
             float yUnit = 1;
 
-            if (width > height)
-            {
+            if (width > height) {
                 xUnit = width / height;
             }
-            else
-            {
+            else {
                 yUnit = height / width;
             }
 
@@ -862,14 +932,12 @@ namespace Unibas.DBIS.DynamicModelling
             mesh.RecalculateNormals();
             mesh.RecalculateTangents();
 
-            if (mat != null)
-            {
+            if (mat != null) {
                 meshRenderer.material.CopyPropertiesFromMaterial(mat);
                 //meshRenderer.material.SetTextureScale("_MainTex", new Vector2(1,1));
                 meshRenderer.material.name = mat.name;
             }
-            else
-            {
+            else {
                 meshRenderer.material = new Material(Shader.Find("Standard"));
                 meshRenderer.material.color = Color.white;
             }
@@ -886,9 +954,9 @@ namespace Unibas.DBIS.DynamicModelling
         private static Vector3 CalculateUnit(Vector3 dimensions)
         {
             float m = Math.Max(Math.Max(dimensions.x, dimensions.y), dimensions.z);
-            return new Vector3(m/dimensions.x, m/dimensions.y, m/dimensions.z);
+            return new Vector3(m / dimensions.x, m / dimensions.y, m / dimensions.z);
         }
-        
+
         private static Vector2 CalculateUnit(float width, float height)
         {
             return CalculateNormalizedToLeastSquareUnit(width, height);
@@ -900,12 +968,10 @@ namespace Unibas.DBIS.DynamicModelling
             float xUnit = 1,
                 yUnit = 1;
 
-            if (width > height)
-            {
+            if (width > height) {
                 xUnit = width / height;
             }
-            else
-            {
+            else {
                 yUnit = height / width;
             }
 
@@ -921,16 +987,15 @@ namespace Unibas.DBIS.DynamicModelling
         {
             GameObject cub = CreateCuboid(cuboid.Width, cuboid.Height, cuboid.Depth);
             MeshRenderer meshRenderer = cub.GetComponent<MeshRenderer>();
-            if (cuboid.Material != null)
-            {
+            if (cuboid.Material != null) {
                 meshRenderer.material.CopyPropertiesFromMaterial(cuboid.Material);
             }
-            else
-            {
+            else {
                 meshRenderer.material = new Material(Shader.Find("Standard"));
                 meshRenderer.material.name = "Default";
                 meshRenderer.material.color = Color.white;
             }
+
             cub.AddComponent<ModelContainer>().Model = cuboid;
             return cub;
         }
@@ -1004,7 +1069,7 @@ namespace Unibas.DBIS.DynamicModelling
             };
             mesh.normals = normals;
 
-            
+
             /*
              * Unwrapping of mesh for uf like following
              *  U
@@ -1017,7 +1082,7 @@ namespace Unibas.DBIS.DynamicModelling
             var h = height / u;
             var d = depth / u;
 
-            Vector2 uvUnits = new Vector2(u,u);
+            Vector2 uvUnits = new Vector2(u, u);
             var fOff = uvUnits.x * depth;
             var rOff = uvUnits.x * width + fOff;
             var bOff = uvUnits.x * depth + rOff;
@@ -1068,8 +1133,7 @@ namespace Unibas.DBIS.DynamicModelling
         public static GameObject CreateModel(ComplexCuboidModel model)
         {
             GameObject root = new GameObject("ComplexCuboid");
-            for (int i = 0; i < model.Size(); i++)
-            {
+            for (int i = 0; i < model.Size(); i++) {
                 Vector3 pos = model.GetPositionAt(i);
                 CuboidModel cuboid = model.GetCuboidAt(i);
                 GameObject cub = CreateCuboid(cuboid);
@@ -1081,116 +1145,128 @@ namespace Unibas.DBIS.DynamicModelling
             return root;
         }
     }
-    
+
     /*
      * calculates triangles of polygons
      * http://wiki.unity3d.com/index.php/Triangulator
      */
     public class Triangulator
-{
-    private List<Vector2> m_points = new List<Vector2>();
- 
-    public Triangulator (Vector2[] points) {
-        m_points = new List<Vector2>(points);
-    }
- 
-    public int[] Triangulate() {
-        List<int> indices = new List<int>();
- 
-        int n = m_points.Count;
-        if (n < 3)
-            return indices.ToArray();
- 
-        int[] V = new int[n];
-        if (Area() > 0) {
-            for (int v = 0; v < n; v++)
-                V[v] = v;
+    {
+        private List<Vector2> m_points = new List<Vector2>();
+
+        public Triangulator(Vector2[] points)
+        {
+            m_points = new List<Vector2>(points);
         }
-        else {
-            for (int v = 0; v < n; v++)
-                V[v] = (n - 1) - v;
-        }
- 
-        int nv = n;
-        int count = 2 * nv;
-        for (int v = nv - 1; nv > 2; ) {
-            if ((count--) <= 0)
+
+        public int[] Triangulate()
+        {
+            List<int> indices = new List<int>();
+
+            int n = m_points.Count;
+            if (n < 3)
                 return indices.ToArray();
- 
-            int u = v;
-            if (nv <= u)
-                u = 0;
-            v = u + 1;
-            if (nv <= v)
-                v = 0;
-            int w = v + 1;
-            if (nv <= w)
-                w = 0;
- 
-            if (Snip(u, v, w, nv, V)) {
-                int a, b, c, s, t;
-                a = V[u];
-                b = V[v];
-                c = V[w];
-                indices.Add(a);
-                indices.Add(b);
-                indices.Add(c);
-                for (s = v, t = v + 1; t < nv; s++, t++)
-                    V[s] = V[t];
-                nv--;
-                count = 2 * nv;
+
+            int[] V = new int[n];
+            if (Area() > 0) {
+                for (int v = 0; v < n; v++)
+                    V[v] = v;
             }
+            else {
+                for (int v = 0; v < n; v++)
+                    V[v] = (n - 1) - v;
+            }
+
+            int nv = n;
+            int count = 2 * nv;
+            for (int v = nv - 1; nv > 2;) {
+                if ((count--) <= 0)
+                    return indices.ToArray();
+
+                int u = v;
+                if (nv <= u)
+                    u = 0;
+                v = u + 1;
+                if (nv <= v)
+                    v = 0;
+                int w = v + 1;
+                if (nv <= w)
+                    w = 0;
+
+                if (Snip(u, v, w, nv, V)) {
+                    int a, b, c, s, t;
+                    a = V[u];
+                    b = V[v];
+                    c = V[w];
+                    indices.Add(a);
+                    indices.Add(b);
+                    indices.Add(c);
+                    for (s = v, t = v + 1; t < nv; s++, t++)
+                        V[s] = V[t];
+                    nv--;
+                    count = 2 * nv;
+                }
+            }
+
+            indices.Reverse();
+            return indices.ToArray();
         }
- 
-        indices.Reverse();
-        return indices.ToArray();
-    }
- 
-    private float Area () {
-        int n = m_points.Count;
-        float A = 0.0f;
-        for (int p = n - 1, q = 0; q < n; p = q++) {
-            Vector2 pval = m_points[p];
-            Vector2 qval = m_points[q];
-            A += pval.x * qval.y - qval.x * pval.y;
+
+        private float Area()
+        {
+            int n = m_points.Count;
+            float A = 0.0f;
+            for (int p = n - 1, q = 0; q < n; p = q++) {
+                Vector2 pval = m_points[p];
+                Vector2 qval = m_points[q];
+                A += pval.x * qval.y - qval.x * pval.y;
+            }
+
+            return (A * 0.5f);
         }
-        return (A * 0.5f);
-    }
- 
-    private bool Snip (int u, int v, int w, int n, int[] V) {
-        int p;
-        Vector2 A = m_points[V[u]];
-        Vector2 B = m_points[V[v]];
-        Vector2 C = m_points[V[w]];
-        if (Mathf.Epsilon > (((B.x - A.x) * (C.y - A.y)) - ((B.y - A.y) * (C.x - A.x))))
-            return false;
-        for (p = 0; p < n; p++) {
-            if ((p == u) || (p == v) || (p == w))
-                continue;
-            Vector2 P = m_points[V[p]];
-            if (InsideTriangle(A, B, C, P))
+
+        private bool Snip(int u, int v, int w, int n, int[] V)
+        {
+            int p;
+            Vector2 A = m_points[V[u]];
+            Vector2 B = m_points[V[v]];
+            Vector2 C = m_points[V[w]];
+            if (Mathf.Epsilon > (((B.x - A.x) * (C.y - A.y)) - ((B.y - A.y) * (C.x - A.x))))
                 return false;
+            for (p = 0; p < n; p++) {
+                if ((p == u) || (p == v) || (p == w))
+                    continue;
+                Vector2 P = m_points[V[p]];
+                if (InsideTriangle(A, B, C, P))
+                    return false;
+            }
+
+            return true;
         }
-        return true;
+
+        private bool InsideTriangle(Vector2 A, Vector2 B, Vector2 C, Vector2 P)
+        {
+            float ax, ay, bx, by, cx, cy, apx, apy, bpx, bpy, cpx, cpy;
+            float cCROSSap, bCROSScp, aCROSSbp;
+
+            ax = C.x - B.x;
+            ay = C.y - B.y;
+            bx = A.x - C.x;
+            by = A.y - C.y;
+            cx = B.x - A.x;
+            cy = B.y - A.y;
+            apx = P.x - A.x;
+            apy = P.y - A.y;
+            bpx = P.x - B.x;
+            bpy = P.y - B.y;
+            cpx = P.x - C.x;
+            cpy = P.y - C.y;
+
+            aCROSSbp = ax * bpy - ay * bpx;
+            cCROSSap = cx * apy - cy * apx;
+            bCROSScp = bx * cpy - by * cpx;
+
+            return ((aCROSSbp >= 0.0f) && (bCROSScp >= 0.0f) && (cCROSSap >= 0.0f));
+        }
     }
- 
-    private bool InsideTriangle (Vector2 A, Vector2 B, Vector2 C, Vector2 P) {
-        float ax, ay, bx, by, cx, cy, apx, apy, bpx, bpy, cpx, cpy;
-        float cCROSSap, bCROSScp, aCROSSbp;
- 
-        ax = C.x - B.x; ay = C.y - B.y;
-        bx = A.x - C.x; by = A.y - C.y;
-        cx = B.x - A.x; cy = B.y - A.y;
-        apx = P.x - A.x; apy = P.y - A.y;
-        bpx = P.x - B.x; bpy = P.y - B.y;
-        cpx = P.x - C.x; cpy = P.y - C.y;
- 
-        aCROSSbp = ax * bpy - ay * bpx;
-        cCROSSap = cx * apy - cy * apx;
-        bCROSScp = bx * cpy - by * cpx;
- 
-        return ((aCROSSbp >= 0.0f) && (bCROSScp >= 0.0f) && (cCROSSap >= 0.0f));
-    }
-}
-    
 }
