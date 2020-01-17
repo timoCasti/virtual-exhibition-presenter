@@ -103,7 +103,7 @@ namespace Unibas.DBIS.DynamicModelling
 
         /*
          * Creates a wall based on 4 coordinates (Vector3)
-         * para:  Vector3 [] coordinates // the coordinates of the walls vertices ( 4! )
+         * para:  Vector3 [] coordinates // the coordinates of the walls vertices ( "4"!!! )
          *        Material material // material of the wall can be null
          * returns the Wall as GameObject
          */
@@ -133,177 +133,25 @@ namespace Unibas.DBIS.DynamicModelling
             normals[3] = -Vector3.forward;
             mesh.normals = normals;
 
-            Vector2[] uv = new Vector2[4];
-
-            float width = Vector3.Distance(coordinates[0], coordinates[1]);
-            float height = Vector3.Distance(coordinates[0], coordinates[3]);
-
-            float xUnit = 1;
-            float yUnit = 1;
-            var shorty = 100f;
-            var j = 0;
-            Vector2[] vector2sWall = new Vector2[coordinates.Length];
-            for (int i = 0; i < coordinates.Length; i++) {
-                vector2sWall[i].x = coordinates[i].x;
-                vector2sWall[i].y = coordinates[i].z;
-                if (i != coordinates.Length - 1) {
-                    j = i + 1;
-                }
-                else {
-                    j = 0;
-                }
-
-                var calc = Vector2.Distance(vector2sWall[i], vector2sWall[j]);
-                if (calc < shorty) {
-                    shorty = calc;
-                }
-            }
             var uv2 = new Vector2[coordinates.Length];
-            
-           
-            
             //math for uv coordinates
-            Vector3[] copy=new Vector3[4];
-            coordinates.CopyTo(copy,0);
+            Vector3[] copy = new Vector3[4];
+            coordinates.CopyTo(copy, 0);
 
             copy[1] = copy[1] - copy[0];
             copy[2] = copy[2] - copy[0];
             copy[3] = copy[3] - copy[0];
-            copy[0] =new Vector3(0,0,0);
-            
-
+            copy[0] = new Vector3(0, 0, 0);
             mesh.RecalculateNormals();
             Vector3 normal = Vector3.Cross(copy[1] - copy[0], copy[2] - copy[0]).normalized;
-            //Debug.Log("normal calc:   " +normal+ "  normal from mesh   "+ mesh.normals[0]);
-            Vector3 normal2 = mesh.normals[0];
-            //Vector3 u = copy[3];
-            
-            Vector3 u=new Vector3();
+            Vector3 u = new Vector3();
             u = Vector3.ProjectOnPlane(Vector3.up, normal);
-            if (Math.Abs(Vector3.Dot(Vector3.right, normal)) < 0.2f) {
-               // u = Vector3.ProjectOnPlane(Vector3.right, normal);
-            }
-            else {
-                Debug.Log("else..");
-               // u = Vector3.ProjectOnPlane(Vector3.forward, normal);
-            }
-            /*
-            if (Math.Abs(Vector3.Dot(Vector3.up, normal)) < 0.2f) {
-                u = Vector3.ProjectOnPlane(Vector3.right, normal);
-            }
-            else {
-                Debug.Log("else..");
-                u = Vector3.ProjectOnPlane(Vector3.up, normal);
-            }
-*/
-
             Vector3 v = Vector3.Cross(u, normal).normalized;
-
-       //  Debug.Log("u   "+u);
-         // Debug.Log(v);
-            /*
-            uv2[0]=new Vector2(Vector3.Dot(copy[0],u),Vector3.Dot(copy[0],v));
-            uv2[1]=new Vector2(Vector3.Dot(copy[1],u),Vector3.Dot(copy[1],v));
-            uv2[2]=new Vector2(Vector3.Dot(copy[2],u),Vector3.Dot(copy[2],v));
-            uv2[3]=new Vector2(Vector3.Dot(copy[3],u),Vector3.Dot(copy[3],v));
-            */
-            uv2[0]=new Vector2(Vector3.Dot(copy[0],v),Vector3.Dot(copy[0],u));
-            uv2[1]=new Vector2(Vector3.Dot(copy[1],v),Vector3.Dot(copy[1],u));
-            uv2[2]=new Vector2(Vector3.Dot(copy[2],v),Vector3.Dot(copy[2],u));
-            uv2[3]=new Vector2(Vector3.Dot(copy[3],v),Vector3.Dot(copy[3],u));
-            //uv[0]=new Vector2(0,0);
-      
-//            Debug.Log("wallnumber   "  +number+"  "+uv2[0]+"   "+uv2[1]+"   "+uv2[2]+"   "+uv2[3]+"   ");
-          mesh.uv = uv2;
-            
-            
-/*
-            uv2[0]=new Vector2(0,0);
-            uv2[1]=new Vector2(width,0);
-            uv2[2]=new Vector2(width,height);
-            uv2[3]=new Vector2(0,height);
-            */
-   //         mesh.uv = uv2;
-/*
-            var uv3 = new Vector2[coordinates.Length];
-            
-            uv3[0]=new Vector2(0,0);
-            uv3[1]=new Vector2(width,0);
-            mesh.RecalculateNormals();
-            Mesh meshcalc = mesh;
-            Vector3[] abc=new Vector3[4];
-            abc[0] = coordinates[0];//new Vector3(0,0,0);
-            abc[1] = coordinates[1];// - coordinates[0];
-            abc[2] = coordinates[2];// - coordinates[0];
-            abc[3] = coordinates[3];// - coordinates[0];
-            
-            Mesh meshi2=new Mesh();
-            meshi2.vertices = abc;
-            meshi2.RecalculateNormals();
-            
-            MeshRenderer mr=new MeshRenderer();
-            GameObject go2 = new GameObject("Calc");
-            MeshFilter meshFilter2 = go2.AddComponent<MeshFilter>();
-            MeshRenderer meshRenderer2 = go2.AddComponent<MeshRenderer>();
-            Mesh mesh2 = meshFilter.mesh;
-            mesh2.vertices = abc;
-
-            mesh2.triangles = tri;
-            mesh2.RecalculateNormals();
-            Vector3 normi = mesh2.normals[0];
-//            meshRenderer2.transform.eulerAngles = normi;
-            var bla=new Vector3(0,0,1);
-            var vli=new List<Vector3>();
-            vli.Add(bla);
-            vli.Add(bla);
-            vli.Add(bla);
-            vli.Add(bla);
-            
-            //mesh2.SetNormals(vli);
-            mesh2.RecalculateTangents();
-            mesh2.RecalculateBounds();
-            //Debug.Log("DADADA  "+ coordinates[2]);
-            Debug.Log("coorinate[0]:   "+coordinates[0]+" ..  "+mesh2.vertices[0]+ "  "+mesh2.vertices[1]+ "  "+mesh2.vertices[2]+ "  "+mesh2.vertices[3]+ "  ");
-
-            for (int i = 0; i < coordinates.Length; i++) {
-                uv3[i].x = mesh2.vertices[i].x;
-                uv3[i].y = mesh2.vertices[i].y;
-            }
-
-            mesh.uv = uv3;
-            //Object.Destroy(GameObject.Find("Calc"));
-            GameObject.Destroy(go2);
-            */
-            
-            /*
-            for (int i = 0; i <vector2sWall.Length; i++) {
-                vector2sWall[i]= vector2sWall[i]/ shorty;
-//                 Debug.Log(" Vector  "+i+ "  "+vector2sWall[i]);
-
-            }*/
-
-            //mesh.uv = vector2sWall;
-
-            
-
-            /*
-            if (width > height)
-           {
-               xUnit = width / height;
-           }
-           else
-           {
-               yUnit = height / width;
-           }
-
-           uv[0] = new Vector2(0, 0);
-           uv[1] = new Vector2(xUnit, 0);
-           uv[2] = new Vector2(0, yUnit);
-           uv[3] = new Vector2(xUnit, yUnit);
-           
-           mesh.uv = uv;*/
-
-
+            uv2[0] = new Vector2(Vector3.Dot(copy[0], v), Vector3.Dot(copy[0], u));
+            uv2[1] = new Vector2(Vector3.Dot(copy[1], v), Vector3.Dot(copy[1], u));
+            uv2[2] = new Vector2(Vector3.Dot(copy[2], v), Vector3.Dot(copy[2], u));
+            uv2[3] = new Vector2(Vector3.Dot(copy[3], v), Vector3.Dot(copy[3], u));
+            mesh.uv = uv2;
             mesh.RecalculateBounds();
             mesh.RecalculateNormals();
             mesh.RecalculateTangents();
@@ -318,16 +166,11 @@ namespace Unibas.DBIS.DynamicModelling
                 meshRenderer.material.color = Color.white;
             }
 
-
-            //postion wall
-            //float a = Vector3.Angle(coordinates[0] - coordinates[1], Vector3.right);
-
             //add collider for teleportation limits
             var collider = go.AddComponent<MeshCollider>();
             collider.sharedMesh = mesh;
 
             return go;
-            
         }
 
         /*
@@ -380,37 +223,8 @@ namespace Unibas.DBIS.DynamicModelling
                 System.Array.Reverse(indices);
             }
 
-
-            // Create the Vector3 vertices  ??
-            Vector3[] verticesOfpoly = new Vector3[vector2s.Length];
-            for (int i = 0; i < vertices.Length; i++) {
-                vertices[i] = new Vector3(vector2s[i].x, vector2s[i].y, 0);
-            }
-
             mesh.triangles = indices;
-
-
-            /*Vector2[] uvs = new Vector2[vertices.Length];
-
-            for (int i = 0; i < uvs.Length; i++)
-            {
-                uvs[i] = new Vector2(vertices[i].x, vertices[i].z);
-                Debug.Log(uvs[i]);
-            }
-            */
-
-//            Debug.Log(shorty+"  Shorty");
-
-
-            /*for (int i = 0; i <vector2s.Length; i++) {
-                vector2s[i]= vector2s[i]/ shorty;
-
-            }*/
-
-
             mesh.uv = vector2s;
-
-
             mesh.RecalculateBounds();
             mesh.RecalculateNormals();
             mesh.RecalculateTangents();
@@ -566,32 +380,21 @@ namespace Unibas.DBIS.DynamicModelling
             // North Aligned
             floorAnchor.transform.position = new Vector3(-halfSize, 0, -halfSize);
             floorAnchor.transform.Rotate(Vector3.right, 90);
-            // East Aligned
-            //floorAnchor.transform.position = new Vector3(-halfSize, 0, halfSize);
-            //floorAnchor.transform.Rotate(Vector3f.back,90);
-
             // Ceiling
             GameObject ceilingAnchor = new GameObject("CeilingAnchor");
             ceilingAnchor.transform.parent = root.transform;
-
             GameObject ceiling = CreateWall(model.Size, model.Size, model.CeilingMaterial);
             ceiling.name = "Ceiling";
             ceiling.transform.parent = ceilingAnchor.transform;
-
-
             // North Aligned
             ceilingAnchor.transform.position = new Vector3(-halfSize, model.Height, halfSize);
             ceilingAnchor.transform.Rotate(Vector3.right, -90);
             // East Aligned
-            //ceilingAnchor.transform.position = new Vector3(halfSize, height, -halfSize);
-            //ceilingAnchor.transform.Rotate( Vector3.back, -90);
-
             root.transform.position = model.Position;
 
             root.AddComponent<ModelContainer>().Model = model;
             return root;
         }
-
 
         /*
          * Method to create regular polygonaial rooms not used anymore.
@@ -607,36 +410,18 @@ namespace Unibas.DBIS.DynamicModelling
             List<GameObject> goWall = new List<GameObject>();
             for (int i = 0; i < model.numberOfWalls; i++) {
                 String wallName = "Wall" + i;
-                // goWall.Add(CreateWall(model.size,model.height,model.walls[i].texture));
-                // goWall[i].name = wallName;
             }
-            // Position walls
-
-
-            //var n = model.numberOfWalls;
-            //var x = 1f / n;
-            //double alpha = ((x* 360f) *0.5f);
 
             for (int i = 0; i < model.numberOfWalls; i++) {
                 goWall[i].name = i.ToString();
                 goWall[i].transform.parent = root.transform;
-                //goWall[i].transform.position=new Vector3((float) (rad * Math.Sin((2 * Math.PI / model.numberOfWalls) * i)),0,
-                //      (float) (rad * Math.Cos((2 * Math.PI / model.numberOfWalls) * i)));
-
                 goWall[i].transform.Rotate(Vector3.up,
                     (((1f / model.numberOfWalls) * 360f * i) + ((1f / model.numberOfWalls) * 360f) / 2f));
-                //aussen winkel (((model.numberOfWalls-2)*180/model.numberOfWalls)*i)+((model.numberOfWalls-2)*180/model.numberOfWalls)/2) 
             }
 
             // Ceiling
             GameObject ceilingAnchor = new GameObject("CeilingAnchor");
             ceilingAnchor.transform.parent = root.transform;
-
-            //GameObject ceiling = CreatePolygonalWall(model.numberOfWalls, rad,LoadMaterialByName( model.CeilingMaterial));
-            //ceiling.name = "Ceiling";
-            //ceiling.transform.parent = ceilingAnchor.transform;
-
-            // North Aligned
             ceilingAnchor.transform.position = new Vector3(0, model.height, 0);
             ceilingAnchor.transform.Rotate(Vector3.right, -90);
 
@@ -648,19 +433,12 @@ namespace Unibas.DBIS.DynamicModelling
             // Floor
             GameObject floorAnchor = new GameObject("FloorAnchor");
             floorAnchor.transform.parent = root.transform;
-            //var floorsize = Vector3.Distance(model.GetWallAt(0).Start, model.Position);
-            //GameObject floor = CreatePolygonalWall(model.numberOfWalls,rad, LoadMaterialByName(model.FloorMaterial));
-            //floor.name = "Floor";
-            //floor.transform.parent = floorAnchor.transform;
-            // North Aligned
             //
             //Not sure if 0 0 0 is right!!!!!! done with -halfsize for x and z in cuboid
             // pretty sure its wrong since wall coordinates are still all positive since not my logic
             //
             floorAnchor.transform.position = new Vector3(0, 0, 0);
             floorAnchor.transform.Rotate(Vector3.right, 90);
-
-
             root.transform.position = model.Position;
 
             root.AddComponent<ModelContainer>().Model = model;
