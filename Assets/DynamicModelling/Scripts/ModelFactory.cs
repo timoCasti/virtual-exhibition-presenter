@@ -163,39 +163,68 @@ namespace Unibas.DBIS.DynamicModelling
            
             
             //math for uv coordinates
+            Vector3[] copy=new Vector3[4];
+            coordinates.CopyTo(copy,0);
 
-            Vector3 normal = Vector3.Cross(coordinates[1] - coordinates[0], coordinates[2] - coordinates[0]).normalized;
-            //Debug.Log(normal);
-            Vector3 u;
-            if (Math.Abs(Vector3.Dot(Vector3.forward, normal)) < 0.2f) {
+            copy[1] = copy[1] - copy[0];
+            copy[2] = copy[2] - copy[0];
+            copy[3] = copy[3] - copy[0];
+            copy[0] =new Vector3(0,0,0);
+            
+
+            mesh.RecalculateNormals();
+            Vector3 normal = Vector3.Cross(copy[1] - copy[0], copy[2] - copy[0]).normalized;
+            //Debug.Log("normal calc:   " +normal+ "  normal from mesh   "+ mesh.normals[0]);
+            Vector3 normal2 = mesh.normals[0];
+            //Vector3 u = copy[3];
+            
+            Vector3 u=new Vector3();
+            u = Vector3.ProjectOnPlane(Vector3.up, normal);
+            if (Math.Abs(Vector3.Dot(Vector3.right, normal)) < 0.2f) {
+               // u = Vector3.ProjectOnPlane(Vector3.right, normal);
+            }
+            else {
+                Debug.Log("else..");
+               // u = Vector3.ProjectOnPlane(Vector3.forward, normal);
+            }
+            /*
+            if (Math.Abs(Vector3.Dot(Vector3.up, normal)) < 0.2f) {
                 u = Vector3.ProjectOnPlane(Vector3.right, normal);
             }
             else {
-                u = Vector3.ProjectOnPlane(Vector3.forward, normal);
+                Debug.Log("else..");
+                u = Vector3.ProjectOnPlane(Vector3.up, normal);
             }
+*/
 
             Vector3 v = Vector3.Cross(u, normal).normalized;
 
-            Debug.Log("u   "+u);
-            Debug.Log(v);
-            
-            uv2[0]=new Vector2(Vector3.Dot(coordinates[0],u),Vector3.Dot(coordinates[0],v));
-            uv2[1]=new Vector2(Vector3.Dot(coordinates[1],u),Vector3.Dot(coordinates[1],v));
-            uv2[2]=new Vector2(Vector3.Dot(coordinates[2],u),Vector3.Dot(coordinates[2],v));
-            uv2[3]=new Vector2(Vector3.Dot(coordinates[3],u),Vector3.Dot(coordinates[3],v));
+       //  Debug.Log("u   "+u);
+         // Debug.Log(v);
+            /*
+            uv2[0]=new Vector2(Vector3.Dot(copy[0],u),Vector3.Dot(copy[0],v));
+            uv2[1]=new Vector2(Vector3.Dot(copy[1],u),Vector3.Dot(copy[1],v));
+            uv2[2]=new Vector2(Vector3.Dot(copy[2],u),Vector3.Dot(copy[2],v));
+            uv2[3]=new Vector2(Vector3.Dot(copy[3],u),Vector3.Dot(copy[3],v));
+            */
+            uv2[0]=new Vector2(Vector3.Dot(copy[0],v),Vector3.Dot(copy[0],u));
+            uv2[1]=new Vector2(Vector3.Dot(copy[1],v),Vector3.Dot(copy[1],u));
+            uv2[2]=new Vector2(Vector3.Dot(copy[2],v),Vector3.Dot(copy[2],u));
+            uv2[3]=new Vector2(Vector3.Dot(copy[3],v),Vector3.Dot(copy[3],u));
             //uv[0]=new Vector2(0,0);
       
-            Debug.Log(uv2[0]+"   "+uv2[1]+"   "+uv2[2]+"   "+uv2[3]+"   ");
-            mesh.uv = uv2;
+//            Debug.Log("wallnumber   "  +number+"  "+uv2[0]+"   "+uv2[1]+"   "+uv2[2]+"   "+uv2[3]+"   ");
+          mesh.uv = uv2;
             
             
-
+/*
             uv2[0]=new Vector2(0,0);
             uv2[1]=new Vector2(width,0);
             uv2[2]=new Vector2(width,height);
             uv2[3]=new Vector2(0,height);
-            mesh.uv = uv2;
-
+            */
+   //         mesh.uv = uv2;
+/*
             var uv3 = new Vector2[coordinates.Length];
             
             uv3[0]=new Vector2(0,0);
@@ -203,20 +232,19 @@ namespace Unibas.DBIS.DynamicModelling
             mesh.RecalculateNormals();
             Mesh meshcalc = mesh;
             Vector3[] abc=new Vector3[4];
-            abc[0]=new Vector3(0,0,0);
-            abc[1] = coordinates[1] - coordinates[0];
-            abc[2] = coordinates[2] - coordinates[0];
-            abc[3] = coordinates[3] - coordinates[0];
+            abc[0] = coordinates[0];//new Vector3(0,0,0);
+            abc[1] = coordinates[1];// - coordinates[0];
+            abc[2] = coordinates[2];// - coordinates[0];
+            abc[3] = coordinates[3];// - coordinates[0];
             
             Mesh meshi2=new Mesh();
             meshi2.vertices = abc;
             meshi2.RecalculateNormals();
             
             MeshRenderer mr=new MeshRenderer();
-            
             GameObject go2 = new GameObject("Calc");
-            MeshFilter meshFilter2 = go.AddComponent<MeshFilter>();
-            MeshRenderer meshRenderer2 = go.AddComponent<MeshRenderer>();
+            MeshFilter meshFilter2 = go2.AddComponent<MeshFilter>();
+            MeshRenderer meshRenderer2 = go2.AddComponent<MeshRenderer>();
             Mesh mesh2 = meshFilter.mesh;
             mesh2.vertices = abc;
 
@@ -224,18 +252,18 @@ namespace Unibas.DBIS.DynamicModelling
             mesh2.RecalculateNormals();
             Vector3 normi = mesh2.normals[0];
 //            meshRenderer2.transform.eulerAngles = normi;
-            var bla=new Vector3(0,1,0);
+            var bla=new Vector3(0,0,1);
             var vli=new List<Vector3>();
             vli.Add(bla);
             vli.Add(bla);
             vli.Add(bla);
             vli.Add(bla);
             
-            mesh2.SetNormals(vli);
+            //mesh2.SetNormals(vli);
             mesh2.RecalculateTangents();
             mesh2.RecalculateBounds();
             //Debug.Log("DADADA  "+ coordinates[2]);
-            Debug.Log("alles für nüt?   "+mesh2.vertices[0]+ "  "+mesh2.vertices[1]+ "  "+mesh2.vertices[2]+ "  "+mesh2.vertices[3]+ "  ");
+            Debug.Log("coorinate[0]:   "+coordinates[0]+" ..  "+mesh2.vertices[0]+ "  "+mesh2.vertices[1]+ "  "+mesh2.vertices[2]+ "  "+mesh2.vertices[3]+ "  ");
 
             for (int i = 0; i < coordinates.Length; i++) {
                 uv3[i].x = mesh2.vertices[i].x;
@@ -243,7 +271,10 @@ namespace Unibas.DBIS.DynamicModelling
             }
 
             mesh.uv = uv3;
-            Object.Destroy(GameObject.Find("Calc"));
+            //Object.Destroy(GameObject.Find("Calc"));
+            GameObject.Destroy(go2);
+            */
+            
             /*
             for (int i = 0; i <vector2sWall.Length; i++) {
                 vector2sWall[i]= vector2sWall[i]/ shorty;
@@ -289,16 +320,14 @@ namespace Unibas.DBIS.DynamicModelling
 
 
             //postion wall
-            float a = Vector3.Angle(coordinates[0] - coordinates[1], Vector3.right);
+            //float a = Vector3.Angle(coordinates[0] - coordinates[1], Vector3.right);
 
             //add collider for teleportation limits
             var collider = go.AddComponent<MeshCollider>();
             collider.sharedMesh = mesh;
 
             return go;
-
-
-            return go;
+            
         }
 
         /*
@@ -711,7 +740,7 @@ namespace Unibas.DBIS.DynamicModelling
             Vector3 point = model.walls[0].wallCoordinates[0];
             Vector3 point2 = model.walls[0].wallCoordinates[1];
             Vector3 mid = (point + point2) / 2f;
-            GameObject testWall = CreateFreeWall(model.walls[0].wallCoordinates);
+            GameObject testWall = CreateFreeWall(model.walls[0].wallCoordinates, null);
             Vector3[] normals = testWall.GetComponentInChildren<MeshFilter>().mesh.normals;
             Object.Destroy(testWall);
             Vector3 avg = (normals[0] + normals[1]) / 2f;

@@ -59,7 +59,7 @@ namespace Unibas.DBIS.VREP.World
         /// </summary>
         public void PopulateRoom()
         {
-            Debug.LogWarning("Cannot place 3d objects yet");
+//            Debug.LogWarning("Cannot place 3d objects yet");
             /*
              * GameObject parent = new GameObject("Model Anchor");
 		     * GameObject model = new GameObject("Model");
