@@ -182,8 +182,7 @@ namespace Unibas.DBIS.VREP.Core
             foreach (var corridor in _exhibition.corridors)
             {
                 //corridor.CalculatePosition();
-                Debug.Log("Generate Corridor corridor-----------------------");
-                Debug.Log(corridor.connects);//NULL
+                Debug.Log("Generate Corridor corridor");
                 
                 var corridorGameObject = ObjectFactory.BuildCorridor(corridor);
                 

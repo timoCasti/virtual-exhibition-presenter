@@ -1,4 +1,9 @@
 using UnityEngine;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Unibas.DBIS.DynamicModelling.Models
 {
@@ -14,6 +19,7 @@ namespace Unibas.DBIS.DynamicModelling.Models
         public Material NorthMaterial;
         public Material SouthMaterial;
         
+         public Room[] connects;
         public DefaultNamespace.VREM.Model.Wall[] walls;
         //todo populate
         
@@ -39,7 +45,7 @@ namespace Unibas.DBIS.DynamicModelling.Models
 
         public CuboidCorridorModel(Vector3 position, float size, float height, Material floorMaterial = null,
             Material ceilingMaterial = null, Material northMaterial = null, Material southMaterial = null, 
-            DefaultNamespace.VREM.Model.Wall[] wall=null)
+            DefaultNamespace.VREM.Model.Wall[] wall=null, Room[] r=null)
         {
             Position = position;
             Size = new Vector2(size,size);
@@ -49,6 +55,7 @@ namespace Unibas.DBIS.DynamicModelling.Models
             NorthMaterial = northMaterial;
             SouthMaterial = southMaterial;
             walls = wall;
+            connects = r;
 
         }
         

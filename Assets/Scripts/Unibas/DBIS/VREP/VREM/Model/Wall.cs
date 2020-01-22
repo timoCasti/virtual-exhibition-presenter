@@ -7,7 +7,6 @@ namespace DefaultNamespace.VREM.Model {
   [Serializable]
   public class Wall {
     
-    
     public Vector3 color;
     
     public int wallNumber; //name instead of direction?
@@ -22,6 +21,7 @@ namespace DefaultNamespace.VREM.Model {
      *      |        |
      *wC[0] *--------* wC[1]
      */
+    
     
     
 /*

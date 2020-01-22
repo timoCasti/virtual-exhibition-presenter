@@ -9,12 +9,14 @@ namespace Unibas.DBIS.VREP.World
     [RequireComponent(typeof(AudioLoader))]
     public class CuboidExhibitionCorridor : MonoBehaviour
     {
+        
         /**
          * The corridors's 3d appearance as a model.
          */
         [SerializeField] 
         public CuboidCorridorModel CorridorModel { get; set; }
 
+        
         /**
          * The model of the corridor which defines its appearance, its walls and everything.
          * This shall directly be passed from the backend server.

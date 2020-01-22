@@ -5,6 +5,7 @@ using Unibas.DBIS.DynamicModelling.Models;
 using UnityEngine;
 using Object = UnityEngine.Object;
 using System.Collections.Generic;
+using Valve.VR;
 
 namespace Unibas.DBIS.DynamicModelling
 {
@@ -113,6 +114,7 @@ namespace Unibas.DBIS.DynamicModelling
         public static GameObject CreateFreeWall(Vector3[] coordinates, Material material = null)
         {
             GameObject go = new GameObject("FreeWall");
+            
             MeshFilter meshFilter = go.AddComponent<MeshFilter>();
             MeshRenderer meshRenderer = go.AddComponent<MeshRenderer>();
             Mesh mesh = meshFilter.mesh;
@@ -140,7 +142,9 @@ namespace Unibas.DBIS.DynamicModelling
 
             float width = Vector3.Distance(coordinates[0],coordinates[1]);
             float height = Vector3.Distance(coordinates[0], coordinates[3]);
-                        
+            if (width == 0f) width = 1;
+            if (height == 0f) height = 1;
+            
             float xUnit = 1;
             float yUnit = 1;
 
@@ -178,21 +182,18 @@ namespace Unibas.DBIS.DynamicModelling
             }
             
             
-            //postion wall
+            //position wall
             float a = Vector3.Angle(coordinates[0]-coordinates[1], Vector3.right);
         
             //add collider for teleportation limits
+            //todo correct error 
             var collider = go.AddComponent<MeshCollider>();
             collider.sharedMesh = mesh;
             
             return go;
             
-            
-            
-            
-
-            return go;
         }
+        
         /*
          * Creates the "walls" for ceiling or floor out of various amounts of vertices
          *
@@ -219,7 +220,7 @@ namespace Unibas.DBIS.DynamicModelling
             Triangulator tr = new Triangulator(vector2s);
             int[] indices = tr.Triangulate();
 
-            if (string.Equals(FloororCeiling, "Floor")) {
+            if (string.Equals(FloororCeiling, "Ceiling")) {
                 System.Array.Reverse(indices);
             }
  
@@ -424,33 +425,43 @@ namespace Unibas.DBIS.DynamicModelling
         /**
          * Creates corridor model
          */
-        public static GameObject CreateCorridor(CuboidCorridorModel model)
+        public static GameObject CreateCorridor(CuboidCorridorModel model, DefaultNamespace.VREM.Model.Room[] connects)
         {
             GameObject root = new GameObject("CuboidCorridor");
 
-            float halfSize = model.GetSize() / 2f;
+            //float halfSize = model.GetSize() / 2f;
 
             // North wall
-            GameObject north = CreateWall(model.GetSize(), model.Height, model.NorthMaterial);
+            Vector3[] wallCoordinates1;
+            Vector3[] wallCoordinates2;
+            Vector3[] floorCoordinates;
+            Vector3[] ceilingCoordinates;
+            
+            (wallCoordinates1, wallCoordinates2, floorCoordinates, ceilingCoordinates) = CalculateCorridorCoordinates(connects[0],connects[1]);
+            GameObject north = CreateFreeWall(wallCoordinates1, model.NorthMaterial);
+            //GameObject north = CreateWall(model.GetSize(), model.Height, model.NorthMaterial);
             north.name = "NorthWall";
             north.transform.parent = root.transform;
-            north.transform.position = new Vector3(-halfSize, 0, halfSize);
+            north.transform.position = new Vector3(wallCoordinates1[0].x, 0, wallCoordinates1[0].z);
             // South wall
-            GameObject south = CreateWall(model.GetSize(), model.Height, model.SouthMaterial);
+            GameObject south = CreateFreeWall(wallCoordinates2, model.SouthMaterial);
+           // GameObject south = CreateWall(model.GetSize(), model.Height, model.SouthMaterial);
             south.name = "SouthWall";
             south.transform.parent = root.transform;
-            south.transform.position = new Vector3(halfSize, 0, -halfSize);
+            south.transform.position = new Vector3(wallCoordinates2[0].x, 0, wallCoordinates2[0].z);
             south.transform.Rotate(Vector3.up, 180);
 
             // Floor
             GameObject floorAnchor = new GameObject("FloorAnchor");
             floorAnchor.transform.parent = root.transform;
 
-            GameObject floor = CreateWall(model.GetSize(), model.GetSize(), model.FloorMaterial);
+            //GameObject floor = CreateWall(model.GetSize(), model.GetSize(), model.FloorMaterial);
+            GameObject floor = CreateFreeWall(floorCoordinates, model.FloorMaterial);
+
             floor.name = "Floor";
             floor.transform.parent = floorAnchor.transform;
-            // North Aligned
-            floorAnchor.transform.position = new Vector3(-halfSize, 0, -halfSize);
+            // North  Aligned
+            floorAnchor.transform.position = new Vector3(model.Size.x, 0, model.Size.y);
             floorAnchor.transform.Rotate(Vector3.right, 90);
             // East Aligned
             //floorAnchor.transform.position = new Vector3(-halfSize, 0, halfSize);
@@ -458,15 +469,18 @@ namespace Unibas.DBIS.DynamicModelling
 
             // Ceiling
             GameObject ceilingAnchor = new GameObject("CeilingAnchor");
+            
             ceilingAnchor.transform.parent = root.transform;
 
-            GameObject ceiling = CreateWall(model.GetSize(), model.GetSize(), model.CeilingMaterial);
+            //GameObject ceiling = CreateWall(model.GetSize(), model.GetSize(), model.CeilingMaterial);
+            GameObject ceiling = CreateFreeWall(ceilingCoordinates, model.CeilingMaterial);
+
             ceiling.name = "Ceiling";
             ceiling.transform.parent = ceilingAnchor.transform;
 
             
             // North Aligned
-            ceilingAnchor.transform.position = new Vector3(-halfSize, model.Height, halfSize);
+            ceilingAnchor.transform.position = new Vector3(model.Size.x, model.Height, model.Size.y);
             ceilingAnchor.transform.Rotate(Vector3.right, -90);
             // East Aligned
             //ceilingAnchor.transform.position = new Vector3(halfSize, height, -halfSize);
@@ -585,7 +599,7 @@ namespace Unibas.DBIS.DynamicModelling
             GameObject ceiling = CreatePolygonalMeshes(ceilingArray, LoadMaterialByName( model.CeilingMaterial),"Ceiling");
             ceiling.name = "Ceiling";
             ceiling.transform.parent = ceilingAnchor.transform;
-            ceilingAnchor.transform.position = new Vector3(0, model.height, 0);
+           // ceilingAnchor.transform.position = new Vector3(0, model.height, 0);
             
             // Floor
             GameObject floorAnchor = new GameObject("FloorAnchor");
@@ -593,7 +607,7 @@ namespace Unibas.DBIS.DynamicModelling
             GameObject floor = CreatePolygonalMeshes(floorArray, LoadMaterialByName(model.FloorMaterial),"Floor");
             floor.name = "Floor";
             floor.transform.parent = floorAnchor.transform;
-            floorAnchor.transform.position = new Vector3(0, 0, 0);
+            //floorAnchor.transform.position = new Vector3(0, 0, 0);
 
 
             /*
@@ -1040,6 +1054,118 @@ namespace Unibas.DBIS.DynamicModelling
             root.AddComponent<ModelContainer>().Model = model;
             return root;
         }
+        
+    /// <summary>
+        /// calculate the coordinates of a corridor walls, floor and ceiling, depending on the two rooms to connect
+        /// input two rooms
+        /// output Vector3[] size 4 (needed for CreateFreeWall() )
+        /// 
+        /// 
+        public static (Vector3[],Vector3[],Vector3[],Vector3[]) CalculateCorridorCoordinates(DefaultNamespace.VREM.Model.Room room0, DefaultNamespace.VREM.Model.Room room1)
+        {
+            List<DistanceAndCoordinate> distanceList = new List<DistanceAndCoordinate>();
+            
+            //is this the most efficient way?
+            //find nearest corners in the rooms to connect
+            foreach (DefaultNamespace.VREM.Model.Wall wall0 in room0.walls)
+            {
+                foreach (Vector3 wallCoord0 in wall0.wallCoordinates)
+                {
+                    if (wallCoord0.y.Equals(0))
+                    {
+                        foreach (DefaultNamespace.VREM.Model.Wall wall1 in room1.walls)
+                        {
+                            foreach (Vector3 wallCoord1 in wall1.wallCoordinates)
+                            {
+                                if (wallCoord1.y.Equals(0))
+                                {
+                                    var dist = Vector3.Distance(wallCoord0, wallCoord1);
+                                    distanceList.Add(new DistanceAndCoordinate(wallCoord0, wallCoord1, dist));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            float lowestDist = distanceList.Min(dist => dist.distance);
+            DistanceAndCoordinate lowestDistanceCoord = distanceList.Find(x => x.distance.Equals(lowestDist));
+            distanceList.Remove(lowestDistanceCoord);
+
+            //find the second connection with the second lowest distance with two different corners
+            bool found = false;
+            float secondlowestDist = distanceList.Min(dist => dist.distance);
+            DistanceAndCoordinate secondLowestDistanceCoord = distanceList.Find(x => x.distance.Equals(secondlowestDist));
+            while (!found)
+            {
+                secondlowestDist = distanceList.Min(dist => dist.distance);
+                secondLowestDistanceCoord = distanceList.Find(x => x.distance.Equals(secondlowestDist));
+                distanceList.Remove(secondLowestDistanceCoord);
+                
+                if (!HaveTheSameCorners(lowestDistanceCoord, secondLowestDistanceCoord))
+                {
+                    found = true;
+                }
+            }//end while
+            Vector3[] wall_1= new Vector3[4];
+            Vector3[] wall2= new Vector3[4];
+            Vector3[] floor= new Vector3[4];
+            Vector3[] ceiling_0= new Vector3[4];
+            
+            wall_1[0]=lowestDistanceCoord.wallCoord0;
+            wall_1[1]=lowestDistanceCoord.wallCoord0;
+            wall_1[1].y = 5;
+            wall_1[2]=lowestDistanceCoord.wallCoord1;
+            wall_1[3]=lowestDistanceCoord.wallCoord1;
+            wall_1[3].y = 5;
+            
+            wall2[0]=secondLowestDistanceCoord.wallCoord0;
+            wall2[1]=secondLowestDistanceCoord.wallCoord0;
+            wall2[1].y = 5;
+            wall2[2]=secondLowestDistanceCoord.wallCoord1;
+            wall2[3]=secondLowestDistanceCoord.wallCoord1;                   
+            wall2[3].y = 5;
+
+            ceiling_0[0] = wall_1[0];
+            ceiling_0[0] = wall_1[2];
+            ceiling_0[0] = wall2[0];
+            ceiling_0[0] = wall2[2];
+            
+            floor[0] = wall_1[1];
+            floor[0] = wall_1[3];
+            floor[0] = wall2[1];
+            floor[0] = wall2[3];
+
+
+
+            return (wall_1, wall2, ceiling_0, floor);
+        }
+    
+    //check if two distance and corner pairs have the same corners
+    //returns true if one corner has the same coordinates.
+    private static bool HaveTheSameCorners(DistanceAndCoordinate dc0, DistanceAndCoordinate dc1)
+    {
+        return dc0.wallCoord0.Equals(dc1.wallCoord0) ||
+               dc0.wallCoord0.Equals(dc1.wallCoord1) ||
+               dc0.wallCoord1.Equals(dc1.wallCoord0) ||
+               dc0.wallCoord1.Equals(dc1.wallCoord1);
+    }
+    
+    //Local class to combine coordinates and distance 
+    internal class DistanceAndCoordinate
+    {
+        public Vector3 wallCoord0;
+        public Vector3 wallCoord1;
+        public float distance;
+
+        public DistanceAndCoordinate(Vector3 wallcoord0, Vector3 wallcoord1, float dist)
+        {
+            wallCoord0 = wallcoord0;
+            wallCoord1 = wallcoord1;
+            distance = dist;
+        }
+    }
+        
     }
     
     /*
@@ -1151,6 +1277,7 @@ namespace Unibas.DBIS.DynamicModelling
  
         return ((aCROSSbp >= 0.0f) && (bCROSScp >= 0.0f) && (cCROSSap >= 0.0f));
     }
+    
 }
     
 }

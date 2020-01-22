@@ -7,7 +7,6 @@ namespace DefaultNamespace.VREM.Model {
   [Serializable]
   public class Room {
 
-    
     public string text;
     
     public Vector3 position;
@@ -23,7 +22,6 @@ namespace DefaultNamespace.VREM.Model {
     public string ambient;
 
     public Exhibit[] exhibits;
-     
     
     public string GetURLEncodedAudioPath() {
       

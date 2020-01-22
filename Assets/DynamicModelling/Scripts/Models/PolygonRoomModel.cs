@@ -23,7 +23,6 @@ namespace Unibas.DBIS.DynamicModelling.Models
         public string FloorMaterial;
         public string CeilingMaterial;
 
-        
         public PolygonRoomModel(Vector3 position, int NumberOfWalls, float Height)
         {
             Position = position;

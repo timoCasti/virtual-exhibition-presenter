@@ -26,6 +26,7 @@ namespace DefaultNamespace.VREM.Model
         
         [FormerlySerializedAs("connectsRoom")] public Room[] connects;
     
+        
     
         public string GetURLEncodedAudioPath() {
             if (!string.IsNullOrEmpty(ambient))
@@ -246,7 +247,7 @@ namespace DefaultNamespace.VREM.Model
     }//end class corridor
 
     //Local class to combine coordinates and distance 
-    public class DistanceAndCoordinate
+    internal class DistanceAndCoordinate
     {
         public Vector3 wallCoord0;
         public Vector3 wallCoord1;
