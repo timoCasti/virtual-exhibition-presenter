@@ -114,7 +114,8 @@ namespace Unibas.DBIS.VREP.World
 
         public Vector3 GetEntryPoint()
         {
-            return transform.position + RoomData.entrypoint;
+            //return transform.position + RoomData.entrypoint;
+            return transform.position +GetPositionForTeleportButtons();
         }
 
         public Vector3 GetPositionForTeleportButtons()
@@ -141,29 +142,16 @@ namespace Unibas.DBIS.VREP.World
             // Method which calculates polygons triangluars
             Triangulator tr = new Triangulator(vector2s);
             int[] triangles = tr.Triangulate();
-
-            /*
-            if (string.Equals(FloororCeiling, "Floor")) {
-                System.Array.Reverse(indices);
-            }
-            */
-            // Create the Vector3 vertices  ??
+            
             Vector3[] verticesOfpoly = new Vector3[vector2s.Length];
             for (int i=0; i<vertices.Length; i++) {
                 vertices[i] = new Vector3(vector2s[i].x, vector2s[i].y, 0);
             }
-            
-
-            
-            //var pos = (meschOfFloor.vertices[meschOfFloor.triangles[0]] +meschOfFloor.vertices[meschOfFloor.triangles[1]] + meschOfFloor.vertices[meschOfFloor.triangles[2]])/3f;
-
             int iteration = 0;
             Vector3 pos = new Vector3();
-            var posVar=new Vector3();
             var sizeF = AreaOfTriangle(vertices[triangles[0]],vertices[triangles[1]], vertices[triangles[2]]);
            
             for (int i = 0; i < triangles.Length/3f; i++) {
-                //posVar = (vertices[triangles[0]] +vertices[triangles[1]] + vertices[triangles[2]])/3f;
                 var sizeVar=AreaOfTriangle(vertices[triangles[i*3]],vertices[triangles[i*3+1]],vertices[triangles[i*3+2]]);
                 if(sizeVar>sizeF) {
                     sizeF = sizeVar;
@@ -173,9 +161,6 @@ namespace Unibas.DBIS.VREP.World
             
             pos = (vertices[triangles[iteration*3]] +vertices[triangles[iteration*3+1]] + vertices[triangles[iteration*3+2]])/3f;
 
-            
-            
-            
             return pos;
         }
         
