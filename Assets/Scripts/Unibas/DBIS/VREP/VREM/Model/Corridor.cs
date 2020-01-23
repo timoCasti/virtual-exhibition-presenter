@@ -8,7 +8,6 @@ using World;
 
 namespace DefaultNamespace.VREM.Model
 {
-    [Serializable]
     public class Corridor
     {
         public string text;
