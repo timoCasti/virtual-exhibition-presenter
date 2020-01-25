@@ -1064,8 +1064,10 @@ namespace Unibas.DBIS.DynamicModelling
         public static (Vector3[],Vector3[],Vector3[],Vector3[]) CalculateCorridorCoordinates(DefaultNamespace.VREM.Model.Room room0, DefaultNamespace.VREM.Model.Room room1)
         {
             List<DistanceAndCoordinate> distanceList = new List<DistanceAndCoordinate>();
+
             
-            //is this the most efficient way?
+            
+            
             //find nearest corners in the rooms to connect
             foreach (DefaultNamespace.VREM.Model.Wall wall0 in room0.walls)
             {
@@ -1079,7 +1081,7 @@ namespace Unibas.DBIS.DynamicModelling
                             {
                                 if (wallCoord1.y.Equals(0))
                                 {
-                                    var dist = Vector3.Distance(wallCoord0, wallCoord1);
+                                    var dist = Vector3.Distance(wallCoord0-room0.position, wallCoord1-room1.position);
                                     distanceList.Add(new DistanceAndCoordinate(wallCoord0, wallCoord1, dist));
                                 }
                             }
@@ -1127,14 +1129,24 @@ namespace Unibas.DBIS.DynamicModelling
             wall2[3].y = 5;
 
             ceiling_0[0] = wall_1[0];
-            ceiling_0[0] = wall_1[2];
-            ceiling_0[0] = wall2[0];
-            ceiling_0[0] = wall2[2];
+            ceiling_0[1] = wall_1[2];
+            ceiling_0[2] = wall2[0];
+            ceiling_0[3] = wall2[2];
+            ceiling_0[0].y = 5;
+            ceiling_0[1].y = 5;
+            ceiling_0[2].y = 5;
+            ceiling_0[3].y = 5;
+            
+            
             
             floor[0] = wall_1[1];
-            floor[0] = wall_1[3];
-            floor[0] = wall2[1];
-            floor[0] = wall2[3];
+            floor[1] = wall_1[3];
+            floor[2] = wall2[1];
+            floor[3] = wall2[3];
+            floor[0].y = 0;
+            floor[1].y = 0;
+            floor[2].y = 0;
+            floor[3].y = 0;
 
 
 
