@@ -108,7 +108,7 @@ namespace Unibas.DBIS.DynamicModelling
          *        Material material // material of the wall can be null
          * returns the Wall as GameObject
          */
-        public static GameObject CreateFreeWall(Vector3[] coordinates, Material material = null)
+        public static GameObject CreateFreeWall(Vector3[] coordinates, Material material = null,Boolean ceilingOrFloor= false)
         {
             GameObject go = new GameObject("FreeWall");
             MeshFilter meshFilter = go.AddComponent<MeshFilter>();
@@ -147,6 +147,9 @@ namespace Unibas.DBIS.DynamicModelling
             Vector3 normal = Vector3.Cross(copy[1] - copy[0], copy[2] - copy[0]).normalized;
             Vector3 u = new Vector3();
             u = Vector3.ProjectOnPlane(Vector3.up, normal);
+            if (ceilingOrFloor) {
+                u = Vector3.ProjectOnPlane(Vector3.back, normal);
+            }
             Vector3 v = Vector3.Cross(u, normal).normalized;
             uv2[0] = new Vector2(Vector3.Dot(copy[0], v), Vector3.Dot(copy[0], u));
             uv2[1] = new Vector2(Vector3.Dot(copy[1], v), Vector3.Dot(copy[1], u));
@@ -405,20 +408,17 @@ namespace Unibas.DBIS.DynamicModelling
          */
         public static GameObject CreateCorridor(CuboidCorridorModel model, DefaultNamespace.VREM.Model.Room[] connects)
         {
-            GameObject root = new GameObject("CuboidCorridor");
+            GameObject root = new GameObject("Corridor ");
 
-            //float halfSize = model.GetSize() / 2f;
-
-            // North wall
             Vector3[] wallCoordinates1;
             Vector3[] wallCoordinates2;
             Vector3[] floorCoordinates;
             Vector3[] ceilingCoordinates;
             int[] wallsToDestroy;
             
+            //calculate which walls get removed and the coordinates of the corridor
             (wallCoordinates1, wallCoordinates2, floorCoordinates, ceilingCoordinates, wallsToDestroy) = CalculateCorridorCoordinates2(connects[0],connects[1]);
-            GameObject north = CreateFreeWall(wallCoordinates1, model.NorthMaterial);
-            //GameObject.Destroy(connects[0].walls[wallsToDestroy[0]]);
+         
             
             //Destroy the walls 
             var wall1Des = "Wall" + wallsToDestroy[0];
@@ -427,66 +427,25 @@ namespace Unibas.DBIS.DynamicModelling
             GameObject.Destroy(gogo.transform.Find(wall1Des).gameObject);
             GameObject gogo2 = GameObject.Find(connects[1].text);
             GameObject.Destroy(gogo2.transform.Find(wall2Des).gameObject);
-            Debug.Log("Coordinates for corridor 1:  "+ wallCoordinates1[0] + "  "+ wallCoordinates1[1]+ "  "+ wallCoordinates1[2]+ "  "+ wallCoordinates1[3]);
-            Debug.Log("Coordinates for corridor 2: "+ wallCoordinates2[0] + "  "+ wallCoordinates2[1]+ "  "+ wallCoordinates2[2]+ "  "+ wallCoordinates2[3]);
-            Debug.Log("Coordinates for corridor floor: "+ floorCoordinates[0] + "  "+ floorCoordinates[1]+ "  "+ floorCoordinates[2]+ "  "+ floorCoordinates[3]);
-            Debug.Log("Coordinates for corridor ceiling: "+ ceilingCoordinates[0] + "  "+ ceilingCoordinates[1]+ "  "+ ceilingCoordinates[2]+ "  "+ ceilingCoordinates[3]);
 
-                
-            //GameObject north = CreateWall(model.GetSize(), model.Height, model.NorthMaterial);
+            GameObject north = CreateFreeWall(wallCoordinates1, model.NorthMaterial);
             north.name = "CorridorWall0";
             north.transform.parent = root.transform;
-           // north.transform.position = new Vector3(wallCoordinates1[0].x, 0, wallCoordinates1[0].z);
-            // South wall
             GameObject south = CreateFreeWall(wallCoordinates2, model.SouthMaterial);
-           // GameObject south = CreateWall(model.GetSize(), model.Height, model.SouthMaterial);
             south.name = "CorridorWall1";
             south.transform.parent = root.transform;
-           // south.transform.position = new Vector3(wallCoordinates2[0].x, 0, wallCoordinates2[0].z);
-         //   south.transform.Rotate(Vector3.up, 180);
 
-            // Floor
             GameObject floorAnchor = new GameObject("FloorAnchor");
             floorAnchor.transform.parent = root.transform;
-
-            //GameObject floor = CreateWall(model.GetSize(), model.GetSize(), model.FloorMaterial);
-            GameObject floor = CreateFreeWall(floorCoordinates, model.FloorMaterial);
-            //GameObject floor = CreatePolygonalMeshes(floorCoordinates, model.FloorMaterial, "Blub", true);
-            
+            GameObject floor = CreateFreeWall(floorCoordinates, model.FloorMaterial,true);
             floor.name = "Floor";
             floor.transform.parent = floorAnchor.transform;
-            // North  Aligned
-          //  floorAnchor.transform.position = new Vector3(model.Size.x, 0, model.Size.y);
-           // floorAnchor.transform.Rotate(Vector3.right, 90);
-            // East Aligned
-            //floorAnchor.transform.position = new Vector3(-halfSize, 0, halfSize);
-            //floorAnchor.transform.Rotate(Vector3f.back,90);
 
-            // Ceiling
             GameObject ceilingAnchor = new GameObject("CeilingAnchor");
-            
             ceilingAnchor.transform.parent = root.transform;
-
-            //GameObject ceiling = CreateWall(model.GetSize(), model.GetSize(), model.CeilingMaterial);
-            GameObject ceiling = CreateFreeWall(ceilingCoordinates, model.CeilingMaterial);
-//            GameObject ceiling = CreatePolygonalMeshes(ceilingCoordinates, model.CeilingMaterial, "Blub", true);
-            
+            GameObject ceiling = CreateFreeWall(ceilingCoordinates, model.CeilingMaterial,true);
             ceiling.name = "Ceiling";
             ceiling.transform.parent = ceilingAnchor.transform;
-
-            
-            // North Aligned
-           // ceilingAnchor.transform.position = new Vector3(model.Size.x, model.Height, model.Size.y);
-            //ceilingAnchor.transform.Rotate(Vector3.right, -90);
-            // East Aligned
-            //ceilingAnchor.transform.position = new Vector3(halfSize, height, -halfSize);
-            //ceilingAnchor.transform.Rotate( Vector3.back, -90);
-
-            //root.transform.position = model.Position;
-           // var walls= GameObject.FindObjectsOfType(DefaultNamespace.VREM.Model.Wall);
-           // GameObject.fi
-            
-            
 
             root.AddComponent<ModelContainer>().Model = model;
             return root;
