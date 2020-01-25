@@ -8,14 +8,14 @@ namespace Unibas.DBIS.DynamicModelling.Models
     public class PolygonRoomModel : IModel
     {
         public Vector3 Position;
-
-        public double ceiling_scale;
         
         //private List<DefaultNamespace.VREM.Model.Wall> _walls;
 
         public DefaultNamespace.VREM.Model.Wall[] walls;
         
         public int numberOfWalls;
+
+        public double ceiling_scale;
         
         //public float size;
         public float height;

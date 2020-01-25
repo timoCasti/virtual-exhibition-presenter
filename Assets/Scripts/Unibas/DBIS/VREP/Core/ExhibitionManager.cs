@@ -143,12 +143,12 @@ namespace Unibas.DBIS.VREP.Core
             Debug.Log("ExhibitionManager GenerateExhibition");
             foreach (Corridor c in _exhibition.corridors)
             {
-                Debug.Log(c);
-                Debug.Log(c.connects);//NULL
+  //              Debug.Log(c);
+//                Debug.Log(c.connects);//NULL
                 //This is ok
-                Debug.Log(c.size);
-                Debug.Log(c.position);
-                Debug.Log(c.entrypoint);
+//                Debug.Log(c.size);
+//                Debug.Log(c.position);
+//                Debug.Log(c.entrypoint);
             }
             //Debug.Log(_exhibition.corridors.);//NULL
             //This is ok
@@ -182,8 +182,8 @@ namespace Unibas.DBIS.VREP.Core
             foreach (var corridor in _exhibition.corridors)
             {
                 //corridor.CalculatePosition();
-                Debug.Log("Generate Corridor corridor-----------------------");
-                Debug.Log(corridor.connects);//NULL
+  //              Debug.Log("Generate Corridor corridor-----------------------");
+//                Debug.Log(corridor.connects);//NULL
                 
                 var corridorGameObject = ObjectFactory.BuildCorridor(corridor);
                 
@@ -273,7 +273,7 @@ namespace Unibas.DBIS.VREP.Core
                 var nextPos = new Vector3(posmid.x+.25f, 0, posmid.z+.2f);
                 var nd = next.GetEntryPoint();
                 var pd = prev.GetEntryPoint();
-                Debug.Log("next  "+ nd + "  prev  "+pd);
+//                Debug.Log("next  "+ nd + "  prev  "+pd);
                 //var backPos = new Vector3(-.25f, 0, .2f);
                 //var nextPos = new Vector3(.25f, 0, .2f);
 

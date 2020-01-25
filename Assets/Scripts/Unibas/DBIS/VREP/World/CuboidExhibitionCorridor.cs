@@ -48,7 +48,7 @@ namespace Unibas.DBIS.VREP.World
         /// </summary>
         public void Populate()
         {
-            Debug.Log("Populate Wall in Corridor");
+//            Debug.Log("Populate Wall in Corridor");
             PopulateCorridor();
             PopulateWalls();
         }

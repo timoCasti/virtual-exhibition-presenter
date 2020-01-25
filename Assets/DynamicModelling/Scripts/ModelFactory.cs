@@ -9,6 +9,7 @@ namespace Unibas.DBIS.DynamicModelling
 {
     public static class ModelFactory
     {
+        
         /// <summary>
         /// Quad of sorts:
         ///
@@ -215,7 +216,7 @@ namespace Unibas.DBIS.DynamicModelling
             int[] indices = tr.Triangulate();
 
 
-            // Corrects the "Direction of Cailing and Floor
+            // Corrects the "Direction of Ceiling and Floor
             if (string.Equals(FloororCeiling, "Ceiling") && !swap) {
                 System.Array.Reverse(indices);
             }
@@ -344,7 +345,7 @@ namespace Unibas.DBIS.DynamicModelling
         {
             GameObject root = new GameObject("CuboidRoom");
 
-            float halfSize = model.Size / 2f;
+            float halfSize = model.Size.x / 2f;
 
             // North wall
             GameObject north = CreateWall(model.Size, model.Height, model.NorthMaterial);
@@ -390,10 +391,115 @@ namespace Unibas.DBIS.DynamicModelling
             ceilingAnchor.transform.position = new Vector3(-halfSize, model.Height, halfSize);
             ceilingAnchor.transform.Rotate(Vector3.right, -90);
             // East Aligned
+            //ceilingAnchor.transform.position = new Vector3(halfSize, height, -halfSize);
+            //ceilingAnchor.transform.Rotate( Vector3.back, -90);
+
             root.transform.position = model.Position;
+            
+            root.AddComponent<ModelContainer>().Model = model;
+            return root;
+        }
+        
+        /**
+         * Creates corridor model
+         */
+        public static GameObject CreateCorridor(CuboidCorridorModel model, DefaultNamespace.VREM.Model.Room[] connects)
+        {
+            GameObject root = new GameObject("CuboidCorridor");
+
+            //float halfSize = model.GetSize() / 2f;
+
+            // North wall
+            Vector3[] wallCoordinates1;
+            Vector3[] wallCoordinates2;
+            Vector3[] floorCoordinates;
+            Vector3[] ceilingCoordinates;
+            int[] wallsToDestroy;
+            
+            (wallCoordinates1, wallCoordinates2, floorCoordinates, ceilingCoordinates, wallsToDestroy) = CalculateCorridorCoordinates2(connects[0],connects[1]);
+            GameObject north = CreateFreeWall(wallCoordinates1, model.NorthMaterial);
+            //GameObject.Destroy(connects[0].walls[wallsToDestroy[0]]);
+            
+            //Destroy the walls 
+            var wall1Des = "Wall" + wallsToDestroy[0];
+            var wall2Des = "Wall" + wallsToDestroy[1];
+            GameObject gogo = GameObject.Find(connects[0].text);
+            GameObject.Destroy(gogo.transform.Find(wall1Des).gameObject);
+            GameObject gogo2 = GameObject.Find(connects[1].text);
+            GameObject.Destroy(gogo2.transform.Find(wall2Des).gameObject);
+            Debug.Log("Coordinates for corridor 1:  "+ wallCoordinates1[0] + "  "+ wallCoordinates1[1]+ "  "+ wallCoordinates1[2]+ "  "+ wallCoordinates1[3]);
+            Debug.Log("Coordinates for corridor 2: "+ wallCoordinates2[0] + "  "+ wallCoordinates2[1]+ "  "+ wallCoordinates2[2]+ "  "+ wallCoordinates2[3]);
+            Debug.Log("Coordinates for corridor floor: "+ floorCoordinates[0] + "  "+ floorCoordinates[1]+ "  "+ floorCoordinates[2]+ "  "+ floorCoordinates[3]);
+            Debug.Log("Coordinates for corridor ceiling: "+ ceilingCoordinates[0] + "  "+ ceilingCoordinates[1]+ "  "+ ceilingCoordinates[2]+ "  "+ ceilingCoordinates[3]);
+
+                
+            //GameObject north = CreateWall(model.GetSize(), model.Height, model.NorthMaterial);
+            north.name = "CorridorWall0";
+            north.transform.parent = root.transform;
+           // north.transform.position = new Vector3(wallCoordinates1[0].x, 0, wallCoordinates1[0].z);
+            // South wall
+            GameObject south = CreateFreeWall(wallCoordinates2, model.SouthMaterial);
+           // GameObject south = CreateWall(model.GetSize(), model.Height, model.SouthMaterial);
+            south.name = "CorridorWall1";
+            south.transform.parent = root.transform;
+           // south.transform.position = new Vector3(wallCoordinates2[0].x, 0, wallCoordinates2[0].z);
+         //   south.transform.Rotate(Vector3.up, 180);
+
+            // Floor
+            GameObject floorAnchor = new GameObject("FloorAnchor");
+            floorAnchor.transform.parent = root.transform;
+
+            //GameObject floor = CreateWall(model.GetSize(), model.GetSize(), model.FloorMaterial);
+            GameObject floor = CreateFreeWall(floorCoordinates, model.FloorMaterial);
+            //GameObject floor = CreatePolygonalMeshes(floorCoordinates, model.FloorMaterial, "Blub", true);
+            
+            floor.name = "Floor";
+            floor.transform.parent = floorAnchor.transform;
+            // North  Aligned
+          //  floorAnchor.transform.position = new Vector3(model.Size.x, 0, model.Size.y);
+           // floorAnchor.transform.Rotate(Vector3.right, 90);
+            // East Aligned
+            //floorAnchor.transform.position = new Vector3(-halfSize, 0, halfSize);
+            //floorAnchor.transform.Rotate(Vector3f.back,90);
+
+            // Ceiling
+            GameObject ceilingAnchor = new GameObject("CeilingAnchor");
+            
+            ceilingAnchor.transform.parent = root.transform;
+
+            //GameObject ceiling = CreateWall(model.GetSize(), model.GetSize(), model.CeilingMaterial);
+            GameObject ceiling = CreateFreeWall(ceilingCoordinates, model.CeilingMaterial);
+//            GameObject ceiling = CreatePolygonalMeshes(ceilingCoordinates, model.CeilingMaterial, "Blub", true);
+            
+            ceiling.name = "Ceiling";
+            ceiling.transform.parent = ceilingAnchor.transform;
+
+            
+            // North Aligned
+           // ceilingAnchor.transform.position = new Vector3(model.Size.x, model.Height, model.Size.y);
+            //ceilingAnchor.transform.Rotate(Vector3.right, -90);
+            // East Aligned
+            //ceilingAnchor.transform.position = new Vector3(halfSize, height, -halfSize);
+            //ceilingAnchor.transform.Rotate( Vector3.back, -90);
+
+            //root.transform.position = model.Position;
+           // var walls= GameObject.FindObjectsOfType(DefaultNamespace.VREM.Model.Wall);
+           // GameObject.fi
+            
+            
 
             root.AddComponent<ModelContainer>().Model = model;
             return root;
+        }
+
+        private static GameObject CreateWall(Vector2 modelSize, float modelHeight, Material modelFloorMaterial)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static GameObject CreateWall(Vector2 modelSize, Vector2 height, Material modelFloorMaterial)
+        {
+            throw new NotImplementedException();
         }
 
         /*
@@ -587,7 +693,7 @@ namespace Unibas.DBIS.DynamicModelling
 
             return true;
         }
-
+        
 
         /// <summary>
         /// Creates a wall game object to position later.
@@ -951,6 +1057,318 @@ namespace Unibas.DBIS.DynamicModelling
             root.AddComponent<ModelContainer>().Model = model;
             return root;
         }
+        
+    /// <summary>
+        /// calculate the coordinates of a corridor walls, floor and ceiling, depending on the two rooms to connect
+        /// input two rooms
+        /// output Vector3[] size 4 (needed for CreateFreeWall() )
+        /// 
+        /// 
+        public static (Vector3[],Vector3[],Vector3[],Vector3[]) CalculateCorridorCoordinates(DefaultNamespace.VREM.Model.Room room0, DefaultNamespace.VREM.Model.Room room1)
+        {
+            List<DistanceAndCoordinate> distanceList = new List<DistanceAndCoordinate>();
+            
+            //is this the most efficient way?
+            //find nearest corners in the rooms to connect
+            foreach (DefaultNamespace.VREM.Model.Wall wall0 in room0.walls)
+            {
+                foreach (Vector3 wallCoord0 in wall0.wallCoordinates)
+                {
+                    if (wallCoord0.y.Equals(0))
+                    {
+                        foreach (DefaultNamespace.VREM.Model.Wall wall1 in room1.walls)
+                        {
+                            foreach (Vector3 wallCoord1 in wall1.wallCoordinates)
+                            {
+                                if (wallCoord1.y.Equals(0))
+                                {
+                                    var dist = Vector3.Distance(wallCoord0, wallCoord1);
+                                    distanceList.Add(new DistanceAndCoordinate(wallCoord0, wallCoord1, dist));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            float lowestDist = distanceList.Min(dist => dist.distance);
+            DistanceAndCoordinate lowestDistanceCoord = distanceList.Find(x => x.distance.Equals(lowestDist));
+            distanceList.Remove(lowestDistanceCoord);
+
+            //find the second connection with the second lowest distance with two different corners
+            bool found = false;
+            float secondlowestDist = distanceList.Min(dist => dist.distance);
+            DistanceAndCoordinate secondLowestDistanceCoord = distanceList.Find(x => x.distance.Equals(secondlowestDist));
+            while (!found)
+            {
+                secondlowestDist = distanceList.Min(dist => dist.distance);
+                secondLowestDistanceCoord = distanceList.Find(x => x.distance.Equals(secondlowestDist));
+                distanceList.Remove(secondLowestDistanceCoord);
+                
+                if (!HaveTheSameCorners(lowestDistanceCoord, secondLowestDistanceCoord))
+                {
+                    found = true;
+                }
+            }//end while
+            Vector3[] wall_1= new Vector3[4];
+            Vector3[] wall2= new Vector3[4];
+            Vector3[] floor= new Vector3[4];
+            Vector3[] ceiling_0= new Vector3[4];
+            
+            wall_1[0]=lowestDistanceCoord.wallCoord0;
+            wall_1[1]=lowestDistanceCoord.wallCoord0;
+            wall_1[1].y = 5;
+            wall_1[2]=lowestDistanceCoord.wallCoord1;
+            wall_1[3]=lowestDistanceCoord.wallCoord1;
+            wall_1[3].y = 5;
+            
+            wall2[0]=secondLowestDistanceCoord.wallCoord0;
+            wall2[1]=secondLowestDistanceCoord.wallCoord0;
+            wall2[1].y = 5;
+            wall2[2]=secondLowestDistanceCoord.wallCoord1;
+            wall2[3]=secondLowestDistanceCoord.wallCoord1;                   
+            wall2[3].y = 5;
+
+            ceiling_0[0] = wall_1[0];
+            ceiling_0[0] = wall_1[2];
+            ceiling_0[0] = wall2[0];
+            ceiling_0[0] = wall2[2];
+            
+            floor[0] = wall_1[1];
+            floor[0] = wall_1[3];
+            floor[0] = wall2[1];
+            floor[0] = wall2[3];
+
+
+
+            return (wall_1, wall2, ceiling_0, floor);
+        }
+    
+    //check if two distance and corner pairs have the same corners
+    //returns true if one corner has the same coordinates.
+    private static bool HaveTheSameCorners(DistanceAndCoordinate dc0, DistanceAndCoordinate dc1)
+    {
+        return dc0.wallCoord0.Equals(dc1.wallCoord0) ||
+               dc0.wallCoord0.Equals(dc1.wallCoord1) ||
+               dc0.wallCoord1.Equals(dc1.wallCoord0) ||
+               dc0.wallCoord1.Equals(dc1.wallCoord1);
+    }
+    
+    public static (Vector3[],Vector3[],Vector3[],Vector3[],int[]) CalculateCorridorCoordinates2(DefaultNamespace.VREM.Model.Room room0, DefaultNamespace.VREM.Model.Room room1)
+    {
+
+        DefaultNamespace.VREM.Model.Wall wall0;
+        DefaultNamespace.VREM.Model.Wall wall1;
+        
+        int room0wall = 0;
+        int room1wall = 0;
+        Vector3 wall1cor0;
+        Vector3 wall2cor0;
+        var dist1 = Vector3.Distance(room0.walls[0].wallCoordinates[0]+room0.position, room1.walls[0].wallCoordinates[0]+room1.position);;
+        
+        // find the 2 closest points of 2 rooms save its wall;
+        for (int i = 0; i < room0.walls.Length; i++) {
+            for (int j = 0; j < room1.walls.Length; j++) {
+
+                var a = Vector3.Distance(room0.walls[i].wallCoordinates[0]+room0.position, room1.walls[j].wallCoordinates[0]+room1.position);
+                if (a< dist1) {
+                    dist1 = a;
+                    room0wall = i;
+                    room1wall = j;
+                }
+                
+            }
+            
+        }
+       // wall1cor0=room0.walls[i].wallCoordinates
+        
+        
+    // find the second closest point pair (1 of 2 neigbor points)
+        var wall0before = room0wall-1;
+        if (room0wall == 0) {
+            wall0before = room0.walls.Length - 1;
+        }
+
+        var wall1before = room1wall-1;
+        if (room1wall == 0) {
+            wall1before = room1.walls.Length - 1;
+        }
+        /*
+         *  Find the best combination, choose 4 of 6 points
+         *     A            A*
+         *        \       /
+         *  R0      B    B*    R1
+         *       /         \
+         *     C            C*
+         */
+        var Point_A = room0.walls[wall0before].wallCoordinates[0]+ room0.position;
+        var Point_B = room0.walls[room0wall].wallCoordinates[0]+ room0.position;
+        var Point_C = room0.walls[room0wall].wallCoordinates[1]+ room0.position;
+        var Point_Astar = room1.walls[wall1before].wallCoordinates[0]+ room1.position;
+        var Point_Bstar = room1.walls[room1wall].wallCoordinates[0]+ room1.position;
+        var Point_Cstar = room1.walls[room1wall].wallCoordinates[1]+ room1.position;
+        var Point_A_ceiling = room0.walls[wall0before].wallCoordinates[2]+ room0.position;
+        var Point_B_ceiling = room0.walls[room0wall].wallCoordinates[2]+ room0.position;
+        var Point_C_ceiling = room0.walls[room0wall].wallCoordinates[3]+ room0.position;
+        var Point_Astar_ceiling = room1.walls[wall1before].wallCoordinates[2]+ room1.position;
+        var Point_Bstar_ceiling = room1.walls[room1wall].wallCoordinates[2]+ room1.position;
+        var Point_Cstar_ceiling = room1.walls[room1wall].wallCoordinates[3]+ room1.position;
+
+        var AABB = Vector3.Distance(Point_A, Point_Astar) + Vector3.Distance(Point_B, Point_Bstar);
+        var ABBC = Vector3.Distance(Point_A, Point_Bstar) + Vector3.Distance(Point_B, Point_Cstar);
+        var BBCC = Vector3.Distance(Point_B, Point_Bstar) + Vector3.Distance(Point_C, Point_Cstar);
+        var BACB = Vector3.Distance(Point_B, Point_Astar) + Vector3.Distance(Point_C, Point_Bstar);
+
+        Debug.Log("a:  "+Point_A);
+        Debug.Log("b:  "+Point_B);
+        Debug.Log("a ceil:  "+Point_B_ceiling);
+        
+        if (AABB<ABBC&&AABB<BBCC&&AABB<BACB) 
+        {
+            Debug.Log("AABB");
+            Vector3[] wall_1= new Vector3[]{Point_A,Point_Astar,Point_A_ceiling,Point_Astar_ceiling};
+            Vector3[] wall2 = new Vector3[] {Point_Bstar,Point_B,Point_Bstar_ceiling,Point_B_ceiling};
+            Vector3[] floor = new Vector3[] {Point_A, Point_B, Point_Astar, Point_Bstar};
+            Vector3[] ceiling_0 = new Vector3[]
+                {Point_B_ceiling,Point_A_ceiling,Point_Bstar_ceiling,  Point_Astar_ceiling};
+            int[] destroy = {wall0before, wall1before};
+            return (wall_1, wall2, floor, ceiling_0,destroy);
+
+
+        }else if (ABBC<AABB&&ABBC<BBCC&&ABBC<BACB) {
+            Debug.Log("ABBC");
+            Vector3[] wall_1= new Vector3[]{Point_A,Point_Bstar,Point_A_ceiling,Point_Bstar_ceiling};
+            Vector3[] wall2 = new Vector3[] {Point_Cstar,Point_B,Point_Cstar_ceiling,Point_B_ceiling};
+            Vector3[] floor = new Vector3[] {Point_A, Point_B, Point_Bstar, Point_Cstar};
+            Vector3[] ceiling_0 = new Vector3[]
+                {Point_B_ceiling,Point_A_ceiling, Point_Cstar_ceiling, Point_Bstar_ceiling};
+            int[] destroy = {wall0before, room1wall};
+            return (wall_1, wall2, floor, ceiling_0,destroy);
+        }
+        else if (BBCC<AABB&&BBCC<ABBC&&ABBC<BACB) {
+           
+            Debug.Log("BBCC");
+            
+            Vector3[] wall_1= new Vector3[]{Point_B,Point_Bstar,Point_B_ceiling,Point_Bstar_ceiling};
+            Vector3[] wall2 = new Vector3[] {Point_Cstar,Point_C,Point_Cstar_ceiling,Point_C_ceiling};
+            Vector3[] floor = new Vector3[] {Point_B, Point_C, Point_Bstar, Point_Cstar};
+            Vector3[] ceiling_0 = new Vector3[]
+                {Point_C_ceiling,Point_B_ceiling,Point_Cstar_ceiling,  Point_Bstar_ceiling};
+            int[] destroy = {room0wall, room1wall};
+            return (wall_1, wall2, floor, ceiling_0,destroy);
+        }
+        else {
+            Debug.Log("BACB");
+            Vector3[] wall_1= new Vector3[]{Point_B,Point_Astar,Point_B_ceiling,Point_Astar_ceiling};
+            Vector3[] wall2 = new Vector3[] {Point_Bstar,Point_C,Point_Bstar_ceiling,Point_C_ceiling};
+            Vector3[] floor = new Vector3[] {Point_B, Point_C, Point_Astar, Point_Bstar};
+            Vector3[] ceiling_0 = new Vector3[]
+                {Point_C_ceiling,Point_B_ceiling, Point_Bstar_ceiling, Point_Astar_ceiling };
+            int[] destroy = {room0wall, wall1before};
+            return (wall_1, wall2, floor, ceiling_0,destroy);
+        }
+
+        
+        
+        
+
+        var beforeafter = Vector3.Distance(room0.walls[wall0before].wallCoordinates[0] + room0.position,
+            room1.walls[room1wall].wallCoordinates[0] + room1.position);
+        var afterbefore=Vector3.Distance(room0.walls[room0wall].wallCoordinates[3] + room0.position,
+            room1.walls[wall1before].wallCoordinates[3] + room1.position);
+        
+        var afterafter=Vector3.Distance(room0.walls[wall0before].wallCoordinates[0] + room0.position,
+            room1.walls[wall1before].wallCoordinates[0] + room1.position);
+        
+        var beforebefore=Vector3.Distance(room0.walls[room0wall].wallCoordinates[0] + room0.position,
+            room1.walls[room1wall].wallCoordinates[0] + room1.position);
+        
+        
+        
+// das stimmt nid was wenn .....es git nid nur die 2 möglichkeite
+        if (beforeafter < afterbefore) {
+            wall0 = room0.walls[wall0before];
+            wall1 = room1.walls[room1wall];
+        }
+        else {
+            wall0 = room0.walls[room0wall];
+            wall1 = room1.walls[wall1before];
+        }
+
+        if (Vector3.Distance(wall0.wallCoordinates[0]+ room0.position, wall1.wallCoordinates[0]+ room1.position)+
+            Vector3.Distance(wall0.wallCoordinates[1]+ room0.position, wall1.wallCoordinates[1]+ room1.position)<Vector3.Distance(wall0.wallCoordinates[0]+ room0.position, wall1.wallCoordinates[1]+ room1.position)+Vector3.Distance(wall0.wallCoordinates[1]+ room0.position, wall1.wallCoordinates[0]+ room1.position)) {
+            Debug.Log(" here we need a swap");
+            
+            
+            Vector3[] wall_1= new Vector3[]{wall0.wallCoordinates[0]+room0.position,wall1.wallCoordinates[0]+room1.position,wall0.wallCoordinates[2]+room0.position,wall1.wallCoordinates[2]+room1.position};
+            Vector3[] wall2 = new Vector3[]
+                {wall0.wallCoordinates[1]+room0.position, wall1.wallCoordinates[1]+room1.position, wall0.wallCoordinates[3]+room0.position, wall1.wallCoordinates[3]+room1.position};
+            Vector3[] floor= new Vector3[]
+                {wall0.wallCoordinates[1]+ room0.position, wall0.wallCoordinates[0]+ room0.position, wall1.wallCoordinates[0]+room1.position, wall1.wallCoordinates[1]+room1.position};
+            Vector3[] ceiling_0=new Vector3[]
+                {wall0.wallCoordinates[3]+room0.position, wall0.wallCoordinates[2]+room0.position, wall1.wallCoordinates[2]+room1.position, wall1.wallCoordinates[3]+room1.position};
+
+            
+           // return (wall_1, wall2, floor,ceiling_0);
+            
+        }
+        else {
+
+
+
+
+
+            Vector3[] wall_1 = new Vector3[]
+            {
+                wall0.wallCoordinates[0] + room0.position, wall1.wallCoordinates[1] + room1.position,
+                wall0.wallCoordinates[2] + room0.position, wall1.wallCoordinates[3] + room1.position
+            };
+            Vector3[] wall2 = new Vector3[]
+            {
+                wall0.wallCoordinates[1] + room0.position, wall1.wallCoordinates[0] + room1.position,
+                wall0.wallCoordinates[3] + room0.position, wall1.wallCoordinates[2] + room1.position
+            };
+            Vector3[] floor = new Vector3[]
+            {
+                wall0.wallCoordinates[1]+ room0.position, wall0.wallCoordinates[0]+ room0.position, wall1.wallCoordinates[1] + room1.position,
+                wall1.wallCoordinates[0] + room1.position
+            };
+            Vector3[] ceiling_0 = new Vector3[]
+            {
+                wall0.wallCoordinates[3] + room0.position, wall0.wallCoordinates[2] + room0.position,
+                wall1.wallCoordinates[3] + room1.position, wall1.wallCoordinates[2] + room1.position
+            };
+
+            //  System.Array.Reverse(ceiling_0);
+            // System.Array.Reverse(wall_1);
+            //System.Array.Reverse(floor);
+        //    return (wall_1, wall2, floor, ceiling_0);
+        }
+    }
+    
+    
+    //Local class to combine coordinates and distance 
+    internal class DistanceAndCoordinate
+    {
+        public Vector3 wallCoord0;
+        public Vector3 wallCoord1;
+        public float distance;
+
+        public DistanceAndCoordinate(Vector3 wallcoord0, Vector3 wallcoord1, float dist)
+        {
+            wallCoord0 = wallcoord0;
+            wallCoord1 = wallcoord1;
+            distance = dist;
+        }
+    }
+        
+    
+    
+    
+    
+    
+    
+    
     }
 
     /*

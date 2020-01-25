@@ -158,12 +158,12 @@ namespace World
             //corridorData.CalculateSizeAndPosition();
             //corridorData.CalculatePosition();
             
-            Debug.Log("ObjectFactory BuildCorridor");
-            Debug.Log(corridorData.connects);//NULL
+  //          Debug.Log("ObjectFactory BuildCorridor");
+//            Debug.Log(corridorData.connects);//NULL
             //This is ok
-            Debug.Log(corridorData.size);
-            Debug.Log(corridorData.position);
-            Debug.Log(corridorData.entrypoint);
+    //        Debug.Log(corridorData.size);
+  //          Debug.Log(corridorData.position);
+//            Debug.Log(corridorData.entrypoint);
             
             Material[] mats = new Material[corridorData.walls.Length+2];
             Material[] matsWallonly = new Material[corridorData.walls.Length];
@@ -171,12 +171,12 @@ namespace World
             mats[1] = TexturingUtility.LoadMaterialByName(corridorData.ceiling);
             
             corridorData.CalculatePosition();
-            Debug.Log("ObjectFactory BuildCorridor after CalculatePosition");
-            Debug.Log(corridorData.connects);//NULL
+  //          Debug.Log("ObjectFactory BuildCorridor after CalculatePosition");
+//            Debug.Log(corridorData.connects);//NULL
             //This is ok
-            Debug.Log(corridorData.size);
-            Debug.Log(corridorData.position);
-            Debug.Log(corridorData.entrypoint);
+    //        Debug.Log(corridorData.size);
+  //          Debug.Log(corridorData.position);
+//            Debug.Log(corridorData.entrypoint);
             
             //calculate Position before loop!
             for (int i = 0; i < corridorData.walls.Length; i++) {
@@ -189,7 +189,7 @@ namespace World
                 corridorData.size.x, corridorData.size.y,
                 mats[0], mats[1], mats[2], mats[3], corridorData.walls);
             
-            GameObject corridor = ModelFactory.CreateCorridor(cuboidCorridorModelData);
+            GameObject corridor = ModelFactory.CreateCorridor(cuboidCorridorModelData,corridorData.connects);
             
             var er = corridor.AddComponent<CuboidExhibitionCorridor>();
 
@@ -372,7 +372,7 @@ namespace World
             int Wallnumber, GameObject corridor, CuboidCorridorModel model, DefaultNamespace.VREM.Model.Wall wall)
         {
             //todo walorientation 0 1
-            Debug.Log("ObjectFactory CreateAnchorCorridors");
+//            Debug.Log("ObjectFactory CreateAnchorCorridors");
             GameObject anchor = new GameObject(Wallnumber + "Anchor");
             anchor.transform.parent = corridor.transform;
             //Vector3 pos = Vector3.zero;
@@ -401,7 +401,7 @@ namespace World
             Vector3 vec = Quaternion.FromToRotation(Vector3.back, nor).eulerAngles;
             anchor.transform.Rotate(Vector3.up,vec.y);
             anchor.transform.localPosition = pos;
-            Debug.Log(anchor.ToString());
+//            Debug.Log(anchor.ToString());
             return anchor;
             
             Debug.Log(a.ToString());
