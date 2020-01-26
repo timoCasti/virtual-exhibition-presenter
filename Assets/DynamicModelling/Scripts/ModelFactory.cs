@@ -557,7 +557,6 @@ namespace Unibas.DBIS.DynamicModelling
                 model.walls[i].wallCoordinates[3].x = midOfCeiling.x + (scalevector2.x * (float) scaling);
                 model.walls[i].wallCoordinates[3].z = midOfCeiling.z + (scalevector2.z * (float) scaling);
             }
-
             // convert list to array, since its needed as parameter
             var ceilingArray = ceilingvertices.ToArray();
             var floorArray = floorvertices.ToArray();
@@ -1115,6 +1114,76 @@ namespace Unibas.DBIS.DynamicModelling
     
     public static (Vector3[],Vector3[],Vector3[],Vector3[],int[]) CalculateCorridorCoordinates2(DefaultNamespace.VREM.Model.Room room0, DefaultNamespace.VREM.Model.Room room1)
     {
+        // ceiling scaling room0
+        
+        
+        var ceilingvertices = new System.Collections.Generic.List<Vector3>();
+        for (int i = 0; i < room0.walls.Length; i++) {
+            if (ceilingvertices.Contains(room0.walls[i].wallCoordinates[2])) {
+            }
+            else {
+                ceilingvertices.Add(room0.walls[i].wallCoordinates[2]);
+            }
+        }
+        var scaling = room0.ceiling_scale;
+        Vector3 midOfCeiling = new Vector3(0, 0, 0);
+        for (int i = 0; i < room0.walls.Length; i++) {
+            midOfCeiling += ceilingvertices[i];
+        }
+
+        Vector3 scalevector0;
+        Vector3 scalevector1;
+        Vector3 scalevector2;
+        midOfCeiling = midOfCeiling / ceilingvertices.Count;
+        for (int i = 0; i < room0.walls.Length; i++) {
+            scalevector0 = ceilingvertices[i] - midOfCeiling;
+            scalevector1 = room0.walls[i].wallCoordinates[2] - midOfCeiling;
+            scalevector2 = room0.walls[i].wallCoordinates[3] - midOfCeiling;
+
+            ceilingvertices[i] = midOfCeiling + (scalevector1 * (float) scaling);
+
+            room0.walls[i].wallCoordinates[2].x = midOfCeiling.x + (scalevector1.x * (float) scaling);
+            room0.walls[i].wallCoordinates[2].z = midOfCeiling.z + (scalevector1.z * (float) scaling);
+            room0.walls[i].wallCoordinates[3].x = midOfCeiling.x + (scalevector2.x * (float) scaling);
+            room0.walls[i].wallCoordinates[3].z = midOfCeiling.z + (scalevector2.z * (float) scaling);
+        }
+
+        
+        
+
+        // ceiling scaling room1
+        var ceilingvertices2 = new System.Collections.Generic.List<Vector3>();
+        for (int i = 0; i < room1.walls.Length; i++) {
+            if (ceilingvertices2.Contains(room1.walls[i].wallCoordinates[2])) {
+            }
+            else {
+                ceilingvertices2.Add(room1.walls[i].wallCoordinates[2]);
+            }
+        }
+        var scaling2 = room1.ceiling_scale;
+        Vector3 midOfCeiling2 = new Vector3(0, 0, 0);
+        for (int i = 0; i < room1.walls.Length; i++) {
+            midOfCeiling2 += ceilingvertices2[i];
+        }
+
+        Vector3 scalevector02;
+        Vector3 scalevector12;
+        Vector3 scalevector22;
+        midOfCeiling2 = midOfCeiling2 / ceilingvertices2.Count;
+        
+        for (int i = 0; i < room1.walls.Length; i++) {
+            scalevector02 = ceilingvertices2[i] - midOfCeiling2;
+            scalevector12 = room1.walls[i].wallCoordinates[2] - midOfCeiling2;
+            scalevector22 = room1.walls[i].wallCoordinates[3] - midOfCeiling2;
+
+            ceilingvertices2[i] = midOfCeiling2 + (scalevector12 * (float) scaling2);
+
+            room1.walls[i].wallCoordinates[2].x = midOfCeiling2.x + (scalevector12.x * (float) scaling2);
+            room1.walls[i].wallCoordinates[2].z = midOfCeiling2.z + (scalevector12.z * (float) scaling2);
+            room1.walls[i].wallCoordinates[3].x = midOfCeiling2.x + (scalevector22.x * (float) scaling2);
+            room1.walls[i].wallCoordinates[3].z = midOfCeiling2.z + (scalevector22.z * (float) scaling2);
+        }
+        
 
         DefaultNamespace.VREM.Model.Wall wall0;
         DefaultNamespace.VREM.Model.Wall wall1;
@@ -1154,11 +1223,11 @@ namespace Unibas.DBIS.DynamicModelling
         }
         /*
          *  Find the best combination, choose 4 of 6 points
-         *     A            A*
+         *     A            A*            A        C*
          *        \       /
-         *  R0      B    B*    R1
+         *  R0      B    B*    R1 or        B    B*
          *       /         \
-         *     C            C*
+         *     C            C*            C        A*
          */
         var Point_A = room0.walls[wall0before].wallCoordinates[0]+ room0.position;
         var Point_B = room0.walls[room0wall].wallCoordinates[0]+ room0.position;
@@ -1178,11 +1247,21 @@ namespace Unibas.DBIS.DynamicModelling
         var BBCC = Vector3.Distance(Point_B, Point_Bstar) + Vector3.Distance(Point_C, Point_Cstar);
         var BACB = Vector3.Distance(Point_B, Point_Astar) + Vector3.Distance(Point_C, Point_Bstar);
 
-        Debug.Log("a:  "+Point_A);
-        Debug.Log("b:  "+Point_B);
-        Debug.Log("a ceil:  "+Point_B_ceiling);
+        var ACBB = Vector3.Distance(Point_A, Point_Cstar) + Vector3.Distance(Point_B, Point_Bstar);
+        var CABB = Vector3.Distance(Point_C, Point_Astar) + Vector3.Distance(Point_B, Point_Bstar);
+        var ABBA =Vector3.Distance(Point_A, Point_Bstar) + Vector3.Distance(Point_B, Point_Astar);
+        var CBBA =Vector3.Distance(Point_C, Point_Bstar) + Vector3.Distance(Point_B, Point_Astar);            
+
+
+//        Debug.Log(AABB);
         
-        if (AABB<ABBC&&AABB<BBCC&&AABB<BACB) 
+  //      Debug.Log(ABBC);
+        
+    //    Debug.Log(BBCC);
+        
+      //  Debug.Log(BACB);
+        
+        if (AABB<ABBC&&AABB<BBCC&&AABB<BACB&&AABB<ACBB&&AABB<CABB&&AABB<ABBA&&AABB<CBBA) 
         {
             Debug.Log("AABB");
             Vector3[] wall_1= new Vector3[]{Point_A,Point_Astar,Point_A_ceiling,Point_Astar_ceiling};
@@ -1194,7 +1273,7 @@ namespace Unibas.DBIS.DynamicModelling
             return (wall_1, wall2, floor, ceiling_0,destroy);
 
 
-        }else if (ABBC<AABB&&ABBC<BBCC&&ABBC<BACB) {
+        }else if (ABBC<AABB&&ABBC<BBCC&&ABBC<BACB&&AABB<ACBB&&AABB<CABB&&AABB<ABBA&&AABB<CBBA) {
             Debug.Log("ABBC");
             Vector3[] wall_1= new Vector3[]{Point_A,Point_Bstar,Point_A_ceiling,Point_Bstar_ceiling};
             Vector3[] wall2 = new Vector3[] {Point_Cstar,Point_B,Point_Cstar_ceiling,Point_B_ceiling};
@@ -1204,7 +1283,7 @@ namespace Unibas.DBIS.DynamicModelling
             int[] destroy = {wall0before, room1wall};
             return (wall_1, wall2, floor, ceiling_0,destroy);
         }
-        else if (BBCC<AABB&&BBCC<ABBC&&ABBC<BACB) {
+        else if (BBCC<AABB&&BBCC<ABBC&&ABBC<BACB&&BBCC<ACBB&&BBCC<CABB&&BBCC<ABBA&&BBCC<CBBA) {
            
             Debug.Log("BBCC");
             
@@ -1216,7 +1295,8 @@ namespace Unibas.DBIS.DynamicModelling
             int[] destroy = {room0wall, room1wall};
             return (wall_1, wall2, floor, ceiling_0,destroy);
         }
-        else {
+        else if (BACB<AABB&&BACB<ABBC&&BACB<BBCC&&BACB<ACBB&&BACB<CABB&&BACB<ABBA&&BACB<CBBA) {
+            
             Debug.Log("BACB");
             Vector3[] wall_1= new Vector3[]{Point_B,Point_Astar,Point_B_ceiling,Point_Astar_ceiling};
             Vector3[] wall2 = new Vector3[] {Point_Bstar,Point_C,Point_Bstar_ceiling,Point_C_ceiling};
@@ -1225,6 +1305,57 @@ namespace Unibas.DBIS.DynamicModelling
                 {Point_C_ceiling,Point_B_ceiling, Point_Bstar_ceiling, Point_Astar_ceiling };
             int[] destroy = {room0wall, wall1before};
             return (wall_1, wall2, floor, ceiling_0,destroy);
+        }
+        else if (ACBB<AABB&&ACBB<ABBC&&ACBB<BACB&&ACBB<BBCC&&ACBB<CABB&&ACBB<ABBA&&ACBB<CBBA) {
+            Debug.Log("ACBB");
+            
+            Vector3[] wall_1= new Vector3[]{Point_A,Point_Cstar,Point_A_ceiling,Point_Cstar_ceiling};
+            Vector3[] wall2 = new Vector3[] {Point_Bstar,Point_B,Point_Bstar_ceiling,Point_B_ceiling};
+            Vector3[] floor = new Vector3[] {Point_A, Point_B, Point_Cstar, Point_Bstar};
+            Vector3[] ceiling_0 = new Vector3[]
+                {Point_B_ceiling,Point_A_ceiling,Point_Bstar_ceiling,  Point_Cstar_ceiling};
+            int[] destroy = {wall0before, room1wall};
+            return (wall_1, wall2, floor, ceiling_0,destroy);
+            
+            
+        }
+        else if (CABB < AABB && CABB < ABBC && CABB < BACB && CABB < BBCC && CABB < ACBB && CABB < ABBA &&
+                 CABB < CBBA) {
+            Debug.Log("CABB");
+            
+            Vector3[] wall_1= new Vector3[]{Point_C,Point_Astar,Point_C_ceiling,Point_Astar_ceiling};
+            Vector3[] wall2 = new Vector3[] {Point_Bstar,Point_B,Point_Bstar_ceiling,Point_B_ceiling};
+            Vector3[] floor = new Vector3[] {Point_C, Point_B, Point_Astar, Point_Bstar};
+            Vector3[] ceiling_0 = new Vector3[]
+                {Point_B_ceiling,Point_C_ceiling,Point_Bstar_ceiling,  Point_Astar_ceiling};
+            int[] destroy = {room0wall, wall1before};
+            return (wall_1, wall2, floor, ceiling_0,destroy);
+        }
+        else if (ABBA < AABB && ABBA < ABBC && ABBA < BACB && ABBA < BBCC && ABBA < ACBB && ABBA < CABB &&
+                 ABBA < CBBA) {
+            Debug.Log("ABBA");
+            
+            Vector3[] wall_1= new Vector3[]{Point_A,Point_Bstar,Point_A_ceiling,Point_Bstar_ceiling};
+            Vector3[] wall2 = new Vector3[] {Point_Astar,Point_B,Point_Astar_ceiling,Point_B_ceiling};
+            Vector3[] floor = new Vector3[] {Point_A, Point_B,Point_Bstar, Point_Astar};
+            Vector3[] ceiling_0 = new Vector3[]
+                {Point_B_ceiling,Point_A_ceiling,Point_Astar_ceiling,Point_Bstar_ceiling};
+            int[] destroy = {wall0before, wall1before};
+            return (wall_1, wall2, floor, ceiling_0,destroy);
+        }
+        else {
+            Debug.Log("CBBA");
+            
+            Vector3[] wall_1= new Vector3[]{Point_C,Point_Bstar,Point_C_ceiling,Point_Bstar_ceiling};
+            Vector3[] wall2 = new Vector3[] {Point_Astar,Point_B,Point_Astar_ceiling,Point_B_ceiling};
+            Vector3[] floor = new Vector3[] {Point_C, Point_B, Point_Astar, Point_Bstar};
+            Vector3[] ceiling_0 = new Vector3[]
+                {Point_B_ceiling,Point_A_ceiling,Point_Bstar_ceiling,  Point_Astar_ceiling};
+            int[] destroy = {room0wall, wall1before};
+            return (wall_1, wall2, floor, ceiling_0,destroy);
+
+        
+            
         }
 
         
