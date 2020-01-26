@@ -155,28 +155,13 @@ namespace World
         //TODO
         public static GameObject BuildCorridor(DefaultNamespace.VREM.Model.Corridor corridorData)
         {
-            //corridorData.CalculateSizeAndPosition();
-            //corridorData.CalculatePosition();
-            
-  //          Debug.Log("ObjectFactory BuildCorridor");
-//            Debug.Log(corridorData.connects);//NULL
-            //This is ok
-    //        Debug.Log(corridorData.size);
-  //          Debug.Log(corridorData.position);
-//            Debug.Log(corridorData.entrypoint);
-            
+        
             Material[] mats = new Material[corridorData.walls.Length+2];
             Material[] matsWallonly = new Material[corridorData.walls.Length];
             mats[0] = TexturingUtility.LoadMaterialByName(corridorData.floor);
             mats[1] = TexturingUtility.LoadMaterialByName(corridorData.ceiling);
             
             corridorData.CalculatePosition();
-  //          Debug.Log("ObjectFactory BuildCorridor after CalculatePosition");
-//            Debug.Log(corridorData.connects);//NULL
-            //This is ok
-    //        Debug.Log(corridorData.size);
-  //          Debug.Log(corridorData.position);
-//            Debug.Log(corridorData.entrypoint);
             
             //calculate Position before loop!
             for (int i = 0; i < corridorData.walls.Length; i++) {
@@ -195,13 +180,10 @@ namespace World
 
             er.CorridorModel = cuboidCorridorModelData;
 
-            //corridor.CalculatePosition();
+           
             er.Model = corridor;
             er.CorridorData = corridorData;
-            //er.CorridorData.CalculatePosition();
-            
-            //var na = CreateAnchor(WallOrientation.NORTH, corridor, corridorModelData);
-            //var sa = CreateAnchor(WallOrientation.SOUTH, corridor, corridorModelData);
+      
             var na = CreateAnchorCorridors(0, corridor, cuboidCorridorModelData, corridorData.GetWall(0));
             var sa = CreateAnchorCorridors(1, corridor, cuboidCorridorModelData, corridorData.GetWall(1));
             
@@ -378,6 +360,7 @@ namespace World
             //Vector3 pos = Vector3.zero;
             //Vector3 pos = corridor;
             //Vector3 pos; // = wall.wallCoordinates[0];
+            //Vector3 pos = model.walls[Wallnumber].wallCoordinates[0];
             Vector3 pos = model.walls[Wallnumber].wallCoordinates[0];
             var a = 0f;
             var sizeHalf = model.GetSize() / 2f;
@@ -395,12 +378,13 @@ namespace World
                 default:
                     throw new ArgumentOutOfRangeException("orientation", orientation, null);
             }*/
-            string wallname = "Wall" + Wallnumber;
+            string wallname = "CorridorWall" + Wallnumber;
             GameObject gogo = GameObject.Find(wallname);
             Vector3 nor = gogo.GetComponentInChildren<MeshFilter>().mesh.normals[0];
             Vector3 vec = Quaternion.FromToRotation(Vector3.back, nor).eulerAngles;
             anchor.transform.Rotate(Vector3.up,vec.y);
-            anchor.transform.localPosition = pos;
+            //anchor.transform.localPosition = pos;
+            anchor.transform.position = gogo.GetComponentInChildren<MeshFilter>().mesh.vertices[0];
 //            Debug.Log(anchor.ToString());
             return anchor;
             
@@ -434,7 +418,7 @@ namespace World
         
         private static GameObject CreateAnchorFreePoly(int Wallnumber, GameObject room, PolygonRoomModel model)
         {
-            GameObject anchor = new GameObject(" Anchor " + Wallnumber);
+            GameObject anchor = new GameObject("Anchor " + Wallnumber);
             anchor.transform.parent = room.transform;
             Vector3 pos = Vector3.zero;
             

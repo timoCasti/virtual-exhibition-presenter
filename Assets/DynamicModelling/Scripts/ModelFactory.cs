@@ -402,7 +402,11 @@ namespace Unibas.DBIS.DynamicModelling
             root.AddComponent<ModelContainer>().Model = model;
             return root;
         }
-        
+
+        public static IEnumerable<WaitForSeconds> WaitForAnchor(float s)
+        {
+            yield return new WaitForSeconds(s);
+        }
         /**
          * Creates corridor model
          */
@@ -423,10 +427,16 @@ namespace Unibas.DBIS.DynamicModelling
             //Destroy the walls 
             var wall1Des = "Wall" + wallsToDestroy[0];
             var wall2Des = "Wall" + wallsToDestroy[1];
+            var anchorDes0 = "Anchor " + wallsToDestroy[0];
+            var anchorDes1 = "Anchor " + wallsToDestroy[1];
             GameObject gogo = GameObject.Find(connects[0].text);
             GameObject.Destroy(gogo.transform.Find(wall1Des).gameObject);
+            GameObject gogoA = GameObject.Find(connects[0].text);
+            GameObject.Destroy(gogoA.transform.Find(anchorDes0).gameObject);
             GameObject gogo2 = GameObject.Find(connects[1].text);
+            GameObject gogo2A = GameObject.Find(connects[1].text);
             GameObject.Destroy(gogo2.transform.Find(wall2Des).gameObject);
+            GameObject.Destroy(gogo2A.transform.Find(anchorDes1).gameObject);
 
             GameObject north = CreateFreeWall(wallCoordinates1, model.NorthMaterial);
             north.name = "CorridorWall0";
