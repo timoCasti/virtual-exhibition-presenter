@@ -1336,11 +1336,11 @@ namespace Unibas.DBIS.DynamicModelling
                  CABB < BCCB) {
             Debug.Log("CABB ");
             
-            Vector3[] wall_1= new Vector3[]{Point_C,Point_Astar,Point_C_ceiling,Point_Astar_ceiling};
-            Vector3[] wall2 = new Vector3[] {Point_Bstar,Point_B,Point_Bstar_ceiling,Point_B_ceiling};
-            Vector3[] floor = new Vector3[] {Point_C, Point_B, Point_Astar, Point_Bstar};
+            Vector3[] wall_1= new Vector3[]{Point_Astar,Point_C,Point_Astar_ceiling,Point_C_ceiling};
+            Vector3[] wall2 = new Vector3[] {Point_B,Point_Bstar,Point_B_ceiling,Point_Bstar_ceiling};
+            Vector3[] floor = new Vector3[] {Point_B,Point_C,Point_Bstar, Point_Astar};
             Vector3[] ceiling_0 = new Vector3[]
-                {Point_B_ceiling,Point_C_ceiling,Point_Bstar_ceiling,  Point_Astar_ceiling};
+                {Point_C_ceiling,Point_B_ceiling,  Point_Astar_ceiling,Point_Bstar_ceiling};
             int[] destroy = {room0wall, wall1before};
             return (wall_1, wall2, floor, ceiling_0,destroy);
         }
