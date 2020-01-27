@@ -1260,18 +1260,21 @@ namespace Unibas.DBIS.DynamicModelling
         var ACBB = Vector3.Distance(Point_A, Point_Cstar) + Vector3.Distance(Point_B, Point_Bstar);
         var CABB = Vector3.Distance(Point_C, Point_Astar) + Vector3.Distance(Point_B, Point_Bstar);
         var ABBA =Vector3.Distance(Point_A, Point_Bstar) + Vector3.Distance(Point_B, Point_Astar);
-        var CBBA =Vector3.Distance(Point_C, Point_Bstar) + Vector3.Distance(Point_B, Point_Astar);            
+        var BCCB =Vector3.Distance(Point_B, Point_Cstar) + Vector3.Distance(Point_C, Point_Bstar);            
 
 
-//        Debug.Log(AABB);
+        /*
+        Debug.Log(AABB);
+        Debug.Log(ABBC);
+        Debug.Log(BBCC);
+        Debug.Log(BACB);
+        Debug.Log(ACBB);
+        Debug.Log(CABB);
+        Debug.Log(ABBA);
+        Debug.Log(BCCB);
+        */
         
-  //      Debug.Log(ABBC);
-        
-    //    Debug.Log(BBCC);
-        
-      //  Debug.Log(BACB);
-        
-        if (AABB<ABBC&&AABB<BBCC&&AABB<BACB&&AABB<ACBB&&AABB<CABB&&AABB<ABBA&&AABB<CBBA) 
+        if (AABB<ABBC&&AABB<BBCC&&AABB<BACB&&AABB<ACBB&&AABB<CABB&&AABB<ABBA&&AABB<BCCB) 
         {
             Debug.Log("AABB");
             Vector3[] wall_1= new Vector3[]{Point_A,Point_Astar,Point_A_ceiling,Point_Astar_ceiling};
@@ -1283,7 +1286,7 @@ namespace Unibas.DBIS.DynamicModelling
             return (wall_1, wall2, floor, ceiling_0,destroy);
 
 
-        }else if (ABBC<AABB&&ABBC<BBCC&&ABBC<BACB&&AABB<ACBB&&AABB<CABB&&AABB<ABBA&&AABB<CBBA) {
+        }else if (ABBC<AABB&&ABBC<BBCC&&ABBC<BACB&&AABB<ACBB&&AABB<CABB&&AABB<ABBA&&AABB<BCCB) {
             Debug.Log("ABBC");
             Vector3[] wall_1= new Vector3[]{Point_A,Point_Bstar,Point_A_ceiling,Point_Bstar_ceiling};
             Vector3[] wall2 = new Vector3[] {Point_Cstar,Point_B,Point_Cstar_ceiling,Point_B_ceiling};
@@ -1293,19 +1296,19 @@ namespace Unibas.DBIS.DynamicModelling
             int[] destroy = {wall0before, room1wall};
             return (wall_1, wall2, floor, ceiling_0,destroy);
         }
-        else if (BBCC<AABB&&BBCC<ABBC&&ABBC<BACB&&BBCC<ACBB&&BBCC<CABB&&BBCC<ABBA&&BBCC<CBBA) {
+        else if (BBCC<AABB&&BBCC<ABBC&&BBCC<BACB&&BBCC<ACBB&&BBCC<CABB&&BBCC<ABBA&&BBCC<BCCB) {
            
-            Debug.Log("BBCC");
+            Debug.Log("BBCC" );
             
             Vector3[] wall_1= new Vector3[]{Point_B,Point_Bstar,Point_B_ceiling,Point_Bstar_ceiling};
             Vector3[] wall2 = new Vector3[] {Point_Cstar,Point_C,Point_Cstar_ceiling,Point_C_ceiling};
-            Vector3[] floor = new Vector3[] {Point_B, Point_C, Point_Bstar, Point_Cstar};
+            Vector3[] floor = new Vector3[] {Point_B, Point_C,Point_Bstar,Point_Cstar};
             Vector3[] ceiling_0 = new Vector3[]
-                {Point_C_ceiling,Point_B_ceiling,Point_Cstar_ceiling,  Point_Bstar_ceiling};
+                {Point_C_ceiling,Point_B_ceiling,Point_Cstar_ceiling,Point_Bstar_ceiling};
             int[] destroy = {room0wall, room1wall};
             return (wall_1, wall2, floor, ceiling_0,destroy);
         }
-        else if (BACB<AABB&&BACB<ABBC&&BACB<BBCC&&BACB<ACBB&&BACB<CABB&&BACB<ABBA&&BACB<CBBA) {
+        else if (BACB<AABB&&BACB<ABBC&&BACB<BBCC&&BACB<ACBB&&BACB<CABB&&BACB<ABBA&&BACB<BCCB) {
             
             Debug.Log("BACB");
             Vector3[] wall_1= new Vector3[]{Point_B,Point_Astar,Point_B_ceiling,Point_Astar_ceiling};
@@ -1316,7 +1319,7 @@ namespace Unibas.DBIS.DynamicModelling
             int[] destroy = {room0wall, wall1before};
             return (wall_1, wall2, floor, ceiling_0,destroy);
         }
-        else if (ACBB<AABB&&ACBB<ABBC&&ACBB<BACB&&ACBB<BBCC&&ACBB<CABB&&ACBB<ABBA&&ACBB<CBBA) {
+        else if (ACBB<AABB&&ACBB<ABBC&&ACBB<BACB&&ACBB<BBCC&&ACBB<CABB&&ACBB<ABBA&&ACBB<BCCB) {
             Debug.Log("ACBB");
             
             Vector3[] wall_1= new Vector3[]{Point_A,Point_Cstar,Point_A_ceiling,Point_Cstar_ceiling};
@@ -1330,8 +1333,8 @@ namespace Unibas.DBIS.DynamicModelling
             
         }
         else if (CABB < AABB && CABB < ABBC && CABB < BACB && CABB < BBCC && CABB < ACBB && CABB < ABBA &&
-                 CABB < CBBA) {
-            Debug.Log("CABB");
+                 CABB < BCCB) {
+            Debug.Log("CABB ");
             
             Vector3[] wall_1= new Vector3[]{Point_C,Point_Astar,Point_C_ceiling,Point_Astar_ceiling};
             Vector3[] wall2 = new Vector3[] {Point_Bstar,Point_B,Point_Bstar_ceiling,Point_B_ceiling};
@@ -1342,7 +1345,7 @@ namespace Unibas.DBIS.DynamicModelling
             return (wall_1, wall2, floor, ceiling_0,destroy);
         }
         else if (ABBA < AABB && ABBA < ABBC && ABBA < BACB && ABBA < BBCC && ABBA < ACBB && ABBA < CABB &&
-                 ABBA < CBBA) {
+                 ABBA < BCCB) {
             Debug.Log("ABBA");
             
             Vector3[] wall_1= new Vector3[]{Point_A,Point_Bstar,Point_A_ceiling,Point_Bstar_ceiling};
@@ -1354,14 +1357,20 @@ namespace Unibas.DBIS.DynamicModelling
             return (wall_1, wall2, floor, ceiling_0,destroy);
         }
         else {
-            Debug.Log("CBBA");
+            //Debug.Log("BCCB");
+            if (BCCB < AABB && BCCB < ABBC && BCCB < BACB && BCCB < BBCC && BCCB < ACBB && BCCB < CABB &&
+                BCCB < ABBA) {
+                Debug.Log("BCCB");
+            }
+            Vector3[] wall_1= new Vector3[]{Point_B,Point_Cstar,Point_B_ceiling,Point_Cstar_ceiling};
+            Vector3[] wall2 = new Vector3[] {Point_Bstar,Point_C,Point_Bstar_ceiling,Point_C_ceiling};
+            Vector3[] floor = new Vector3[] {Point_B,Point_C,Point_Cstar, Point_Bstar};
             
-            Vector3[] wall_1= new Vector3[]{Point_C,Point_Bstar,Point_C_ceiling,Point_Bstar_ceiling};
-            Vector3[] wall2 = new Vector3[] {Point_Astar,Point_B,Point_Astar_ceiling,Point_B_ceiling};
-            Vector3[] floor = new Vector3[] {Point_C, Point_B, Point_Astar, Point_Bstar};
             Vector3[] ceiling_0 = new Vector3[]
-                {Point_B_ceiling,Point_A_ceiling,Point_Bstar_ceiling,  Point_Astar_ceiling};
-            int[] destroy = {room0wall, wall1before};
+                {Point_C_ceiling,Point_B_ceiling,Point_Bstar_ceiling,Point_Cstar_ceiling};
+            
+            
+            int[] destroy = {room0wall, room1wall};
             return (wall_1, wall2, floor, ceiling_0,destroy);
 
         
