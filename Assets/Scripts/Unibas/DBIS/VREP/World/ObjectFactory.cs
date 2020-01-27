@@ -207,6 +207,7 @@ namespace World
             l.transform.localPosition = new Vector3(0, 2.5f, 0);
             corridor.name = "Corridor";
             //todo lock
+            /*
             GameObject teleportArea = new GameObject("TeleportArea");
             var col = teleportArea.AddComponent<BoxCollider>();
             col.size = new Vector3(cuboidCorridorModelData.GetSize(), 0.01f, cuboidCorridorModelData.GetSize());
@@ -214,6 +215,28 @@ namespace World
             var tpa = teleportArea.AddComponent<TeleportArea>();
             tpa.transform.parent = corridor.transform;
             tpa.transform.localPosition = new Vector3(0, 0.01f, 0);
+            */
+            var va = corridor.GetComponentsInChildren<MeshFilter>();
+            Mesh fm = null;
+            for (int i = 0; i < va.Length; i++)
+            {
+                if (string.Equals(va[i].name, "Floor"))
+                {
+                    fm = va[i].mesh;
+                }
+            }
+
+            GameObject teleportAreaPoly = new GameObject("TeleportArea");
+            //var colPoly = teleportAreaPoly.AddComponent<BoxCollider>();
+            //colPoly.size = new Vector3(10, 0.01f, 10); // needs to be changed
+            var colM = teleportAreaPoly.AddComponent<MeshCollider>();
+            colM.sharedMesh = fm; //transform.position=fm.
+           
+            teleportAreaPoly.AddComponent<MeshRenderer>();
+            var tpaPoly = teleportAreaPoly.AddComponent<TeleportArea>();
+            tpaPoly.transform.parent = corridor.transform;
+            tpaPoly.transform.localPosition = Vector3.zero;
+            
 
             return corridor;
         }

@@ -447,7 +447,8 @@ namespace Unibas.DBIS.DynamicModelling
 
             GameObject floorAnchor = new GameObject("FloorAnchor");
             floorAnchor.transform.parent = root.transform;
-            GameObject floor = CreateFreeWall(floorCoordinates, model.FloorMaterial,true);
+            //GameObject floor = CreateFreeWall(floorCoordinates, model.FloorMaterial,true);
+            GameObject floor = CreatePolygonalMeshes(floorCoordinates, model.FloorMaterial, "bla", false);
             floor.name = "Floor";
             floor.transform.parent = floorAnchor.transform;
 
@@ -573,7 +574,7 @@ namespace Unibas.DBIS.DynamicModelling
 
 
             // Floor
-            GameObject floorAnchorTest = new GameObject("FloorAnchorTest");
+            GameObject floorAnchorTest = new GameObject("FloorAnchor");
             floorAnchorTest.transform.parent = go.transform;
             GameObject floortest =
                 CreatePolygonalMeshes(floorArray, LoadMaterialByName(model.FloorMaterial), "Floor", false);
@@ -1324,7 +1325,7 @@ namespace Unibas.DBIS.DynamicModelling
             
             Vector3[] wall_1= new Vector3[]{Point_A,Point_Cstar,Point_A_ceiling,Point_Cstar_ceiling};
             Vector3[] wall2 = new Vector3[] {Point_Bstar,Point_B,Point_Bstar_ceiling,Point_B_ceiling};
-            Vector3[] floor = new Vector3[] {Point_A, Point_B, Point_Cstar, Point_Bstar};
+            Vector3[] floor = new Vector3[] {Point_A, Point_B,Point_Bstar, Point_Cstar};
             Vector3[] ceiling_0 = new Vector3[]
                 {Point_B_ceiling,Point_A_ceiling,Point_Bstar_ceiling,  Point_Cstar_ceiling};
             int[] destroy = {wall0before, room1wall};
@@ -1350,7 +1351,7 @@ namespace Unibas.DBIS.DynamicModelling
             
             Vector3[] wall_1= new Vector3[]{Point_A,Point_Bstar,Point_A_ceiling,Point_Bstar_ceiling};
             Vector3[] wall2 = new Vector3[] {Point_Astar,Point_B,Point_Astar_ceiling,Point_B_ceiling};
-            Vector3[] floor = new Vector3[] {Point_A, Point_B,Point_Bstar, Point_Astar};
+            Vector3[] floor = new Vector3[] {Point_B,Point_A, Point_Bstar, Point_Astar};
             Vector3[] ceiling_0 = new Vector3[]
                 {Point_B_ceiling,Point_A_ceiling,Point_Astar_ceiling,Point_Bstar_ceiling};
             int[] destroy = {wall0before, wall1before};

@@ -115,7 +115,9 @@ namespace Unibas.DBIS.VREP.World
         public Vector3 GetEntryPoint()
         {
             //return transform.position + RoomData.entrypoint;
-            return transform.position +GetPositionForTeleportButtons();
+            Vector3 pos = GetPositionForTeleportButtons();
+            var posFin=new Vector3(pos.x,0,pos.y);
+            return transform.position +posFin;
         }
 
         public Vector3 GetPositionForTeleportButtons()
@@ -160,7 +162,6 @@ namespace Unibas.DBIS.VREP.World
             }
             
             pos = (vertices[triangles[iteration*3]] +vertices[triangles[iteration*3+1]] + vertices[triangles[iteration*3+2]])/3f;
-
             return pos;
         }
         
