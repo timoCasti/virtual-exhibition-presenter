@@ -615,7 +615,7 @@ namespace Unibas.DBIS.DynamicModelling
              */
             if (b == false) {
                 turneCeilingFloor = "floor";
-                Debug.Log("Swapped Direction of Wall");
+                Debug.Log("Swapped Direction of Wall  " +model.Position);
                 for (int i = 0; i < model.walls.Length; i++) {
                     Vector3 swap = model.walls[i].wallCoordinates[0];
                     Vector3 swap2 = model.walls[i].wallCoordinates[2];
@@ -1165,9 +1165,10 @@ namespace Unibas.DBIS.DynamicModelling
                 b = true;
             }
         }
-        if (b == true) {
+        if (b == false) {
+            //System.Array.Reverse(room0.walls);
             //turneCeilingFloor = "floor";
-            Debug.Log("Swapped Direction of Wall in Corridor");
+            Debug.Log("Swapped Direction of Wall in Corridor  "+ room0.text);
             for (int i = 0; i < room0.walls.Length; i++) {
                 Vector3 swap = room0.walls[i].wallCoordinates[0];
                 Vector3 swap2 = room0.walls[i].wallCoordinates[2];
@@ -1215,27 +1216,27 @@ namespace Unibas.DBIS.DynamicModelling
                 ceilingvertices2.Add(room1.walls[i].wallCoordinates[2]);
             }
         }
-         var ceilingArray2 = ceilingvertices.ToArray();
+         var ceilingArray2 = ceilingvertices2.ToArray();
         // ceiling for direction
         GameObject floorAnchorTest2 = new GameObject("FloorAnchor");
         //floorAnchorTest.transform.parent = go.transform;
         GameObject floortest2 =
             CreatePolygonalMeshes(ceilingArray2, LoadMaterialByName(room1.ceiling), "Floor", false);
         floortest2.name = "ceilingTestingCorridor";
-        floortest2.transform.parent = floorAnchorTest.transform;
+        floortest2.transform.parent = floorAnchorTest2.transform;
         
-        Mesh m2 = floortest.GetComponentInChildren<MeshFilter>().mesh;
+        Mesh m2 = floortest2.GetComponentInChildren<MeshFilter>().mesh;
         Vector3 point12 = room1.walls[0].wallCoordinates[0];
         Vector3 point22 = room1.walls[0].wallCoordinates[1];
         Vector3 mid2 = (point12 + point22) / 2f;
         GameObject testWall2 = CreateFreeWall(room1.walls[0].wallCoordinates, null);
-        Vector3[] normals2 = testWall.GetComponentInChildren<MeshFilter>().mesh.normals;
+        Vector3[] normals2 = testWall2.GetComponentInChildren<MeshFilter>().mesh.normals;
         Object.Destroy(testWall2);
         Object.Destroy(floortest2);
         Object.Destroy(floorAnchorTest2);
-        Vector3 avg2 = (normals[0] + normals[1]) / 2f;
+        Vector3 avg2 = (normals2[0] + normals2[1]) / 2f;
         Vector3 inOut2 = mid2 + (avg2 * 0.1f);
-        //Debug.Log("Point to test "+inOut);
+//        Debug.Log("Point to test "+inOut);
         int[] tri2 = m2.triangles;
         var vert2 = m2.vertices;
         bool b2 = false;
@@ -1244,16 +1245,18 @@ namespace Unibas.DBIS.DynamicModelling
                 b2 = true;
             }
         }
-        if (b2 == true) {
+        
+        if (b2 == false) {
+            //System.Array.Reverse(room1.walls);
             //turneCeilingFloor = "floor";
-            Debug.Log("Swapped Direction of Wall in Corridor Room2");
+//            Debug.Log("Swapped Direction of Wall in Corridor Room2  "+room1.text);
             for (int i = 0; i < room1.walls.Length; i++) {
-                Vector3 swap = room1.walls[i].wallCoordinates[0];
-                Vector3 swap2 = room1.walls[i].wallCoordinates[2];
+                Vector3 swap12 = room1.walls[i].wallCoordinates[0];
+                Vector3 swap22 = room1.walls[i].wallCoordinates[2];
                 room1.walls[i].wallCoordinates[0] = room1.walls[i].wallCoordinates[1];
                 room1.walls[i].wallCoordinates[2] = room1.walls[i].wallCoordinates[3];
-                room1.walls[i].wallCoordinates[1] = swap;
-                room1.walls[i].wallCoordinates[3] = swap2;
+                room1.walls[i].wallCoordinates[1] = swap12;
+                room1.walls[i].wallCoordinates[3] = swap22;
             }
         }
         
@@ -1312,23 +1315,42 @@ namespace Unibas.DBIS.DynamicModelling
         
         
     // find the second closest point pair (1 of 2 neigbor points)
-        var wall0before = room0wall-1;
-        if (room0wall == 0) {
+    int wall0before = 0;
+    if (!b)
+    {
+        wall0before = (room0wall+1) % room0.walls.Length;
+    }
+    else
+    {
+        wall0before = room0wall - 1;
+        if (room0wall == 0)
+        {
             wall0before = room0.walls.Length - 1;
         }
+    }
 
-        var wall1before = room1wall-1;
-        if (room1wall == 0) {
+    int wall1before = 0;
+    if (!b2)
+    {
+        wall1before = (room1wall+1) %room1.walls.Length;
+    }
+    else
+    {
+        wall1before = room1wall - 1;
+        if (room1wall == 0)
+        {
             wall1before = room1.walls.Length - 1;
         }
-        /*
-         *  Find the best combination, choose 4 of 6 points
-         *     A            A*            A        C*
-         *        \       /
-         *  R0      B    B*    R1 or        B    B*
-         *       /         \
-         *     C            C*            C        A*
-         */
+    }
+
+    /*
+     *  Find the best combination, choose 4 of 6 points
+     *     A            A*            A        C*
+     *        \       /
+     *  R0      B    B*    R1 or not        B    B*
+     *       /         \
+     *     C            C*            C        A*
+     */
         var Point_A = room0.walls[wall0before].wallCoordinates[0]+ room0.position;
         var Point_B = room0.walls[room0wall].wallCoordinates[0]+ room0.position;
         var Point_C = room0.walls[room0wall].wallCoordinates[1]+ room0.position;
@@ -1342,28 +1364,31 @@ namespace Unibas.DBIS.DynamicModelling
         var Point_Bstar_ceiling = room1.walls[room1wall].wallCoordinates[2]+ room1.position;
         var Point_Cstar_ceiling = room1.walls[room1wall].wallCoordinates[3]+ room1.position;
 
+        /*
         var AABB = Vector3.Distance(Point_A, Point_Astar) + Vector3.Distance(Point_B, Point_Bstar);
         var ABBC = Vector3.Distance(Point_A, Point_Bstar) + Vector3.Distance(Point_B, Point_Cstar);
         var BBCC = Vector3.Distance(Point_B, Point_Bstar) + Vector3.Distance(Point_C, Point_Cstar);
         var BACB = Vector3.Distance(Point_B, Point_Astar) + Vector3.Distance(Point_C, Point_Bstar);
-
+*/
         var ACBB = Vector3.Distance(Point_A, Point_Cstar) + Vector3.Distance(Point_B, Point_Bstar);
         var CABB = Vector3.Distance(Point_C, Point_Astar) + Vector3.Distance(Point_B, Point_Bstar);
         var ABBA =Vector3.Distance(Point_A, Point_Bstar) + Vector3.Distance(Point_B, Point_Astar);
         var BCCB =Vector3.Distance(Point_B, Point_Cstar) + Vector3.Distance(Point_C, Point_Bstar);            
 
 
-        
+        /*
         Debug.Log(AABB);
         Debug.Log(ABBC);
         Debug.Log(BBCC);
         Debug.Log(BACB);
+        */
+        /*
         Debug.Log(ACBB);
         Debug.Log(CABB);
         Debug.Log(ABBA);
         Debug.Log(BCCB);
-        
-        
+        */
+        /*
         if (AABB<=ABBC&&AABB<=BBCC&&AABB<=BACB&&AABB<=ACBB&&AABB<=CABB&&AABB<=ABBA&&AABB<=BCCB) 
         {
             Debug.Log("AABB");
@@ -1390,11 +1415,11 @@ namespace Unibas.DBIS.DynamicModelling
            
             Debug.Log("BBCC" );
             
-            Vector3[] wall_1= new Vector3[]{Point_B,Point_Bstar,Point_B_ceiling,Point_Bstar_ceiling};
-            Vector3[] wall2 = new Vector3[] {Point_Cstar,Point_C,Point_Cstar_ceiling,Point_C_ceiling};
+            Vector3[] wall_1= new Vector3[]{Point_Bstar,Point_B,Point_Bstar_ceiling,Point_B_ceiling};
+            Vector3[] wall2 = new Vector3[] {Point_C,Point_Cstar,Point_C_ceiling,Point_Cstar_ceiling};
             Vector3[] floor = new Vector3[] {Point_C,Point_B,Point_Bstar,Point_Cstar};
             Vector3[] ceiling_0 = new Vector3[]
-                {Point_C_ceiling,Point_B_ceiling,Point_Cstar_ceiling,Point_Bstar_ceiling};
+                {Point_B_ceiling,Point_C_ceiling,Point_Bstar_ceiling,Point_Cstar_ceiling};
             int[] destroy = {room0wall, room1wall};
             return (wall_1, wall2, floor, ceiling_0,destroy);
         }
@@ -1408,7 +1433,7 @@ namespace Unibas.DBIS.DynamicModelling
                 {Point_C_ceiling,Point_B_ceiling, Point_Bstar_ceiling, Point_Astar_ceiling };
             int[] destroy = {room0wall, wall1before};
             return (wall_1, wall2, floor, ceiling_0,destroy);
-        }
+        } 
         else if (ACBB<=AABB&&ACBB<=ABBC&&ACBB<=BACB&&ACBB<=BBCC&&ACBB<=CABB&&ACBB<=ABBA&&ACBB<=BCCB) {
             Debug.Log("ACBB");
             
@@ -1466,6 +1491,66 @@ namespace Unibas.DBIS.DynamicModelling
         
             
         }
+        */
+        if (ACBB<=CABB&&ACBB<=ABBA&&ACBB<=BCCB) {
+            Debug.Log("ACBB");
+            
+            Vector3[] wall_1= new Vector3[]{Point_A,Point_Cstar,Point_A_ceiling,Point_Cstar_ceiling};
+            Vector3[] wall2 = new Vector3[] {Point_Bstar,Point_B,Point_Bstar_ceiling,Point_B_ceiling};
+            Vector3[] floor = new Vector3[] {Point_A, Point_B,Point_Bstar, Point_Cstar};
+            Vector3[] ceiling_0 = new Vector3[]
+                {Point_B_ceiling,Point_A_ceiling,Point_Bstar_ceiling,  Point_Cstar_ceiling};
+            int[] destroy = {wall0before, room1wall};
+            return (wall_1, wall2, floor, ceiling_0,destroy);
+            
+            
+        }
+        else if ( CABB <= ACBB && CABB <= ABBA &&
+                 CABB <= BCCB) {
+            Debug.Log("CABB ");
+            
+            Vector3[] wall_1= new Vector3[]{Point_Astar,Point_C,Point_Astar_ceiling,Point_C_ceiling};
+            Vector3[] wall2 = new Vector3[] {Point_B,Point_Bstar,Point_B_ceiling,Point_Bstar_ceiling};
+            Vector3[] floor = new Vector3[] {Point_C,Point_B,Point_Bstar, Point_Astar};
+            Vector3[] ceiling_0 = new Vector3[]
+                {Point_C_ceiling,Point_B_ceiling,  Point_Astar_ceiling,Point_Bstar_ceiling};
+            int[] destroy = {room0wall, wall1before};
+            return (wall_1, wall2, floor, ceiling_0,destroy);
+        }
+        else if ( ABBA < ACBB && ABBA < CABB &&
+                 ABBA < BCCB) {
+            Debug.Log("ABBA");
+            
+            Vector3[] wall_1= new Vector3[]{Point_A,Point_Bstar,Point_A_ceiling,Point_Bstar_ceiling};
+            Vector3[] wall2 = new Vector3[] {Point_Astar,Point_B,Point_Astar_ceiling,Point_B_ceiling};
+            Vector3[] floor = new Vector3[] {Point_B,Point_A, Point_Bstar, Point_Astar};
+            Vector3[] ceiling_0 = new Vector3[]
+                {Point_B_ceiling,Point_A_ceiling,Point_Astar_ceiling,Point_Bstar_ceiling};
+            int[] destroy = {wall0before, wall1before};
+            return (wall_1, wall2, floor, ceiling_0,destroy);
+        }
+        else {
+            //Debug.Log("BCCB");
+            if ( BCCB < ACBB && BCCB < CABB &&
+                BCCB < ABBA) {
+                Debug.Log("BCCB");
+            }
+            Vector3[] wall_1= new Vector3[]{Point_B,Point_Cstar,Point_B_ceiling,Point_Cstar_ceiling};
+            Vector3[] wall2 = new Vector3[] {Point_Bstar,Point_C,Point_Bstar_ceiling,Point_C_ceiling};
+            Vector3[] floor = new Vector3[] {Point_C,Point_B,Point_Cstar, Point_Bstar};
+            
+            Vector3[] ceiling_0 = new Vector3[]
+                {Point_C_ceiling,Point_B_ceiling,Point_Bstar_ceiling,Point_Cstar_ceiling};
+            
+            
+            int[] destroy = {room0wall, room1wall};
+            return (wall_1, wall2, floor, ceiling_0,destroy);
+
+        
+            
+        }
+        
+        
 
         
         
