@@ -1168,7 +1168,7 @@ namespace Unibas.DBIS.DynamicModelling
         if (b == false) {
             //System.Array.Reverse(room0.walls);
             //turneCeilingFloor = "floor";
-            Debug.Log("Swapped Direction of Wall in Corridor  "+ room0.text);
+//            Debug.Log("Swapped Direction of Wall in Corridor  "+ room0.text);
             for (int i = 0; i < room0.walls.Length; i++) {
                 Vector3 swap = room0.walls[i].wallCoordinates[0];
                 Vector3 swap2 = room0.walls[i].wallCoordinates[2];
